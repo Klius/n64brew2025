@@ -191,6 +191,14 @@ void player_enter_grounded_state(struct player* player) {
     player_loop_animation(player, PLAYER_ANIMATION_IDLE, 1.0f);
 }
 
+void player_move_to_vehicle(struct player* player, vehicle_t* vehicle) {
+    struct Vector3 target_direction;
+    player_get_input_direction(player, &target_direction);
+    vehicle_steer(vehicle, &target_direction);
+    vehicle_apply_driver_transform(vehicle, &player->cutscene_actor.transform);
+    player->cutscene_actor.collider.velocity = gZeroVec;
+}
+
 void player_enter_vehicle(struct player* player, entity_id vehicle_id) {
     vehicle_t* vehicle = vehicle_get(vehicle_id);
 
@@ -203,6 +211,7 @@ void player_enter_vehicle(struct player* player, entity_id vehicle_id) {
     player->hover_interaction = 0;
     vehicle_enter(vehicle, ENTITY_ID_PLAYER);
     player->cutscene_actor.collider.collision_layers = 0;
+    player_move_to_vehicle(player, vehicle);
     player_loop_animation(player, PLAYER_ANIMATION_RIDE_BIKE, 1.0f);
 
     if (vehicle_id == ENTITY_ID_MOTORCYLE) {
@@ -413,11 +422,7 @@ void player_update_in_vehicle(struct player* player, struct contact* ground_cont
         return;
     }
 
-    struct Vector3 target_direction;
-    player_get_input_direction(player, &target_direction);
-    vehicle_steer(vehicle, &target_direction);
-    vehicle_apply_driver_transform(vehicle, &player->cutscene_actor.transform);
-    player->cutscene_actor.collider.velocity = gZeroVec;
+    player_move_to_vehicle(player, vehicle);
     player_loop_animation(player, PLAYER_ANIMATION_RIDE_BIKE, 1.0f);
 
     joypad_buttons_t pressed = joypad_get_buttons_pressed(0);

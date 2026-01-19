@@ -18,6 +18,7 @@
 #include "../menu/map_menu.h"
 #include "../player/inventory.h"
 #include "../menu/main_menu.h"
+#include "../cutscene/cutscene_stopwatch.h"
 #include "cutscene_timer.h"
 #include <assert.h>
 
@@ -361,8 +362,16 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
             cutscene_timer_cancel();
             break;
         }
-        case CUTSCENE_SETP_SHOW_MAIN_MENU: {
+        case CUTSCENE_STEP_SHOW_MAIN_MENU: {
             main_menu_show();
+            break;
+        }
+        case CUTSCENE_STEP_STOPWATCH_SHOW: {
+            cutscene_stopwatch_set_active(step->data.stopwatch.value);
+            break;
+        }
+        case CUTSCENE_STEP_STOPWATCH_RUN: {
+            cutscene_stopwatch_set_running(step->data.stopwatch.value);
             break;
         }
     }

@@ -166,3 +166,42 @@ end
 func main_menu_loop()
 
 end
+
+scene race0_progress: i8;
+
+func race0_bot_speak()
+    world_pause;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
+    cam_look_npc ENTITY_ID_SUBJECT;
+
+    ask "Would you like to race?";
+
+    if ask_response() then
+        fade FADE_COLOR_BLACK, 0.5;
+        delay 0.5;
+        is_race0_going = true;
+        race0_progress = 0;
+        is_riding_motorcycle = true;
+        load_scene "rom:/scenes/overworld.scene#race0";
+        return;
+    end
+
+    cam_return;
+    world_unpause;
+end
+
+func race0_entry()
+    if is_race0_going then
+        world_pause;
+        delay 0.5;
+        fade FADE_COLOR_NONE, 0.5;
+
+        delay 0.5;
+        stopwatch_show true;
+
+        delay 3;
+        stopwatch_run true;
+        world_unpause;
+    end
+end

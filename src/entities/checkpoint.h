@@ -12,6 +12,8 @@ struct checkpoint {
     transform_sa_t transform;
     spatial_trigger_t trigger;
     renderable_t renderable;
+    integer_variable race_progress;
+    uint16_t checkpoint_index;
 };
 
 typedef struct checkpoint checkpoint_t;

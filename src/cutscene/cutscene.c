@@ -160,6 +160,10 @@ struct cutscene* cutscene_load(const char* filename) {
                 fread(&step->data.start_timer.time, 4, 1, file);
                 step->data.start_timer.cutscene = string_load(file);
                 break;
+            case CUTSCENE_STEP_STOPWATCH_SHOW:
+            case CUTSCENE_STEP_STOPWATCH_RUN:
+                fread(&step->data.stopwatch.value, 1, 1, file);
+                break;
         }
     }
     

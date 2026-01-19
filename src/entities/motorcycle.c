@@ -279,7 +279,7 @@ void motorcycle_update(void* data) {
     }
 #endif
 
-    if (motorcycle->vehicle.driver) {
+    if (motorcycle->vehicle.driver && update_has_layer(UPDATE_LAYER_WORLD)) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;
 
         float target_speed = motorcycle_target_speed(motorcycle, input);

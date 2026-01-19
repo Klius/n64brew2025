@@ -43,7 +43,9 @@ enum cutscene_step_type {
     CUTSCENE_STEP_START_TIMER,
     CUTSCENE_STEP_CANCEL_TIMER,
     CUTSCENE_STEP_ASK,
-    CUTSCENE_SETP_SHOW_MAIN_MENU,
+    CUTSCENE_STEP_SHOW_MAIN_MENU,
+    CUTSCENE_STEP_STOPWATCH_SHOW,
+    CUTSCENE_STEP_STOPWATCH_RUN,
 };
 
 typedef void (*cutscene_step_callback)(void* data);
@@ -157,6 +159,9 @@ union cutscene_step_data {
         float time;
         char* cutscene;
     } start_timer;
+    struct {
+        uint8_t value;
+    } stopwatch;
 };
 
 struct cutscene_step {

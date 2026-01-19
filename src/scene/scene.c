@@ -192,18 +192,21 @@ void scene_update(void* data) {
     scene_check_despawns(scene);
     scene_check_cutscenes(scene);
 
-    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
-    joypad_inputs_t input = joypad_get_inputs(0);
-
-    if (!input.btn.start) {
-        scene->can_pause = true;
-    }
-
-    if (pressed.start && scene->can_pause) {
-        map_menu_show();
-        scene->can_pause = false;
-    }
+    if (update_has_layer(UPDATE_LAYER_WORLD)) {
+        joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
+        joypad_inputs_t input = joypad_get_inputs(0);
     
+        if (!input.btn.start) {
+            scene->can_pause = true;
+        }
+    
+        if (pressed.start && scene->can_pause) {
+            map_menu_show();
+            scene->can_pause = false;
+        }
+        
+    }
+
     if (scene->music && !audio_is_playing(scene->music_id)) {
         scene->music_id = audio_play_2d(scene->music, 1.0f, 0.0f, 1.0f, 1);
     }

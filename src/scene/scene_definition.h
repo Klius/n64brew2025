@@ -272,6 +272,8 @@ struct checkpoint_definition {
     struct Vector3 position;
     struct Vector2 rotation;
     enum checkpoint_type checkpoint_type;
+    integer_variable race_progress;
+    uint16_t checkpoint_index;
 };
 
 // definition insert point
