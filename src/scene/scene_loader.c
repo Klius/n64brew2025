@@ -17,6 +17,7 @@
 #include "../effects/area_title.h"
 #include "../render/defs.h"
 #include "../audio/audio.h"
+#include "../cutscene/race.h"
 
 #include "../collision/collision_scene.h"
 
@@ -345,7 +346,7 @@ struct scene* scene_load(const char* filename) {
     cutscene_ref_run_then_destroy(&starting_cutscene, 0);
 
     if (scene->overworld) {
-        scene->music = wav64_load("rom:/sounds/music/desert_daydreams.wav64", NULL);
+        scene->music = wav64_load(race_get_state() == RACE_STATE_STARTED ? "rom:/sounds/music/race.wav64" : "rom:/sounds/music/desert_daydreams.wav64", NULL);
         scene->music_id = audio_play_2d(scene->music, 1.0f, 0.0f, 1.0f, 1);
     } else {
         scene->music = NULL;
