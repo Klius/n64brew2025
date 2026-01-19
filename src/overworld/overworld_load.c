@@ -240,11 +240,13 @@ struct overworld* overworld_load(const char* filename) {
     result->lod1.entries = malloc(sizeof(struct overworld_lod1_entry) * result->lod1.entry_count);
 
     for (int i = 0; i < result->lod1.entry_count; i += 1) {
-        fread(&result->lod1.entries[i].x, sizeof(uint16_t), 1, result->file);
-        fread(&result->lod1.entries[i].z, sizeof(uint16_t), 1, result->file);
-        fread(&result->lod1.entries[i].priority, sizeof(uint16_t), 1, result->file);
-        result->lod1.entries[i].child_count = 0;
-        result->lod1.entries[i].lod_scale = 1;
+        struct overworld_lod1_entry* entry = &result->lod1.entries[i];
+
+        fread(&entry->x, sizeof(uint16_t), 1, result->file);
+        fread(&entry->z, sizeof(uint16_t), 1, result->file);
+        fread(&entry->priority, sizeof(uint16_t), 1, result->file);
+        fread(&entry->child_count, 1, 1, result->file);
+        fread(&entry->lod_scale, 1, 1, result->file);
         for (int direction_index = 0; direction_index < LOD0_SORT_DIRECTION_COUNT; direction_index += 1) {
             tmesh_load(&result->lod1.entries[i].meshes[direction_index], result->file);
         }

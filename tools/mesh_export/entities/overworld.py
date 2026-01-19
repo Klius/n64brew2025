@@ -163,12 +163,60 @@ sort_directions = [
 
 SKYBOX_RENDER_OFFSET = 10
 
+def obj_bounding_box(obj: bpy.types.Object) -> tuple[mathutils.Vector, mathutils.Vector]:
+    final_transform = obj.matrix_world
+    transformed = [final_transform @ mathutils.Vector(vtx) for vtx in obj.bound_box]
+
+    bb_min = transformed[0]
+    bb_max = transformed[0]
+
+    for vtx in transformed:
+        bb_min = mathutils.Vector((
+            min(bb_min.x, vtx.x),
+            min(bb_min.y, vtx.y),
+            min(bb_min.z, vtx.z)
+        ))
+        bb_max = mathutils.Vector((
+            max(bb_max.x, vtx.x),
+            max(bb_max.y, vtx.y),
+            max(bb_max.z, vtx.z)
+        ))
+
+    return bb_min, bb_max
+
+def bounding_box_intersection(a: tuple[mathutils.Vector, mathutils.Vector], b: tuple[mathutils.Vector, mathutils.Vector]) -> tuple[mathutils.Vector, mathutils.Vector]:
+    bb_min = mathutils.Vector((
+        max(a[0].x, b[0].x),
+        max(a[0].y, b[0].y),
+        max(a[0].z, b[0].z)
+    ))
+    bb_max = mathutils.Vector((
+        min(a[1].x, b[1].x),
+        min(a[1].y, b[1].y),
+        min(a[1].z, b[1].z)
+    ))
+
+    return bb_min, mathutils.Vector((
+        max(bb_min.x, bb_max.x),
+        max(bb_min.y, bb_max.y),
+        max(bb_min.z, bb_max.z)
+    ))
+
+def bounding_box_volume(a: tuple[mathutils.Vector, mathutils.Vector]):
+    return (a[1].x - a[0].x) * (a[1].y - a[0].y) * (a[1].z - a[0].z)
+
 class LodTile():
     def __init__(self, obj: bpy.types.Object, level: int):
         self.obj: bpy.types.Object = obj
         self.level: int = level
-
         self.children: list = []
+
+        bb_min, bb_max = obj_bounding_box(self.obj)
+
+        if bb_min.z + 1 > bb_max.z:
+            bb_max.z = bb_min.z + 1
+
+        self.bb: tuple[mathutils.Vector, mathutils.Vector] = (bb_min, bb_max)
 
     def priority(self):
         digit_prefix_length = 0
@@ -179,12 +227,36 @@ class LodTile():
         result = int(self.obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
 
         if not self.is_skybox():
-            result += SKYBOX_RENDER_OFFSET
+            result += 100 - self.level * SKYBOX_RENDER_OFFSET
 
         return result
     
     def is_skybox(self):
         return 'skybox' in self.obj.name
+    
+    def child_count(self) -> int:
+        result = len(self.children)
+
+        for child in self.children:
+            result += child.child_count()
+
+        return result
+    
+    def does_contain(self, child) -> bool:
+        intersection = bounding_box_intersection(self.bb, child.bb)
+
+        return bounding_box_volume(intersection) > bounding_box_volume(child.bb) * 0.5
+    
+    def flatten_into(self, result: list):
+        result.append(self)
+        for child in self.children:
+            child.flatten_into(result)
+
+    def debug_print(self, indent = ''):
+        print(indent + self.obj.name + ' pri=' + str(self.priority()))
+
+        for child in self.children:
+            child.debug_print('    ' + indent)
     
 def separate_lods(lod_1_objects: list[LodTile]) -> list[list[LodTile]]:
     result: list[list[LodTile]] = []
@@ -202,6 +274,23 @@ def separate_lods(lod_1_objects: list[LodTile]) -> list[list[LodTile]]:
 
     return result
 
+def map_children(child_lod: list[LodTile], parent_lod: list[LodTile]) -> list[LodTile]:
+    unused: list[LodTile] = []
+    
+    for child in child_lod:
+        use_parent = None
+        for parent in parent_lod:
+            if parent.does_contain(child):
+                use_parent = parent
+                break
+
+        if use_parent:
+            use_parent.children.append(child)
+        else:
+            unused.append(child)
+
+    return unused
+
 def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: export_settings.ExportSettings, base_transform: mathutils.Matrix, file):
     lod_1_start_time = time.perf_counter()
 
@@ -212,19 +301,30 @@ def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: exp
     scaled_transform = mathutils.Matrix.Scale(1 / subdivisions, 4) @ base_transform
     center_scale = settings.world_scale * 0.5
 
-    all_meshes: list[tuple[mesh.mesh_data, int, int, int]] = []
-
     root_objects = []
 
     grouped_objects: list[list[LodTile]] = separate_lods(lod_1_objects)
 
     if len(grouped_objects) > 0:
         root_objects += grouped_objects[0]
+    if len(grouped_objects) > 1:
+        root_objects += grouped_objects[-1]
 
-        if len(grouped_objects) > 1:
-            root_objects += grouped_objects[-1]
 
-    for tile in root_objects:
+    for i in range(1, len(grouped_objects) - 1):
+        root_objects += map_children(grouped_objects[i], grouped_objects[i + 1])
+
+    for root in root_objects:
+        root.debug_print()
+
+    ordered_objects: list[LodTile] = []
+
+    for root in root_objects:
+        root.flatten_into(ordered_objects)
+
+    file.write(struct.pack('>B', len(ordered_objects)))
+
+    for tile in ordered_objects:
         mesh_list = mesh.mesh_list(scaled_transform)
         mesh_list.append(tile.obj)
 
@@ -232,18 +332,17 @@ def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: exp
 
         priority = tile.priority()
 
-        all_meshes += map(lambda mesh: (mesh, int(center.x), int(center.z), priority), mesh_list.determine_mesh_data(None))
+        mesh_data = mesh_list.determine_mesh_data(None)
 
-    file.write(struct.pack('>B', len(all_meshes)))
+        file.write(struct.pack('>hhHBB', int(center.x), int(center.z), priority, tile.child_count(), 2 ** (tile.level - 1)))
 
-    for single_mesh in all_meshes:
-        file.write(struct.pack('>hhH', single_mesh[1], single_mesh[2], single_mesh[3]))
-        lod_1_settings.default_material_name = material_extract.material_romname(single_mesh[0].mat)
-        lod_1_settings.default_material = material_extract.load_material_with_name(single_mesh[0].mat)
+        if len(mesh_data) > 0:
+            lod_1_settings.default_material_name = material_extract.material_romname(mesh_data[0].mat)
+            lod_1_settings.default_material = material_extract.load_material_with_name(mesh_data[0].mat)
 
         for dir in sort_directions:
             lod_1_settings.sort_direction = dir
-            tiny3d_mesh_writer.write_mesh([single_mesh[0]], None, [], lod_1_settings, file)
+            tiny3d_mesh_writer.write_mesh(mesh_data, None, [], lod_1_settings, file)
 
     print(f"lod_1 creation time {time.perf_counter() - lod_1_start_time}")
 

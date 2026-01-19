@@ -265,13 +265,13 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
 
         int distance = (int)delta.x * (int)delta.x + (int)delta.y * (int)delta.y;
 
-        // if (curr->lod_scale > 1 && distance > LEVEL2_MIN_DISTANCE * LEVEL2_MIN_DISTANCE * curr->lod_scale * curr->lod_scale) {
-        //     continue;
-        // } else {
-        //     should_skip_children = true;
-        // }
+        if (curr->lod_scale > 1 && distance < LEVEL2_MIN_DISTANCE * LEVEL2_MIN_DISTANCE * curr->lod_scale * curr->lod_scale) {
+            continue;
+        } else {
+            should_skip_children = true;
+        }
 
-        entry->priority = (distance >> 2) - ((uint32_t)(curr->priority) << 24);
+        entry->priority = (distance >> 2) + ((uint32_t)(100 - curr->priority) << 24);
         
         entry->mesh = &curr->meshes[overworld_lod_1_direction_index(delta.x, delta.y)];
         entry += 1;
