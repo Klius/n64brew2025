@@ -117,7 +117,7 @@ void render_scene_render_point(void* data, struct render_batch* batch) {
 
         renderable->point_render.particle_data.colorA[3] = next;
         renderable->point_render.particle_data.colorB[3] = next;
-        data_cache_hit_writeback_invalidate(&renderable->point_render.particle_data, sizeof(TPXParticleS8));
+        data_cache_hit_writeback_invalidate(&renderable->point_render.particle_data, sizeof(TPXParticle));
     }
 
     render_batch_add_particles(batch, renderable->point_render.material, &renderable->point_render.particles, mtxfp);

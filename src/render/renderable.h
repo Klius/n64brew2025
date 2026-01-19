@@ -17,7 +17,7 @@ struct renderable {
             struct tmesh** attachments;
         } mesh_render;
         struct {
-            TPXParticleS8 particle_data;
+            TPXParticle particle_data;
             render_batch_particles_t particles;
             struct material* material;
             uint8_t frame_max_x;

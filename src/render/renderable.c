@@ -35,7 +35,7 @@ void renderable_init_point(struct renderable* renderable, vector3_t* position, f
     renderable->point_render.frame_max_x = 0;
     renderable->point_render.frame_step = 0;
 
-    renderable->point_render.particle_data = (TPXParticleS8){
+    renderable->point_render.particle_data = (TPXParticle){
         .sizeA = 127,
         .sizeB = 127,
         .colorA = {255, 255, 255, 0},
