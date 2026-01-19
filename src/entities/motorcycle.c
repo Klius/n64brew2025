@@ -178,7 +178,7 @@ float motorcycle_hover_height(motorcycle_t* motorcycle, float speed) {
 }
 
 float motorcycle_target_speed(motorcycle_t* motorcycle, joypad_inputs_t input) {
-    if (input.btn.a) {
+    if (input.btn.a || motorcycle->vehicle.is_boosting) {
         return motorcycle->boost_timer > 0.0f ? BOOST_SPEED : DRIVE_SPEED;
     } else if (input.btn.b) {
         return 0.0f;
@@ -256,13 +256,13 @@ void motorcycle_update(void* data) {
     vector2ToLookDir(&motorcycle->transform.rotation, &forward);
 
     joypad_inputs_t input = joypad_get_inputs(0);
-    
+
+    motorcycle->vehicle.is_boosting = motorcycle->vehicle.hit_boost_pad;
+
     if (motorcycle->vehicle.hit_boost_pad) {
         motorcycle->boost_timer = BOOST_TIME;
         motorcycle->vehicle.hit_boost_pad = false;
     }
-
-    motorcycle->vehicle.is_boosting = false;
 
     if (motorcycle->boost_timer > 0.0f) {
         motorcycle->boost_timer -= fixed_time_step;

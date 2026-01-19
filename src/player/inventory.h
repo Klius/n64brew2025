@@ -15,4 +15,6 @@ void inventory_set_has_item(enum inventory_item_type item, bool value);
 
 int inventory_get_count(enum inventory_item_type item);
 
+boolean_variable inventory_get_item_ref(enum inventory_item_type item);
+
 #endif

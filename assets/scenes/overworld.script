@@ -167,7 +167,7 @@ func main_menu_loop()
 
 end
 
-scene race0_progress: i8;
+scene race0_scrapbot: entity_id;
 
 func race0_bot_speak()
     world_pause;
@@ -178,12 +178,7 @@ func race0_bot_speak()
     ask "Would you like to race?";
 
     if ask_response() then
-        fade FADE_COLOR_BLACK, 0.5;
-        delay 0.5;
-        is_race0_going = true;
-        race0_progress = 0;
-        is_riding_motorcycle = true;
-        load_scene "rom:/scenes/overworld.scene#race0";
+        race_start "rom:/scenes/overworld.scene#race0";
         return;
     end
 
@@ -192,7 +187,7 @@ func race0_bot_speak()
 end
 
 func race0_entry()
-    if is_race0_going then
+    if race_get_state() == RACE_STATE_STARTED then
         world_pause;
         delay 0.5;
         fade FADE_COLOR_NONE, 0.5;
@@ -202,6 +197,31 @@ func race0_entry()
 
         delay 3;
         stopwatch_run true;
-        world_unpause;
+    elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        world_pause;
+        interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race0_scrapbot;
+        interact_with_npc INTERACTION_LOOK, race0_scrapbot, ENTITY_ID_PLAYER;
+        cam_look_npc race0_scrapbot;
+
+        if race_get_state() == RACE_STATE_MISS_CHECKPOINT then
+            say "You need to cross each checkpoint in order.";
+        else
+            say "You abandoned the race.";
+        end
+        
+        ask "Would you like to try again?";
+            
+        if ask_response() then
+            race_start "rom:/scenes/overworld.scene#race0";
+            return;
+        end
+
+        cam_return;
+    elif race_get_state() == RACE_STATE_FINISH then
+        say "You did it!";
+        
+        cam_return;
     end
+    
+    world_unpause;
 end

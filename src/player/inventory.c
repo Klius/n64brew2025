@@ -40,3 +40,19 @@ int inventory_get_count(enum inventory_item_type item) {
 
     return evaluation_context_load(savefile_get_globals(GLOBAL_ACCESS_MODE_READ), global->data_type, global->word_offset);
 }
+
+boolean_variable inventory_get_item_ref(enum inventory_item_type item) {
+    if (item >= ITEM_TYPE_COUNT || item == ITEM_TYPE_NONE) {
+        return VARIABLE_DISCONNECTED;
+    }
+
+    struct global_location* global = &inventory_item_locations[item];
+
+    if (!global->data_type) {
+        debugf("item %d has no mapping\n", item);
+    }
+
+    assert(global->data_type == DATA_TYPE_BOOL);
+
+    return global->word_offset;
+}

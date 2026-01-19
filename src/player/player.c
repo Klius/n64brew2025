@@ -18,6 +18,7 @@
 #include "../menu/map_menu.h"
 #include "../scene/scene.h"
 #include "../config.h"
+#include "../cutscene/race.h"
 #include "inventory.h"
 
 #include "../effects/fade_effect.h"
@@ -228,6 +229,7 @@ void player_exit_vehicle(struct player* player) {
     player->cutscene_actor.collider.collision_layers = PLAYER_LAYERS;
 
     player_enter_grounded_state(player);
+    race_trigger_end(RACE_STATE_ABANDON);
     
     if (vehicle) {
         vehicle_apply_exit_transform(vehicle, &player->cutscene_actor.transform);

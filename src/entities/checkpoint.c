@@ -5,6 +5,7 @@
 #include "../cutscene/expression_evaluate.h"
 #include "../time/time.h"
 #include "../audio/audio.h"
+#include "../cutscene/race.h"
 
 struct checkpoint_assets
 {
@@ -17,7 +18,7 @@ static spatial_trigger_type_t trigger_type = {
     .type = SPATIAL_TRIGGER_BOX,
     .data = {
         .box = {
-            .half_size = {5.0f, 3.0f, 0.5f},
+            .half_size = {5.0f, 3.0f, 1.5f},
         }
     },
     .center = {0.0f, 2.0f, 0.0f},
@@ -31,10 +32,12 @@ static const char* checkpoint_meshes[CHECKPOINT_TYPE_COUNT] = {
 void checkpoint_update(void* data) {
     checkpoint_t* checkpoint = (checkpoint_t*)data;
 
+    if (race_get_state() != RACE_STATE_STARTED) {
+        return;
+    }
+
     if (contacts_are_touching(checkpoint->trigger.active_contacts, ENTITY_ID_MOTORCYLE)) {
-        int last_checkpoint = expression_get_integer(checkpoint->race_progress);
-        if (last_checkpoint + 1 == checkpoint->checkpoint_index) {
-            expression_set_integer(checkpoint->race_progress, last_checkpoint + 1);
+        if (race_trigger_checkpoint(checkpoint->checkpoint_index, checkpoint->is_finish)) {
             audio_play_2d(&assets.checkpoint_sound, 1.0f, 0.0f, 1.0f, 1);
         }
     }
@@ -50,8 +53,8 @@ void checkpoint_init(checkpoint_t* checkpoint, struct checkpoint_definition* def
     render_scene_add_renderable(&checkpoint->renderable, 7.0f);
     update_add(checkpoint, checkpoint_update, UPDATE_PRIORITY_EFFECTS, UPDATE_LAYER_WORLD);
 
-    checkpoint->race_progress = definition->race_progress;
     checkpoint->checkpoint_index = definition->checkpoint_index;
+    checkpoint->is_finish = definition->checkpoint_type == CHECKPOINT_FINISH;
 }
 
 void checkpoint_destroy(checkpoint_t* checkpoint, struct checkpoint_definition* definition) {
@@ -63,7 +66,7 @@ void checkpoint_destroy(checkpoint_t* checkpoint, struct checkpoint_definition* 
 }
 
 void checkpoint_common_init() {
-    wav64_open(&assets.checkpoint_sound, "rom:/sounds/race/checkpoint.wav");
+    wav64_open(&assets.checkpoint_sound, "rom:/sounds/race/checkpoint.wav64");
 }
 
 void checkpoint_common_destroy() {

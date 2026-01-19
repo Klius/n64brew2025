@@ -3,7 +3,8 @@
 #include <stddef.h>
 #include "../collision/collision_scene.h"
 #include "../menu/dialog_box.h"
-#include "../cutscene/cutscene_stopwatch.h"
+#include "cutscene_stopwatch.h"
+#include "race.h"
 
 int expression_are_touching(struct evaluation_context* context, int arg_count) {
     if (arg_count != 2) {
@@ -54,10 +55,17 @@ int expression_stopwatch_time(struct evaluation_context* context, int arg_count)
     return 1;
 }
 
+int expression_race_get_state(struct evaluation_context* context, int arg_count) {
+    evaluation_context_popn(context, NULL, arg_count);
+    evaluation_context_push(context, race_get_state());
+    return 1;
+}
+
 static expression_built_in_fn fn_array[EXPRESSION_BUILT_IN_COUNT] = {
     [EXPRESSION_BUILT_IN_ARE_TOUCHING] = expression_are_touching,
     [EXPRESSION_BUILT_ASK_RESPONSE] = expression_ask_response,
     [EXPRESSION_BUILT_STOPWATCH_TIME] = expression_stopwatch_time,
+    [EXPRESSION_BUILT_RACE_GET_STATE] = expression_race_get_state,
 };
 
 expression_built_in_fn expression_lookup_fn(enum expression_built_in_type type) {

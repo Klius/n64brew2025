@@ -21,6 +21,7 @@
 #include "../cutscene/cutscene_stopwatch.h"
 #include "cutscene_timer.h"
 #include <assert.h>
+#include "../cutscene/race.h"
 
 #define MAX_QUEUED_CUTSCENES   4
 #define MAX_CUTSCENE_CALL_DEPTH 6
@@ -374,6 +375,13 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
             cutscene_stopwatch_set_running(step->data.stopwatch.value);
             break;
         }
+        case CUTSCENE_STEP_START_RACE: {
+            race_start(step->data.race_start.on_finish);
+            break;
+        }
+        case CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE:
+            camera_follow_vehicle(&current_scene->camera_controller);
+            break;
     }
 }
 

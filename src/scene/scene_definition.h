@@ -93,6 +93,14 @@ enum inventory_item_type {
     ITEM_TYPE_COUNT,
 };
 
+enum race_state {
+    RACE_STATE_NOT_STARTED,
+    RACE_STATE_STARTED,
+    RACE_STATE_FINISH,
+    RACE_STATE_MISS_CHECKPOINT,
+    RACE_STATE_ABANDON,
+};
+
 #define ROOM_NONE 0xFFFF
 
 typedef uint16_t room_id;
@@ -272,7 +280,6 @@ struct checkpoint_definition {
     struct Vector3 position;
     struct Vector2 rotation;
     enum checkpoint_type checkpoint_type;
-    integer_variable race_progress;
     uint16_t checkpoint_index;
 };
 

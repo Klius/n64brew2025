@@ -46,6 +46,8 @@ enum cutscene_step_type {
     CUTSCENE_STEP_SHOW_MAIN_MENU,
     CUTSCENE_STEP_STOPWATCH_SHOW,
     CUTSCENE_STEP_STOPWATCH_RUN,
+    CUTSCENE_STEP_START_RACE,
+    CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE,
 };
 
 typedef void (*cutscene_step_callback)(void* data);
@@ -162,6 +164,9 @@ union cutscene_step_data {
     struct {
         uint8_t value;
     } stopwatch;
+    struct {
+        char* on_finish;
+    } race_start;
 };
 
 struct cutscene_step {
@@ -210,6 +215,7 @@ void cutscene_builder_npc_wait(
 );
 void cutscene_builder_camera_wait(struct cutscene_builder* builder);
 void cutscene_builder_camera_follow(struct cutscene_builder* builder);
+void cutscene_builder_camera_follow_vehicle(struct cutscene_builder* builder);
 void cutscene_builder_camera_return(struct cutscene_builder* builder);
 void cutscene_builder_camera_look_at(struct cutscene_builder* builder, entity_id target);
 void cutscene_builder_camera_move_to(struct cutscene_builder* builder, struct Vector3* position, camera_move_to_args_t* args);

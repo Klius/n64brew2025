@@ -156,7 +156,7 @@ void repair_part_interact(struct interactable* interactable, entity_id from) {
 
 #define CLOSE_BEEP_INTERVAL     0.2f
 #define FAR_BEEP_INTERVAL       1.5f
-#define MAX_BEEP_DISTANCE       70.0f
+#define MAX_BEEP_DISTANCE       90.0f
 
 #define CLOSE_FREQ              1.3f
 #define FAR_FREQ                0.7f
@@ -164,7 +164,15 @@ void repair_part_interact(struct interactable* interactable, entity_id from) {
 void repair_part_pickup_update(void* data) {
     repair_part_pickup_t* part = (repair_part_pickup_t*)data;
     float distance = sqrtf(vector3DistSqrd(&part->transform.position, player_get_position(&current_scene->player)));
+    
+    if (distance > MAX_BEEP_DISTANCE) {
+        part->beep_timer = FAR_BEEP_INTERVAL;
+        return;
+    }
+
     float lerp = distance * (1.0f / MAX_BEEP_DISTANCE);
+
+
     float beep_threshold = mathfLerp(CLOSE_BEEP_INTERVAL, FAR_BEEP_INTERVAL, lerp);
 
     if (part->beep_timer >= beep_threshold) {

@@ -2,6 +2,7 @@
 EXPRESSION_BUILT_IN_ARE_TOUCHING = 0
 EXPRESSION_BUILT_ASK_RESPONSE = 1
 EXPRESSION_BUILT_STOPWATCH_TIME = 2
+EXPRESSION_BUILT_RACE_GET_STATE = 3
 
 class FunctionParameter():
     def __init__(self, name: str, type: str):
@@ -25,6 +26,7 @@ _built_in_functions = {
     "are_touching": BuiltInFunction(EXPRESSION_BUILT_IN_ARE_TOUCHING, "int", [FunctionParameter("a", "int"), FunctionParameter("b", "int")]),
     "ask_response": BuiltInFunction(EXPRESSION_BUILT_ASK_RESPONSE, "int", []),
     "stopwatch_time": BuiltInFunction(EXPRESSION_BUILT_STOPWATCH_TIME, "float", []),
+    "race_get_state": BuiltInFunction(EXPRESSION_BUILT_RACE_GET_STATE, "int", []),
 }
 
 def lookup(name: str) -> BuiltInFunction | None:

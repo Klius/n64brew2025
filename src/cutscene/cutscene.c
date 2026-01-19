@@ -164,6 +164,9 @@ struct cutscene* cutscene_load(const char* filename) {
             case CUTSCENE_STEP_STOPWATCH_RUN:
                 fread(&step->data.stopwatch.value, 1, 1, file);
                 break;
+            case CUTSCENE_STEP_START_RACE:
+                step->data.race_start.on_finish = string_load(file);
+                break;
         }
     }
     
@@ -226,6 +229,9 @@ void cutscene_destroy(struct cutscene* cutscene) {
                 break;
             case CUTSCENE_STEP_START_TIMER:
                 free(step->data.start_timer.cutscene);
+                break;
+            case CUTSCENE_STEP_START_RACE:
+                free(step->data.race_start.on_finish);
                 break;
             default:
                 break;
@@ -430,6 +436,14 @@ void cutscene_builder_camera_follow(struct cutscene_builder* builder) {
     
     *step = (struct cutscene_step){
         .type = CUTSCENE_STEP_CAMERA_FOLLOW,
+    };
+}
+
+void cutscene_builder_camera_follow_vehicle(struct cutscene_builder* builder) {
+    struct cutscene_step* step = cutscene_builder_next_step(builder);
+    
+    *step = (struct cutscene_step){
+        .type = CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE,
     };
 }
 
