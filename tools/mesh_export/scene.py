@@ -307,8 +307,8 @@ def check_for_overworld(base_transform: mathutils.Matrix, overworld_filename: st
     lod_1_objects = []
 
     if lod_1_collection:
-        lod_1_objects = list(lod_1_collection.all_objects)
-
+        for obj in lod_1_collection.all_objects:
+            lod_1_objects.append(entities.overworld.LodTile(obj, 1))
     subdivisions = 8
     
     if 'subdivisions' in collection:

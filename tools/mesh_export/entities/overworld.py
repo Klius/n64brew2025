@@ -161,7 +161,30 @@ sort_directions = [
     mathutils.Vector((0, 0, -1)),
 ]
 
-def generate_lod0(lod_1_objects: list[bpy.types.Object], subdivisions: int, settings: export_settings.ExportSettings, base_transform: mathutils.Matrix, file):
+SKYBOX_RENDER_OFFSET = 10
+
+class LodTile():
+    def __init__(self, obj: bpy.types.Object, level: int):
+        self.obj: bpy.types.Object = obj
+        self.level: int = level
+
+    def priority(self):
+        digit_prefix_length = 0
+
+        while digit_prefix_length < len(self.obj.name) and self.obj.name[digit_prefix_length].isdigit():
+            digit_prefix_length += 1
+
+        result = int(self.obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
+
+        if not self.is_skybox():
+            result += SKYBOX_RENDER_OFFSET
+
+        return result
+    
+    def is_skybox(self):
+        return 'sybox' in self.obj.name
+
+def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: export_settings.ExportSettings, base_transform: mathutils.Matrix, file):
     lod_1_start_time = time.perf_counter()
 
     lod_1_settings = settings.copy()
@@ -173,21 +196,13 @@ def generate_lod0(lod_1_objects: list[bpy.types.Object], subdivisions: int, sett
 
     all_meshes: list[tuple[mesh.mesh_data, int, int, int]] = []
 
-    for obj in lod_1_objects:
+    for tile in lod_1_objects:
         mesh_list = mesh.mesh_list(scaled_transform)
-        mesh_list.append(obj)
+        mesh_list.append(tile.obj)
 
-        center = (scaled_transform @ obj.matrix_world.translation) * center_scale
+        center = (scaled_transform @ tile.obj.matrix_world.translation) * center_scale
 
-        digit_prefix_length = 0
-
-        while digit_prefix_length < len(obj.name) and obj.name[digit_prefix_length].isdigit():
-            digit_prefix_length += 1
-
-        priority = int(obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
-
-        if not 'skybox' in obj.name:
-            priority += 100
+        priority = tile.priority()
 
         all_meshes += map(lambda mesh: (mesh, int(center.x), int(center.z), priority), mesh_list.determine_mesh_data(None))
 
@@ -211,7 +226,7 @@ class OverworldInputData():
 def generate_overworld(
         overworld_filename: str, 
         mesh_list: mesh.mesh_list, 
-        lod_1_objects: list[bpy.types.Object], 
+        lod_1_objects: list[LodTile], 
         collider: mesh_collider.MeshCollider, 
         detail_list: list[OverworldDetail], 
         entity_list: list[entities.ObjectEntry],
