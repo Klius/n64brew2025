@@ -166,6 +166,7 @@ union cutscene_step_data {
     } stopwatch;
     struct {
         char* on_finish;
+        int lap_count;
     } race_start;
 };
 

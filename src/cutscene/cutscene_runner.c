@@ -376,7 +376,7 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
             break;
         }
         case CUTSCENE_STEP_START_RACE: {
-            race_start(step->data.race_start.on_finish);
+            race_start(step->data.race_start.on_finish, step->data.race_start.lap_count);
             break;
         }
         case CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE:

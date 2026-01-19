@@ -12,10 +12,8 @@ struct cutscene_stopwatch {
 
 static struct cutscene_stopwatch timer;
 
-void cutscene_stopwatch_render(void* data) {
-    char time[20];
-
-    int sub_seconds = (int)ceilf(timer.current_time * 100.0f);
+int cutscene_stopwatch_format_time(char* into, float duration) {
+    int sub_seconds = (int)ceilf(duration * 100.0f);
     
     int seconds = sub_seconds / 100;
     sub_seconds = sub_seconds % 100;
@@ -23,7 +21,12 @@ void cutscene_stopwatch_render(void* data) {
     int minutes = seconds / 60;
     seconds = seconds % 60;
 
-    sprintf(time, "%02d:%02d.%02d", minutes, seconds, sub_seconds);
+    return sprintf(into, "%02d:%02d.%02d", minutes, seconds, sub_seconds);
+}
+
+void cutscene_stopwatch_render(void* data) {
+    char time[20];
+    int len = cutscene_stopwatch_format_time(time, timer.current_time);
     
     rdpq_text_printn(&(rdpq_textparms_t){
             // .line_spacing = -3,
@@ -36,7 +39,7 @@ void cutscene_stopwatch_render(void* data) {
         FONT_DIALOG, 
         30, 30, 
         time,
-        strlen(time)
+        len
     );
 }
 
@@ -51,7 +54,9 @@ void cutscene_stopwatch_set_running(bool value) {
 }
 
 void cutscene_stopwatch_set_active(bool value) {
-    timer.current_time = 0.0f;
+    if (value) {
+        timer.current_time = 0.0f;
+    }
     timer.is_running = false;
 
     if (timer.is_active == value) {
@@ -73,4 +78,8 @@ void cutscene_stopwatch_set_active(bool value) {
 
 float cutscene_last_stopwatch_time() {
     return timer.current_time;
+}
+
+void cutscene_stopwatch_set(float value) {
+    timer.current_time = value;
 }

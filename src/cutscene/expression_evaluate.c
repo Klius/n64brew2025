@@ -175,6 +175,16 @@ void expression_evaluate(struct evaluation_context* context, struct expression* 
                     -evaluation_context_pop(context)
                 );
                 break;
+            case EXPRESSION_TYPE_GTF:
+                evaluation_context_push(
+                    context,
+                    evaluation_context_pop(context) > evaluation_context_pop(context)
+                );
+            case EXPRESSION_TYPE_GTEF:
+                evaluation_context_push(
+                    context,
+                    evaluation_context_pop_float(context) > evaluation_context_pop_float(context)
+                );
             case EXPRESSION_TYPE_BUILT_IN_FN:
                 // this avoids alignment issues
                 memcpy(&data, current, sizeof(union expression_data));

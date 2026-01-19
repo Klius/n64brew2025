@@ -5,6 +5,7 @@
 #include "menu_rendering.h"
 #include "../time/time.h"
 #include "../util/text.h"
+#include "../cutscene/cutscene_stopwatch.h"
 #include <string.h>
 
 #define CHARACTERS_PER_SECOND   45.0f
@@ -161,6 +162,10 @@ void dialog_box_format_string(char* into, char* format, int* args) {
                 while (*as_str) *into++ = *as_str++;
             } else if (*format == 'd') {
                 into += sprintf(into, "%d", arg);
+            } else if (*format == 'f') {
+                into += sprintf(into, "%f", *(float*)&arg);
+            } else if (*format == 't') {
+                into += cutscene_stopwatch_format_time(into, *(float*)&arg);
             } else if (*format == '%') {
                 *into++ = '%';
             }

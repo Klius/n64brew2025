@@ -6,10 +6,12 @@
 #include "cutscene_runner.h"
 #include "../player/inventory.h"
 #include "expression_evaluate.h"
+#include "cutscene_stopwatch.h"
 
 static char g_completion_script[64];
 static int race_progress;
 static enum race_state current_state;
+static int laps_left = 0;
 
 static const char* completion_messages[] = {
     [RACE_STATE_NOT_STARTED] = "",
@@ -19,9 +21,10 @@ static const char* completion_messages[] = {
     [RACE_STATE_ABANDON] = "Race abandoned",
 };
 
-void race_start(const char* completion_script) {
+void race_start(const char* completion_script, int lap_count) {
     race_progress = 0;
     current_state = RACE_STATE_STARTED;
+    laps_left = lap_count;
     strcpy(g_completion_script, completion_script);
 
     cutscene_builder_t cutscene;
@@ -42,6 +45,8 @@ void race_trigger_end(enum race_state state) {
     if (current_state != RACE_STATE_STARTED) {
         return;
     }
+    
+    cutscene_stopwatch_set_running(false);
 
     current_state = state;
     cutscene_builder_t cutscene;
@@ -67,7 +72,13 @@ bool race_trigger_checkpoint(int index, bool is_finish) {
         race_progress = index;
 
         if (is_finish) {
-            race_trigger_end(RACE_STATE_FINISH);
+            laps_left -= 1;
+
+            if (laps_left) {
+                race_progress = 0;
+            } else {
+                race_trigger_end(RACE_STATE_FINISH);
+            }
         }
 
         return true;

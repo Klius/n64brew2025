@@ -175,10 +175,24 @@ func race0_bot_speak()
     interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
     cam_look_npc ENTITY_ID_SUBJECT;
 
+    if not has_tablet_battery then
+        say "
+            Welcome.
+
+            I am RB0. If you complete 3 laps on my track in under {race0_record:duration} I will give you a nuclear battery.
+        ";
+    else
+        say "
+            Welcome back. 
+        
+            I cannot give you another battery but you can attempt to beat your time of {race0_record:duration}
+        ";
+    end     
+
     ask "Would you like to race?";
 
     if ask_response() then
-        race_start "rom:/scenes/overworld.scene#race0";
+        race_start "rom:/scenes/overworld.scene#race0", 3;
         return;
     end
 
@@ -202,6 +216,7 @@ func race0_entry()
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race0_scrapbot;
         interact_with_npc INTERACTION_LOOK, race0_scrapbot, ENTITY_ID_PLAYER;
         cam_look_npc race0_scrapbot;
+        stopwatch_show false;
 
         if race_get_state() == RACE_STATE_MISS_CHECKPOINT then
             say "You need to cross each checkpoint in order.";
@@ -212,13 +227,49 @@ func race0_entry()
         ask "Would you like to try again?";
             
         if ask_response() then
-            race_start "rom:/scenes/overworld.scene#race0";
+            race_start "rom:/scenes/overworld.scene#race0", 3;
             return;
         end
 
         cam_return;
     elif race_get_state() == RACE_STATE_FINISH then
-        say "You did it!";
+        stopwatch_show false;
+
+
+        if stopwatch_time() <= race0_record then
+            race0_record = stopwatch_time();
+
+            if not has_tablet_battery then
+                say "
+                    You did it!
+
+                    Your time was {stopwatch_time():duration}
+
+                    As promised here is your nuclear battery
+                ";
+
+                world_unpause;
+                cam_return;
+                has_tablet_battery = true;
+                show_item ITEM_TABLET_BATTERY;
+                return;
+            else
+                say "Good work, you set a new track record of {stopwatch_time():duration}";
+            end
+        else
+            say "You didn't complete the race in under {race0_record:duration}.";
+            
+            ask "Would you like to try again?";
+                
+            if ask_response() then
+                race_start "rom:/scenes/overworld.scene#race0", 3;
+                return;
+            end
+        end
+
+        if stopwatch_time() < race0_record then
+            race0_record = stopwatch_time();
+        end
         
         cam_return;
     end

@@ -94,7 +94,7 @@ _step_args = {
     "show_main_menu": [],
     "stopwatch_show": [ParameterType("bool", True)],
     "stopwatch_run": [ParameterType("bool", True)],
-    "race_start": [ParameterType("str", True)],
+    "race_start": [ParameterType("str", True), ParameterType("int", True)],
 }
 
 _step_ids = {
@@ -195,13 +195,20 @@ def build_template_string(string: parser.String, context: variable_layout.Variab
         parts.append(string.contents[idx])
 
         type_checker = expresion_generator.TypeChecker(context)
-        argument_type = type_checker.determine_type(replacement)
+        argument_type = type_checker.determine_type(replacement.expr)
 
-        if argument_type == 'str':
+        if replacement.format:
+            if replacement.format.value == 'duration':
+                if argument_type != 'float':
+                    raise Exception(replacement.expr.at.format_message(f"Expected float got ${argument_type}"))
+                parts.append('%t')
+            else:
+                raise Exception(replacement.format.format_message(f"Invalid string format"))
+        elif argument_type == 'str':
             parts.append('%s')
-        if argument_type == 'int':
+        elif argument_type == 'int':
             parts.append('%d')
-        if argument_type == 'float':
+        elif argument_type == 'float':
             parts.append('%f')
 
     parts.append(string.contents[-1])
@@ -220,7 +227,7 @@ def _generate_function_step(cutscene: Cutscene, step: parser.CutsceneStep, args:
                 raise Exception('Parameter should be a string')
 
             for replacment in parameter.replacements:
-                expression = expresion_generator.generate_script(replacment, context)
+                expression = expresion_generator.generate_script(replacment.expr, context)
                 if not expression:
                     raise Exception(f"Could not generate expression {replacment}")   
 
@@ -323,10 +330,10 @@ def _validate_step(step, errors: list[str], context: variable_layout.VariableCon
                     errors.append(parameter.at.format_message('expected string'))
                 else:
                     for replacement in parameter.replacements:
-                        replacement_type = type_info.determine_type(replacement)
+                        replacement_type = type_info.determine_type(replacement.expr)
                         
                         if replacement_type != 'str' and replacement_type != 'int' and replacement_type != 'float':
-                            errors.append(replacement.at.format_message(f'expected string, int or float but got {replacement_type}'))
+                            errors.append(replacement.expr.at.format_message(f'expected string, int or float but got {replacement_type}'))
                             
                         
                 continue

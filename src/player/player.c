@@ -19,6 +19,7 @@
 #include "../scene/scene.h"
 #include "../config.h"
 #include "../cutscene/race.h"
+#include "../cutscene/cutscene_stopwatch.h"
 #include "inventory.h"
 
 #include "../effects/fade_effect.h"
@@ -450,8 +451,16 @@ void player_update_state(struct player* player, struct contact* ground_contact) 
 
 void player_update(struct player* player) {
 #if ENABLE_CHEATS
-    if (joypad_get_buttons(0).l && joypad_get_buttons_pressed(0).r) {
+    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
+    if (joypad_get_buttons(0).l && pressed.r) {
         scene_queue_next("rom:/scenes/level_select.scene#default");
+    }
+
+    if (pressed.d_right) {
+        race_trigger_end(RACE_STATE_FINISH);
+    } else if (pressed.d_left) {
+        cutscene_stopwatch_set(600.0f);
+        race_trigger_end(RACE_STATE_FINISH);
     }
 #endif
 

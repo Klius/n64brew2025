@@ -166,6 +166,7 @@ struct cutscene* cutscene_load(const char* filename) {
                 break;
             case CUTSCENE_STEP_START_RACE:
                 step->data.race_start.on_finish = string_load(file);
+                fread(&step->data.race_start.lap_count, 4, 1, file);
                 break;
         }
     }
