@@ -235,16 +235,18 @@ struct overworld* overworld_load(const char* filename) {
     fread(&result->min, sizeof(struct Vector2), 1, result->file);
     fread(&result->tile_size, sizeof(float), 1, result->file);
 
-    fread(&result->lod0.entry_count, 1, 1, result->file);
+    fread(&result->lod1.entry_count, 1, 1, result->file);
 
-    result->lod0.entries = malloc(sizeof(struct overworld_lod0_entry) * result->lod0.entry_count);
+    result->lod1.entries = malloc(sizeof(struct overworld_lod1_entry) * result->lod1.entry_count);
 
-    for (int i = 0; i < result->lod0.entry_count; i += 1) {
-        fread(&result->lod0.entries[i].x, sizeof(uint16_t), 1, result->file);
-        fread(&result->lod0.entries[i].z, sizeof(uint16_t), 1, result->file);
-        fread(&result->lod0.entries[i].priority, sizeof(uint16_t), 1, result->file);
+    for (int i = 0; i < result->lod1.entry_count; i += 1) {
+        fread(&result->lod1.entries[i].x, sizeof(uint16_t), 1, result->file);
+        fread(&result->lod1.entries[i].z, sizeof(uint16_t), 1, result->file);
+        fread(&result->lod1.entries[i].priority, sizeof(uint16_t), 1, result->file);
+        result->lod1.entries[i].child_count = 0;
+        result->lod1.entries[i].lod_scale = 1;
         for (int direction_index = 0; direction_index < LOD0_SORT_DIRECTION_COUNT; direction_index += 1) {
-            tmesh_load(&result->lod0.entries[i].meshes[direction_index], result->file);
+            tmesh_load(&result->lod1.entries[i].meshes[direction_index], result->file);
         }
     }
 
@@ -307,12 +309,12 @@ void overworld_free(struct overworld* overworld) {
 
     hash_map_destroy(&overworld->loaded_actors);
 
-    for (int i = 0; i < overworld->lod0.entry_count; i += 1) {
+    for (int i = 0; i < overworld->lod1.entry_count; i += 1) {
         for (int direction_index = 0; direction_index < LOD0_SORT_DIRECTION_COUNT; direction_index += 1) {
-            tmesh_release(&overworld->lod0.entries[i].meshes[direction_index]);
+            tmesh_release(&overworld->lod1.entries[i].meshes[direction_index]);
         }
     }
-    free(overworld->lod0.entries);
+    free(overworld->lod1.entries);
 
     render_scene_remove_step(overworld);
 

@@ -78,14 +78,16 @@ struct overworld_tile_render_block {
 
 #define LOD0_SORT_DIRECTION_COUNT   4
 
-struct overworld_lod0_entry {
+struct overworld_lod1_entry {
     struct tmesh meshes[LOD0_SORT_DIRECTION_COUNT];
     int16_t x, z;
     uint16_t priority;
+    uint8_t child_count;
+    uint8_t lod_scale;
 };
 
-struct overworld_lod0 {
-    struct overworld_lod0_entry* entries;
+struct overworld_lod1 {
+    struct overworld_lod1_entry* entries;
     uint8_t entry_count;
 };
 
@@ -98,7 +100,7 @@ struct overworld {
     struct Vector2 min;
     float inv_tile_size;
     float tile_size;
-    struct overworld_lod0 lod0;
+    struct overworld_lod1 lod1;
     struct overworld_tile_def* tile_definitions;
     FILE* file;
 
