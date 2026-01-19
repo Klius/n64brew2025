@@ -86,6 +86,8 @@ void material_load_tex(struct material_tex* tex, FILE* file) {
     fread(filename, 1, filename_len, file);
     filename[filename_len] = '\0';
 
+    debugf("filename = %s\n", filename);
+
     fread(&tex->params, sizeof(rdpq_tileparms_t), 1, file);
 
     fread(&tex->tmem_addr, 2, 1, file);

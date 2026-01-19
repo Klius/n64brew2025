@@ -168,6 +168,8 @@ class LodTile():
         self.obj: bpy.types.Object = obj
         self.level: int = level
 
+        self.children: list = []
+
     def priority(self):
         digit_prefix_length = 0
 
@@ -183,6 +185,22 @@ class LodTile():
     
     def is_skybox(self):
         return 'skybox' in self.obj.name
+    
+def separate_lods(lod_1_objects: list[LodTile]) -> list[list[LodTile]]:
+    result: list[list[LodTile]] = []
+
+    for obj in lod_1_objects:
+        index = obj.level
+
+        if obj.is_skybox():
+            index = 0
+
+        while len(result) <= index:
+            result.append([])
+
+        result[index].append(obj)
+
+    return result
 
 def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: export_settings.ExportSettings, base_transform: mathutils.Matrix, file):
     lod_1_start_time = time.perf_counter()
@@ -196,7 +214,17 @@ def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: exp
 
     all_meshes: list[tuple[mesh.mesh_data, int, int, int]] = []
 
-    for tile in lod_1_objects:
+    root_objects = []
+
+    grouped_objects: list[list[LodTile]] = separate_lods(lod_1_objects)
+
+    if len(grouped_objects) > 0:
+        root_objects += grouped_objects[0]
+
+        if len(grouped_objects) > 1:
+            root_objects += grouped_objects[-1]
+
+    for tile in root_objects:
         mesh_list = mesh.mesh_list(scaled_transform)
         mesh_list.append(tile.obj)
 
