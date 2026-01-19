@@ -182,7 +182,7 @@ class LodTile():
         return result
     
     def is_skybox(self):
-        return 'sybox' in self.obj.name
+        return 'skybox' in self.obj.name
 
 def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: export_settings.ExportSettings, base_transform: mathutils.Matrix, file):
     lod_1_start_time = time.perf_counter()
