@@ -65,6 +65,39 @@ void expression_set_integer(integer_variable variable, int value) {
     }
 }
 
+void expression_debug_write(struct expression* expression) {
+    uint8_t* current = expression->expression_program;
+    char buffer[128];
+    char* out = buffer;
+
+    while (*current != EXPRESSION_TYPE_END) {
+        int instruction = *current;
+        ++current;
+
+        union expression_data data;
+
+        switch (instruction) {
+            case EXPRESSION_TYPE_LOAD_LOCAL:
+            case EXPRESSION_TYPE_LOAD_SCENE_VAR:
+            case EXPRESSION_TYPE_LOAD_GLOBAL:
+            case EXPRESSION_TYPE_LOAD_LITERAL:
+            case EXPRESSION_TYPE_BUILT_IN_FN:
+                // this avoids alignment issues
+                memcpy(&data, current, sizeof(union expression_data));
+
+                out += sprintf(out, "%02x %08x ", instruction, data.literal);
+
+                current += sizeof(union expression_data);
+                break;
+            default:
+                out += sprintf(out, "%02x ", instruction);
+                break;
+        }
+    }
+
+    debugf("0x%08x %s\n", (int)expression->expression_program, buffer);
+}
+
 void expression_evaluate(struct evaluation_context* context, struct expression* expression) {
     uint8_t* current = expression->expression_program;
 
@@ -180,11 +213,13 @@ void expression_evaluate(struct evaluation_context* context, struct expression* 
                     context,
                     evaluation_context_pop(context) > evaluation_context_pop(context)
                 );
+                break;
             case EXPRESSION_TYPE_GTEF:
                 evaluation_context_push(
                     context,
                     evaluation_context_pop_float(context) > evaluation_context_pop_float(context)
                 );
+                break;
             case EXPRESSION_TYPE_BUILT_IN_FN:
                 // this avoids alignment issues
                 memcpy(&data, current, sizeof(union expression_data));
