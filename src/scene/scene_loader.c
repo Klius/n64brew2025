@@ -344,10 +344,7 @@ struct scene* scene_load(const char* filename) {
 
     scene_show_room(scene, current_room);
 
-    if (starting_cutscene.type == CUTSCENE_REF_NONE) {
-        fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
-    }
-
+    fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
     cutscene_ref_run_then_destroy(&starting_cutscene, 0);
 
     if (scene->overworld) {

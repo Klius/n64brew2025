@@ -15,15 +15,17 @@ func settlement_loop()
 end
 
 func exit_garage()
-    world_pause;
-    cam_animate "exit_garage";
-    interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
-    npc_animate water_pump_scrapbot, "get_attention", true;
-    cam_wait;
-    cam_return;
-    cam_wait;
-    world_unpause;
-    idle_npc water_pump_scrapbot;
+    if not has_well_part_map then
+        world_pause;
+        cam_animate "exit_garage";
+        interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
+        npc_animate water_pump_scrapbot, "get_attention", true;
+        cam_wait;
+        cam_return;
+        cam_wait;
+        world_unpause;
+        idle_npc water_pump_scrapbot;
+    end
 end
 
 func well_scrapbot()

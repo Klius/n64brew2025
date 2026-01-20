@@ -13,12 +13,16 @@
 #include "../resource/material_cache.h"
 #include "../scene/scene.h"
 #include "../math/vector2.h"
+#include "../render/defs.h"
+#include "../savefile/savefile.h"
 #include "menu_common.h"
 #include <string.h>
 
 #define SCREEN_EDGE_MARGIN      20.0f
 #define TEXT_PADDING            2
 #define BOX_HEIGHT              10
+#define AUTO_SAVE_MARGIN        25
+#define AUTO_SAVE_SIZE          16
 
 static sprite_t* map_test;
 static material_t* map_render;
@@ -145,6 +149,23 @@ void hud_render_compass(struct hud* hud) {
     );
 }
 
+void hud_render_autosave(struct hud* hud) {
+    if (!savefile_is_autosaving()) {
+        return;
+    }
+
+    material_apply(hud->assets.saving_icon);
+
+    rdpq_set_prim_color((color_t){255, 255, 255, (uint8_t)(cosf(game_time * 4.0f) * 120 + 128)});
+
+    rdpq_texture_rectangle(
+        TILE0, 
+        SCREEN_WD - AUTO_SAVE_MARGIN - AUTO_SAVE_SIZE, SCREEN_HT - AUTO_SAVE_MARGIN - AUTO_SAVE_SIZE, 
+        SCREEN_WD - AUTO_SAVE_MARGIN, SCREEN_HT - AUTO_SAVE_MARGIN,
+        0, 0
+    );
+}
+
 void hud_render(void *data) {
     if (!update_has_layer(UPDATE_LAYER_WORLD)) {
         return;
@@ -152,6 +173,7 @@ void hud_render(void *data) {
 
     hud_render_interaction_preview(data);
     hud_render_compass(data);
+    hud_render_autosave(data);
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
@@ -164,6 +186,7 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->assets.compass_border = sprite_load("rom:/images/menu/compass_border.sprite");
     hud->assets.icon_material = material_cache_load("rom:/materials/menu/map_icon.mat");
     hud->assets.compass_arrow = material_cache_load("rom:/materials/menu/map_arrow.mat");
+    hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
 }
 
 void hud_destroy(struct hud* hud) {
@@ -172,5 +195,6 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.overlay_material);
     material_cache_release(hud->assets.icon_material);
     material_cache_release(hud->assets.compass_arrow);
+    material_cache_release(hud->assets.saving_icon);
     sprite_free(hud->assets.compass_border);
 }
