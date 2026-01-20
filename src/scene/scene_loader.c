@@ -18,6 +18,7 @@
 #include "../render/defs.h"
 #include "../audio/audio.h"
 #include "../cutscene/race.h"
+#include "../effects/fade_effect.h"
 
 #include "../collision/collision_scene.h"
 
@@ -342,6 +343,10 @@ struct scene* scene_load(const char* filename) {
     update_add(scene, scene_update, UPDATE_PRIORITY_CAMERA, UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE);
 
     scene_show_room(scene, current_room);
+
+    if (starting_cutscene.type == CUTSCENE_REF_NONE) {
+        fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
+    }
 
     cutscene_ref_run_then_destroy(&starting_cutscene, 0);
 

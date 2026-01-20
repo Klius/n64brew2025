@@ -212,8 +212,8 @@ void scene_update(void* data) {
     }
 }
 
-void scene_queue_next(char* scene_name) {
-    char* curr = scene_name;
+void scene_queue_next(const char* scene_name) {
+    const char* curr = scene_name;
     char* out = next_scene_name;
     while (*curr && *curr != '#') {
         *out++ = *curr++;

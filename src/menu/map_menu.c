@@ -14,6 +14,8 @@
 #include "../player/inventory.h"
 #include "../render/defs.h"
 #include "../render/coloru8.h"
+#include "../savefile/savefile.h"
+#include "../audio/audio.h"
 
 #define NEW_ITEM_ANIM_TIME      1.0f
 #define OPEN_ITEM_DELAY_TIME    1.0f
@@ -52,6 +54,8 @@ struct map_asssets {
     material_t* map_view;
     material_t* map_icon;
     material_t* selection_cursor;
+
+    wav64_t save_sound;
 
     sprite_t* icons[MENU_ICON_TYPE_COUNT];
 };
@@ -326,8 +330,8 @@ struct map_menu {
 
 #define MENU_X                  (SCREEN_WD - MAP_X - MAP_SIZE)
 
-#define BRUSH_HALF_SIZE         12
-#define BLUR_RADIUS             6
+#define BRUSH_HALF_SIZE         11
+#define BLUR_RADIUS             5
 
 #define ICON_SIZE               32
 
@@ -749,7 +753,9 @@ void map_menu_init() {
     }
 
     map_menu.selected_item = 0;
-    
+}
+
+void map_menu_update_has_prev() {
     for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
         map_menu.has_prev[i] = map_should_show_item(&menu_items[i]);
     }
@@ -842,6 +848,12 @@ void map_menu_update(void* data) {
         map_menu.can_unpause = true;
     }
 
+    if (pressed.c_right) {
+        if (savefile_save()) {
+            audio_play_2d(&assets.save_sound, 1.0f, 0.0f, 0.0f, 1);
+        }
+    }
+
     switch (map_menu.state) {
         case MAP_MENU_LIST:
             if ((pressed.start && map_menu.can_unpause) || pressed.b) {
@@ -893,6 +905,7 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.map_view = material_cache_load("rom:/materials/menu/map_view.mat");
     assets.map_icon = material_cache_load("rom:/materials/menu/map_icon.mat");
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
+    wav64_open(&assets.save_sound, "rom:/sounds/race/checkpoint.wav64");
     
     map_menu.details_image = NULL;
 
@@ -957,6 +970,7 @@ void map_menu_hide() {
     material_cache_release(assets.map_view);
     material_cache_release(assets.map_icon);
     material_cache_release(assets.selection_cursor);
+    wav64_close(&assets.save_sound);
     assets.map = NULL;
     assets.material = NULL;
     assets.map_background = NULL;
@@ -1035,4 +1049,8 @@ void map_mark_revealed(struct Vector3* pos) {
             data_cache_hit_writeback(chunk_b, 16);
         }
     }
+}
+
+uint8_t* map_get_revealed() {
+    return map_revealed;
 }

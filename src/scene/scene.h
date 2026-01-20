@@ -142,7 +142,7 @@ extern struct scene* current_scene;
 void scene_render(void* data, struct render_batch* batch);
 void scene_update(void* data);
 
-void scene_queue_next(char* scene_name);
+void scene_queue_next(const char* scene_name);
 void scene_clear_next();
 
 bool scene_show_room(struct scene* scene, int room_index);

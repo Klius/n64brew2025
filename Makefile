@@ -2,7 +2,9 @@ V=1
 SOURCE_DIR=src
 BUILD_DIR=build
 include $(N64_INST)/include/n64.mk
+N64_ROM_TITLE = "Junk Runner 64"
 N64_ROM_REGION = E
+N64_ROM_SAVETYPE = sram256k
 include $(T3D_INST)/t3d.mk
 
 MK_ASSET=$(N64_INST)/bin/mkasset
