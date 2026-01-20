@@ -13,7 +13,7 @@
 #include "../effects/drop_shadow.h"
 #include "vehicle.h"
 
-#define CAST_POINT_COUNT 4
+#define CAST_POINT_COUNT 5
 
 struct motorcycle {
     transform_sa_t transform;

@@ -37,6 +37,8 @@
 
 #define BOOST_TIME              2.5f
 
+#define CAST_CENTER             0.3f
+
 struct motorcyle_assets {
     tmesh_t* mesh;
 };
@@ -141,11 +143,12 @@ static vehicle_definiton_t vehicle_def = {
     .boost_camera_positions = boost_positions,
 };
 
-static vector3_t local_cast_points[] = {
-    {0.31f, 0.3f, 1.5f},
-    {0.31f, 0.3f, -1.5f},
-    {-0.31f, 0.3f, 1.5f},
-    {-0.31f, 0.3f, -1.5f},
+static vector3_t local_cast_points[CAST_POINT_COUNT] = {
+    {0.0f, CAST_CENTER, 0.0f},
+    {0.31f, CAST_CENTER, 1.5f},
+    {0.31f, CAST_CENTER, -1.5f},
+    {-0.31f, CAST_CENTER, 1.5f},
+    {-0.31f, CAST_CENTER, -1.5f},
 };
 
 void motorcycle_common_init() {
@@ -194,7 +197,7 @@ float motorycle_get_ground_height(motorcycle_t* motorcycle, float target_height,
         cast_point_t* cast_point = &motorcycle->cast_points[i];
 
         if (cast_point->surface_type != SURFACE_TYPE_NONE) {
-            float actual_height = cast_point->pos.y - cast_point->y;
+            float actual_height = cast_point->pos.y - cast_point->y - CAST_CENTER;
 
             if (actual_height < min_height_offset) {
                 min_height_offset = actual_height;
@@ -321,6 +324,8 @@ void motorcycle_update(void* data) {
     if (min_height_offset < target_height) {
         vector3_t* vel = &motorcycle->collider.velocity;
 
+        bool is_jumping = vector3Dot(vel, &ground_normal) > 0.0f;
+
         float prev_y = vel->y;
 
         vector3_t target_vel;
@@ -331,18 +336,18 @@ void motorcycle_update(void* data) {
         vector3Scale(&target_vel, &target_vel, current_speed);
         motorcycle->last_ground_location = motorcycle->transform.position;
 
+        motorcycle->last_ground_location.y += 2.0f / ground_normal.y;
+
         float max_accel = motorcycle->has_traction ? MAX_TURN_ACCEL : DRIFT_ACCEL;
 
         vector3_t accel;
         vector3Sub(&target_vel, vel, &accel);
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
+        // vel->y = prev_y;
+        float push = (target_height - min_height_offset) * fixed_time_step * HOVER_SPRING_STRENGTH;
         
-        if (vector3Dot(&ground_normal, vel) < 0.0f) {
-            vel->y = vel->y * 0.8 + (target_height - min_height_offset) * fixed_time_step * HOVER_SPRING_STRENGTH;
-        } else {
-            vel->y = prev_y;
-        }
+        vel->y = (is_jumping ? prev_y : vel->y * 0.8) + push;
     }
 }
 

@@ -1,8 +1,6 @@
 
-* crash from racing minigame
 * revaled minimap not saving
 * fix tunneling through ground
-* motorcycle is double spawning
 * fix generator repair minigame
 * driving up steep hills feels bad
 * push motorcyle up hill without clipping
@@ -25,3 +23,6 @@ After new map
 * have boost highways be more direct
 * Mark home on map
 * A north indicator to paper maps+
+
+Should be fixed
+* motorcycle is double spawning

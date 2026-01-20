@@ -18,7 +18,7 @@ static spatial_trigger_type_t trigger_type = {
     .type = SPATIAL_TRIGGER_BOX,
     .data = {
         .box = {
-            .half_size = {5.0f, 3.0f, 1.5f},
+            .half_size = {5.75f, 3.0f, 1.5f},
         }
     },
     .center = {0.0f, 2.0f, 0.0f},

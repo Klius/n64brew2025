@@ -292,10 +292,6 @@ func race0_entry()
             end
         end
         npc_animate race0_scrapbot, "idle", true;
-
-        if stopwatch_time() < race0_record then
-            race0_record = stopwatch_time();
-        end
         
         cam_return;
     end
