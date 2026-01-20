@@ -23,6 +23,7 @@
 #include "audio/audio.h"
 #include "repair/repair_scene.h"
 #include "config.h"
+#include "menu/main_menu.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -30,6 +31,10 @@
 #define RDPQ_VALIDATE_DETACH_ADDR    0x00800000
 
 void load_scene_or_repair(const char* filename) {
+    if (main_menu_enable_scene_saving) {
+        savefile_set_last_scene(filename, scene_get_next_entry());
+    }
+
     if (strncmp("rom:/scenes/", filename, strlen("rom:/scenes/")) == 0) {
         current_scene = scene_load(filename);
     } else if (strncmp("rom:/repair/", filename, strlen("rom:/repair/")) == 0) {
@@ -44,7 +49,7 @@ void load_scene_or_repair(const char* filename) {
 void setup() {
     debug_init_isviewer();
     // rdpq_debug_start();
-    savefile_new();
+    savefile_check_for_data();
     init_engine();
     interactable_reset();
 
@@ -59,7 +64,7 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    scene_queue_next("rom:/scenes/overworld.scene#race0");
+    // scene_queue_next("rom:/scenes/overworld.scene");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/garage.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
@@ -203,7 +208,7 @@ int main(void)
 
     while(1) {
         while (vi_delay > 0) {
-            // TODO process low priority tasks
+            savefile_check_autosave();
         }
         vi_delay = VI_PER_FRAME;
 

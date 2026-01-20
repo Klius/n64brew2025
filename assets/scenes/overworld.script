@@ -15,15 +15,17 @@ func settlement_loop()
 end
 
 func exit_garage()
-    world_pause;
-    cam_animate "exit_garage";
-    interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
-    npc_animate water_pump_scrapbot, "get_attention", true;
-    cam_wait;
-    cam_return;
-    cam_wait;
-    world_unpause;
-    idle_npc water_pump_scrapbot;
+    if not has_well_part_map then
+        world_pause;
+        cam_animate "exit_garage";
+        interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
+        npc_animate water_pump_scrapbot, "get_attention", true;
+        cam_wait;
+        cam_return;
+        cam_wait;
+        world_unpause;
+        idle_npc water_pump_scrapbot;
+    end
 end
 
 func well_scrapbot()
@@ -33,14 +35,18 @@ func well_scrapbot()
     cam_look_npc water_pump_scrapbot;
 
     if not has_well_part_map then
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "
             Hello Jax. I have a task for you.
 
             Aquire clean water to tend to Samson's wounds.
         ";
+        npc_animate water_pump_scrapbot, "idle", true;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, repairs_water_pump_broken;
         npc_wait water_pump_scrapbot;
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "However, the well was damaged in last night's raid and needs new parts.";
+        npc_animate water_pump_scrapbot, "idle", true;
         cam_animate "see_river"; 
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, towards_river;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, towards_river;
@@ -49,23 +55,31 @@ func well_scrapbot()
         cam_wait;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
         npc_wait water_pump_scrapbot;
+        npc_animate water_pump_scrapbot, "bot_handover", false;
         say "Here is a map you can follow to find the parts.";
+        npc_animate water_pump_scrapbot, "idle", true;
         world_unpause;
         has_well_part_map = true;
         show_item ITEM_WELL_PUMP_PART_MAP;
         return;
     elif not has_pump_gear then
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "Consult the map I already gave you to aquire the parts.";
     elif not has_repaired_pump then 
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "You have procured the parts";
+        npc_animate water_pump_scrapbot, "idle", true;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, repairs_water_pump_broken;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, repairs_water_pump_broken;
         cam_look_npc repairs_water_pump_broken;
+        npc_wait water_pump_scrapbot;
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "Now repair the well";
     else
         say "Hello there";
     end
 
+    npc_animate water_pump_scrapbot, "idle", true;
     world_unpause;
     cam_return;
 end
@@ -79,10 +93,13 @@ func exit_repair_well()
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
         cam_look_npc water_pump_scrapbot;
 
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "
-        Your attention please
-        
-        Please come speak to me. I have a map for you.";
+            Your attention please
+            
+            Please come speak to me. I have a map for you.
+        ";
+        npc_animate water_pump_scrapbot, "idle", true;
         
         world_unpause;
         cam_return;
@@ -94,6 +111,7 @@ func exit_repair_well()
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
         cam_look_npc water_pump_scrapbot;
 
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "
             Good work.
             
@@ -101,6 +119,7 @@ func exit_repair_well()
 
             Come with me so we can tend to Samson's wounds.
         ";
+        npc_animate water_pump_scrapbot, "idle", true;
 
         scrapbot_location = SCRAPBOT_LOCATION_BROTHER;
 
@@ -122,6 +141,7 @@ func on_exit_generator()
 
         fade FADE_COLOR_NONE, 0.5;
 
+        npc_animate water_pump_scrapbot, "bot_talk", true;
         say "Here is the broken generator";
         
         cam_animate "sand_dune_focus";
@@ -133,6 +153,7 @@ func on_exit_generator()
 
             This map will aid you in finding the generator parts.
         ";
+        npc_animate water_pump_scrapbot, "idle", true;
         world_unpause;
         cam_return;
         has_generator_part_map = true;
@@ -175,6 +196,7 @@ func race0_bot_speak()
     interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
     cam_look_npc ENTITY_ID_SUBJECT;
 
+    npc_animate race0_scrapbot, "bot_talk", true;
     if not has_tablet_battery then
         say "
             Welcome.
@@ -190,6 +212,7 @@ func race0_bot_speak()
     end     
 
     ask "Would you like to race?";
+    npc_animate race0_scrapbot, "idle", true;
 
     if ask_response() then
         race_start "rom:/scenes/overworld.scene#race0", 3;
@@ -218,6 +241,7 @@ func race0_entry()
         cam_look_npc race0_scrapbot;
         stopwatch_show false;
 
+        npc_animate race0_scrapbot, "bot_talk", true;
         if race_get_state() == RACE_STATE_MISS_CHECKPOINT then
             say "You need to cross each checkpoint in order.";
         else
@@ -225,6 +249,7 @@ func race0_entry()
         end
         
         ask "Would you like to try again?";
+        npc_animate race0_scrapbot, "idle", true;
             
         if ask_response() then
             race_start "rom:/scenes/overworld.scene#race0", 3;
@@ -235,7 +260,7 @@ func race0_entry()
     elif race_get_state() == RACE_STATE_FINISH then
         stopwatch_show false;
 
-
+        npc_animate race0_scrapbot, "bot_talk", true;
         if stopwatch_time() <= race0_record then
             race0_record = stopwatch_time();
 
@@ -266,6 +291,7 @@ func race0_entry()
                 return;
             end
         end
+        npc_animate race0_scrapbot, "idle", true;
 
         if stopwatch_time() < race0_record then
             race0_record = stopwatch_time();

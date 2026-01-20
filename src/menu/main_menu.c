@@ -10,10 +10,11 @@
 #include "../scene/scene.h"
 #include "../render/defs.h"
 #include "../effects/fade_effect.h"
+#include "../savefile/savefile.h"
+#include "../menu/map_menu.h"
 
 struct main_menu {
     bool is_showing;
-    bool has_game;
     sprite_t* title;
     sprite_t* title_band;
     material_t* title_material;
@@ -37,6 +38,8 @@ static struct main_menu main_menu;
 #define FLASH_TIME          0.5f
 
 #define INTRO_TIME          (SLIDE_IN_TIME + FLASH_TIME)
+
+bool main_menu_enable_scene_saving;
 
 void main_menu_render(void* data) {
     material_apply(main_menu.title_material);
@@ -77,7 +80,7 @@ void main_menu_render(void* data) {
 
     menu_common_render_background(100, 120, 120, 60);
 
-    if (main_menu.has_game) {
+    if (savefile_has_save()) {
         rdpq_text_printn(&(rdpq_textparms_t){
                 .align = ALIGN_LEFT,
                 .valign = VALIGN_TOP,
@@ -100,7 +103,7 @@ void main_menu_render(void* data) {
             .wrap = WRAP_NONE,
         }, 
         FONT_DIALOG, 
-        TEXT_X, TEXT_LINE_0_Y + (main_menu.has_game ? TEXT_LINE_SPACING : 0), 
+        TEXT_X, TEXT_LINE_0_Y + (savefile_has_save() ? TEXT_LINE_SPACING : 0), 
         "New game",
         strlen("New game")
     );
@@ -121,7 +124,7 @@ void main_menu_update(void *data) {
 
     joypad_inputs_t inputs = joypad_get_inputs(0);
 
-    if (main_menu.has_game) {
+    if (savefile_has_save()) {
         if ((inputs.stick_y > 40 && prev_y <= 40) || (inputs.stick_y < -40 && prev_y >= -40)) {
             main_menu.selected_item = 1 - main_menu.selected_item;
         }
@@ -141,7 +144,15 @@ void main_menu_update(void *data) {
 
         if (main_menu.go_timer < 0.0f) {
             main_menu_hide();
-            scene_queue_next("rom:/scenes/intro.scene#default");
+            update_unpause_layers(UPDATE_LAYER_WORLD);
+            if (main_menu.selected_item == 0 && savefile_has_save()) {
+                scene_queue_next(savefile_get_last_scene());
+            } else {
+                savefile_new();
+                scene_queue_next("rom:/scenes/intro.scene#default");
+            }
+            map_menu_update_has_prev();
+            main_menu_enable_scene_saving = true;
         }
     }
 
@@ -155,12 +166,11 @@ void main_menu_show() {
         return;
     }
     main_menu.is_showing = true;
-    main_menu.has_game = false;
     main_menu.selected_item = 0;
     main_menu.go_timer = 0.0f;
     main_menu.intro_timer = INTRO_TIME;
 
-    menu_add_callback(main_menu_render, &main_menu, MENU_PRIORITY_OVERLAY);
+    menu_add_callback(main_menu_render, &main_menu, MENU_PRIORITY_MENU);
     main_menu.title = sprite_load("rom:/images/menu/game_title.sprite");
     main_menu.title_band = sprite_load("rom:/images/menu/game_title_band.sprite");
     main_menu.title_material = material_cache_load("rom:/materials/menu/map_icon.mat");

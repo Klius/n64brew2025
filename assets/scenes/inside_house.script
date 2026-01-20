@@ -36,10 +36,14 @@ func on_enter()
         interact_with_npc INTERACTION_LOOK_MOVE, ENTITY_ID_PLAYER, near_med_machine;
         npc_set_speed ENTITY_ID_PLAYER, 3;
         npc_wait scrapbot;
+        npc_animate scrapbot, "bot_talk", true;
         say "The power is back online.";
+        npc_animate scrapbot, "idle", true;
         npc_wait ENTITY_ID_PLAYER;
         interact_with_npc INTERACTION_LOOK, scrapbot, ENTITY_ID_PLAYER;
         cam_look_npc scrapbot;
+        npc_wait scrapbot;
+        npc_animate scrapbot, "bot_talk", true;
         say "
             Although it appears the health juice went bad while the power was out.
 
@@ -47,6 +51,7 @@ func on_enter()
 
             Here is a map where you can find some south east of here.
         ";
+        npc_animate scrapbot, "idle", true;
         world_unpause;
         cam_return;
         has_health_juice_map = true;
@@ -137,16 +142,17 @@ func on_robot_talk()
     cam_look_npc ENTITY_ID_SUBJECT;
 
     if not has_generator_part_map then
+        npc_animate scrapbot, "bot_talk", true;
         say "
             There is a problem.
 
             The medical machine has lost power.
-        ";
-        say "
+
             The generator needs to be repaired.
 
             Follow me outside.
         ";
+        npc_animate scrapbot, "idle", true;
 
         scrapbot_location = SCRAPBOT_LOCATION_GENERATOR;
         fade FADE_COLOR_BLACK, 0.5;
@@ -156,6 +162,7 @@ func on_robot_talk()
         load_scene "rom:/scenes/overworld.scene#generator";
         return;
     elif has_generator_part_0 and has_generator_part_1 and has_generator_part_2 then
+        npc_animate scrapbot, "bot_talk", true;
         if has_repaired_generator then
             say "Use the map to locate more health juice for the machine";
         else
@@ -165,8 +172,11 @@ func on_robot_talk()
                 You need to follow that new map I gave to get more health juice.
             ";
         end
+        npc_animate scrapbot, "idle", true;
     else
+        npc_animate scrapbot, "bot_talk", true;
         say "After you aquire the parts return here to fix the generator";
+        npc_animate scrapbot, "idle", true;
     end
 
     world_unpause;
@@ -179,11 +189,13 @@ func on_exit_medical_machine()
         cam_look_npc scrapbot;
         interact_with_npc INTERACTION_LOOK, scrapbot, medical_machine;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, scrapbot;
+        npc_animate scrapbot, "bot_talk", true;
         say "
             The machine is functional again.
 
             I will tend to his wounds now.
         ";
+        npc_animate scrapbot, "idle", true;
         samson_location = SAMSON_LOCATION_HEALED;
         fade FADE_COLOR_BLACK, 0.5;
         delay 1.5;
@@ -224,17 +236,21 @@ func on_samson_heal()
     cam_look_npc scrapbot;
     npc_wait scrapbot;
 
+    npc_animate scrapbot, "bot_talk", true;
     say "You saved his life but it appears his spirit is still broken";
+    npc_animate scrapbot, "idle", true;
     
     interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, repairs_tablet_broken;
     interact_with_npc INTERACTION_LOOK, scrapbot, repairs_tablet_broken;
     cam_look_npc repairs_tablet_broken;
 
+    npc_animate scrapbot, "bot_talk", true;
     say "
         I finished searching potential locations where you may find parts to repair your old tablet
 
         Perhaps it will have something from life before the impact to cheer samson up
     ";
+    npc_animate scrapbot, "idle", true;
 
     world_unpause;
     cam_return;
