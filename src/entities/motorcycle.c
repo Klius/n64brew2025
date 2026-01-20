@@ -331,6 +331,8 @@ void motorcycle_update(void* data) {
         vector3Scale(&target_vel, &target_vel, current_speed);
         motorcycle->last_ground_location = motorcycle->transform.position;
 
+        motorcycle->last_ground_location.y += 2.0f / ground_normal.y;
+
         float max_accel = motorcycle->has_traction ? MAX_TURN_ACCEL : DRIFT_ACCEL;
 
         vector3_t accel;
