@@ -1,5 +1,4 @@
 
-* revaled minimap not saving
 * fix tunneling through ground
 * fix generator repair minigame
 * driving up steep hills feels bad

@@ -33,7 +33,7 @@
 #define RIDE_HOVER_HEIGHT       0.5f
 #define FAST_HOVER_HEIGHT       1.0f
 #define BOB_HEIGHT              0.1f
-#define BOB_TIME                2.0f
+#define BOB_TIME                4.0f
 
 #define BOOST_TIME              2.5f
 
@@ -250,7 +250,14 @@ void motorcycle_update(void* data) {
     armature_t* armature = renderable_get_armature(&motorcycle->renderable);
     animator_update(&motorcycle->animator, armature, scaled_time_step);
 
-    float current_speed = sqrtf(vector3MagSqrd(&motorcycle->collider.velocity));
+    vector3_t ground_normal = (vector3_t){};
+    float min_height_offset = motorycle_get_ground_height(motorcycle, FAST_HOVER_HEIGHT + HOVER_SAG_AMOUNT, &ground_normal);
+    vector3Normalize(&ground_normal, &ground_normal);
+    
+    vector3_t ground_velocity;
+    vector3ProjectPlane(&motorcycle->collider.velocity, &ground_normal, &ground_velocity);
+
+    float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
 
     float target_height = motorcycle_hover_height(motorcycle, current_speed) + HOVER_SAG_AMOUNT;
 
@@ -311,9 +318,6 @@ void motorcycle_update(void* data) {
 
     motorcycle->vehicle.is_stopped = vector3MagSqrd2D(&motorcycle->collider.velocity) < STOPPED_SPEED_THESHOLD * STOPPED_SPEED_THESHOLD;
 
-    vector3_t ground_normal = (vector3_t){};
-    float min_height_offset = motorycle_get_ground_height(motorcycle, target_height, &ground_normal);
-
     if (motorcycle->collider.hit_kill_plane) {
         motorcycle->collider.velocity = gZeroVec;
         motorcycle->transform.position = motorcycle->last_ground_location;
@@ -323,20 +327,20 @@ void motorcycle_update(void* data) {
 
     if (min_height_offset < target_height) {
         vector3_t* vel = &motorcycle->collider.velocity;
-
-        bool is_jumping = vector3Dot(vel, &ground_normal) > 0.0f;
-
         float prev_y = vel->y;
+
+        float is_going_up = vector3Dot(vel, &ground_normal) > 0.0f;
+        vector3_t ground_velocity;
+        vector3Project(vel, &ground_normal, &ground_velocity);
 
         vector3_t target_vel;
         vector2ToLookDir(&motorcycle->transform.rotation, &target_vel);
-        vector3Normalize(&ground_normal, &ground_normal);
         vector3ProjectPlane(&target_vel, &ground_normal, &target_vel);
         vector3Normalize(&target_vel, &target_vel);
         vector3Scale(&target_vel, &target_vel, current_speed);
         motorcycle->last_ground_location = motorcycle->transform.position;
 
-        motorcycle->last_ground_location.y += 2.0f / ground_normal.y;
+        motorcycle->last_ground_location.y += 5.0f;
 
         float max_accel = motorcycle->has_traction ? MAX_TURN_ACCEL : DRIFT_ACCEL;
 
@@ -344,10 +348,24 @@ void motorcycle_update(void* data) {
         vector3Sub(&target_vel, vel, &accel);
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
-        // vel->y = prev_y;
-        float push = (target_height - min_height_offset) * fixed_time_step * HOVER_SPRING_STRENGTH;
-        
-        vel->y = (is_jumping ? prev_y : vel->y * 0.8) + push;
+
+        float target_offset = target_height - min_height_offset;
+        float spring_accel = target_offset * HOVER_SPRING_STRENGTH;
+
+        if (prev_y > 0.0f) {
+            float vel_threshold = -target_offset * 2.0f * GRAVITY_CONSTANT;
+
+            if (prev_y * prev_y > vel_threshold) {
+                spring_accel = 0.0f;
+            }
+        }
+
+        vel->y = prev_y * 0.9f + spring_accel * fixed_time_step;
+    }
+
+    if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
+        // this sucks
+        vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
     }
 }
 
