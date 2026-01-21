@@ -8,10 +8,12 @@
 
 #define AUTOSAVE_INTERVAL       180.0f
 #define DIRTY_AUTOSAVE_INTERVAL 3.0f
+#define MIN_SAVE_INTERVAL       30.0f
 
 static void* current_savefile;
 static bool needs_save;
-static float auto_save_time;
+static float auto_save_time = AUTOSAVE_INTERVAL;
+static float last_save_time = 0.0f;
 
 #define HEADER_NAME 0x6A756E6B72756E6ELL
 
@@ -30,7 +32,13 @@ struct savefile_header {
 static struct savefile_header savefile;
 
 void savefile_schedule_save(float offset) {
-    float time = scaled_time_step + offset;
+    float time = game_time + offset;
+
+    float min_save_time = last_save_time + MIN_SAVE_INTERVAL;
+
+    if (time < min_save_time) {
+        time = min_save_time;
+    }
 
     if (time < auto_save_time) {
         auto_save_time = time;
@@ -96,7 +104,13 @@ bool savefile_save() {
     dma_write_raw_async(map_revealed, SRAM_ADDRESS + ALIGN_BLOCK(sizeof(struct savefile_header)) + ALIGN_BLOCK(savefile.globals_size), MAP_BLOCK_SIZE);
     dma_wait();
 
+    last_save_time = game_time;
+
     return true;
+}
+
+bool savefile_is_autosaving() {
+    return (auto_save_time - game_time) < 2.0f && update_has_layer(UPDATE_LAYER_WORLD);
 }
 
 void savefile_new() {
@@ -145,9 +159,8 @@ void* savefile_get_globals(global_access_mode_t mode) {
 }
 
 void savefile_check_autosave() {
-    // if (scaled_time_step > auto_save_time) {
-    //     savefile_save();
-    //     debugf("saving\n");
-    //     auto_save_time = scaled_time_step + AUTOSAVE_INTERVAL;
-    // }
+    if (game_time > auto_save_time) {
+        savefile_save();
+        auto_save_time = game_time + AUTOSAVE_INTERVAL;
+    }
 }

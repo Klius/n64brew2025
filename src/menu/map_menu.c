@@ -728,13 +728,6 @@ void map_render(void* data) {
 }
 
 void map_menu_init() {
-    for (int y = 0; y < MAP_SIZE; y += 1) {
-        for (int x = 0; x < MAP_SIZE; x += 1) {
-            map_revealed[x + y * MAP_SIZE] = 0;
-        }
-    }
-    data_cache_hit_writeback_invalidate(map_revealed, sizeof(map_revealed));
-
     uint8_t* pixel = reveal_brush;
 
     for (int y = 0; y < BRUSH_HALF_SIZE; y += 1) {

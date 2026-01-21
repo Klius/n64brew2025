@@ -7,6 +7,7 @@ void savefile_check_for_data();
 void savefile_new();
 bool savefile_has_save();
 bool savefile_save();
+bool savefile_is_autosaving();
 void savefile_set_last_scene(const char* name, const char* entry);
 const char* savefile_get_last_scene();
 

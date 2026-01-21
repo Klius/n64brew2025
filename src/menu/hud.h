@@ -10,6 +10,7 @@ struct hud_assets {
     material_t* overlay_material;
     material_t* icon_material;
     material_t* compass_arrow;
+    material_t* saving_icon;
     sprite_t* compass_border;
 };
 

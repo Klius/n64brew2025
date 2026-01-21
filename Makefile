@@ -11,10 +11,10 @@ MK_ASSET=$(N64_INST)/bin/mkasset
 
 N64_C_AND_CXX_FLAGS += -Og
 
-all: spellcraft.z64
+all: junkrunner64.z64
 .PHONY: all
 
-tests: spellcraft_test.z64
+tests: junkrunner64_test.z64
 .PHONY: tests
 
 ###
@@ -215,25 +215,25 @@ TEST_OBJS := $(SOURCE_OBJS) $(TEST_SOURCE_OBJS)
 
 filesystem/: $(SPRITES) $(TMESHES) $(MATERIALS) $(SCENES) $(REPAIRS) $(FONTS) $(SCRIPTS_COMPILED) $(SOUND_EFFECTS) $(MUSIC) filesystem/scripts/globals.dat
 
-$(BUILD_DIR)/spellcraft.dfs: filesystem/ $(SPRITES) $(TMESHES) $(MATERIALS) $(SCENES) $(REPAIRS) $(FONTS) $(SCRIPTS_COMPILED) $(SOUND_EFFECTS) $(MUSIC) filesystem/scripts/globals.dat
-$(BUILD_DIR)/spellcraft.elf: $(OBJS)
-$(BUILD_DIR)/spellcraft_test.elf: $(TEST_OBJS)
+$(BUILD_DIR)/junkrunner64.dfs: filesystem/ $(SPRITES) $(TMESHES) $(MATERIALS) $(SCENES) $(REPAIRS) $(FONTS) $(SCRIPTS_COMPILED) $(SOUND_EFFECTS) $(MUSIC) filesystem/scripts/globals.dat
+$(BUILD_DIR)/junkrunner64.elf: $(OBJS)
+$(BUILD_DIR)/junkrunner64_test.elf: $(TEST_OBJS)
 
 build/%.asm: build/%.o
 	mips-linux-gnu-objdump -S --disassemble $< > $@
 
-spellcraft.z64: N64_ROM_TITLE="SpellCraft"
-spellcraft.z64: $(BUILD_DIR)/spellcraft.dfs
+junkrunner64.z64: N64_ROM_TITLE="SpellCraft"
+junkrunner64.z64: $(BUILD_DIR)/junkrunner64.dfs
 
-spellcraft_test.z64: N64_ROM_TITLE="SpellCraft Test"
-spellcraft_test.z64: $(BUILD_DIR)/spellcraft.dfs
+junkrunner64_test.z64: N64_ROM_TITLE="SpellCraft Test"
+junkrunner64_test.z64: $(BUILD_DIR)/junkrunner64.dfs
 
 clean:
 	rm -rf $(BUILD_DIR)/* filesystem/ *.z64
 .PHONY: clean
 
 clean-fs:
-	rm -rf filesystem/ $(BUILD_DIR)/spellcraft.dfs
+	rm -rf filesystem/ $(BUILD_DIR)/junkrunner64.dfs
 .PHONY: clean-resource
 
 clean-src:
