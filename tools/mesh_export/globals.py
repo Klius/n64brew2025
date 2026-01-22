@@ -31,6 +31,11 @@ mapping = {
     "has_tablet_repaired_tablet": 'ITEM_TABLET_REPAIRED',
     "has_tablet": 'ITEM_TABLET',
     "has_given_tablet": 'ITEM_GIVEN_TABLET',
+    
+    "upgrade_faster": 'ITEM_UPGRADE_FASTER',
+    "upgrade_longer_boost": 'ITEM_LONGER_BOOST',
+    "upgrade_detect_nuts": 'ITEM_DETECT_NUTS',
+    "upgrade_boost_anywhere": 'ITEM_BOOST_ANYWHERE',
 
     "is_riding_motorcycle": "ITEM_RIDING_MOTORCYCLE",
 

@@ -10,6 +10,7 @@
 #include "../audio/audio.h"
 #include "../scene/scene.h"
 #include "../math/mathf.h"
+#include "../player/inventory.h"
 
 struct repair_part_type_def {
     union {
@@ -27,6 +28,9 @@ struct repair_part_pickup_assets {
 };
 
 typedef struct repair_part_type_def repair_part_type_def_t;
+
+static entity_id tracking_item;
+static float tacking_item_distnace;
 
 static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
     [REPAIR_PART_MOTOR] = {
@@ -164,6 +168,16 @@ void repair_part_interact(struct interactable* interactable, entity_id from) {
 void repair_part_pickup_update(void* data) {
     repair_part_pickup_t* part = (repair_part_pickup_t*)data;
     float distance = sqrtf(vector3DistSqrd(&part->transform.position, player_get_position(&current_scene->player)));
+
+    if (!tracking_item || distance < tacking_item_distnace) {
+        tracking_item = part->entity_id;
+    }
+
+    if (part->entity_id == tracking_item) {
+        tacking_item_distnace = distance;
+    } else {
+        return;
+    }
     
     if (distance > MAX_BEEP_DISTANCE) {
         part->beep_timer = FAR_BEEP_INTERVAL;
@@ -195,6 +209,11 @@ void repair_part_pickup_init(repair_part_pickup_t* part, struct repair_part_pick
     part->has_tracker = definition->has_tracker;
     part->beep_timer = FAR_BEEP_INTERVAL;
     part->count = definition->count;
+    part->entity_id = entity_id;
+
+    if (inventory_has_item(ITEM_DETECT_NUTS) && definition->part_type == REPAIR_PART_MONEY) {
+        part->has_tracker = true;
+    }
 
     repair_part_type_def_t* def = &types[definition->part_type];
 
@@ -234,5 +253,9 @@ void repair_part_pickup_destroy(repair_part_pickup_t* part) {
 
     if (part->has_tracker) {
         update_remove(part);
+    }
+
+    if (part->entity_id == tracking_item) {
+        tracking_item = 0;
     }
 }

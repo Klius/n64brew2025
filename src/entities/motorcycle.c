@@ -18,8 +18,10 @@
 
 #define ACCEL_RATE              20.0f
 #define BOOST_ACCEL_RATE        50.0f
-#define DRIVE_SPEED             35.0f
-#define BOOST_SPEED             60.0f
+#define BASE_DRIVE_SPEED        25.0f
+#define UPGRADED_DRIVE_SPEED    35.0f
+#define BASE_BOOST_SPEED        50.0f
+#define UPGRADED_BOOST_SPEED    60.0f
 #define MAX_TURN_RATE           2.0f
 
 #define MAX_BOOST_TURN_ACCEL    50.0f
@@ -35,7 +37,10 @@
 #define BOB_HEIGHT              0.1f
 #define BOB_TIME                4.0f
 
-#define BOOST_TIME              2.5f
+#define BASE_BOOST_TIME         2.5f
+#define UPGRADED_BOOST_TIME     3.5f
+
+#define SELF_BOOST_COOLDOWN     10.0f
 
 #define CAST_CENTER             0.3f
 
@@ -171,7 +176,7 @@ float motorcycle_hover_height(motorcycle_t* motorcycle, float speed) {
         return STILL_HOVER_HEIGHT + bob_height;
     }
     
-    float lerp = speed * (1.0f / DRIVE_SPEED);
+    float lerp = speed * (1.0f / UPGRADED_DRIVE_SPEED);
 
     if (lerp > 1.0f) {
         return FAST_HOVER_HEIGHT;
@@ -182,7 +187,19 @@ float motorcycle_hover_height(motorcycle_t* motorcycle, float speed) {
 
 float motorcycle_target_speed(motorcycle_t* motorcycle, joypad_inputs_t input) {
     if (input.btn.a || motorcycle->vehicle.is_boosting) {
-        return motorcycle->boost_timer > 0.0f ? BOOST_SPEED : DRIVE_SPEED;
+        if (motorcycle->boost_timer > 0.0f) {
+            if (inventory_has_item(ITEM_UPGRADE_FASTER)) {
+                return UPGRADED_BOOST_SPEED;
+            }
+
+            return BASE_BOOST_SPEED;
+        }
+
+        if (inventory_has_item(ITEM_UPGRADE_FASTER)) {
+            return UPGRADED_DRIVE_SPEED;
+        }
+
+        return BASE_DRIVE_SPEED;
     } else if (input.btn.b) {
         return 0.0f;
     } else {
@@ -267,16 +284,32 @@ void motorcycle_update(void* data) {
 
     joypad_inputs_t input = joypad_get_inputs(0);
 
-    motorcycle->vehicle.is_boosting = motorcycle->vehicle.hit_boost_pad;
+    bool activate_boost = motorcycle->vehicle.hit_boost_pad;
 
-    if (motorcycle->vehicle.hit_boost_pad) {
-        motorcycle->boost_timer = BOOST_TIME;
+    motorcycle->vehicle.is_boosting = activate_boost;
+    
+    if (input.btn.z && motorcycle->self_boost_cooldown <= 0.0f && inventory_has_item(ITEM_BOOST_ANYWHERE)) {
+        motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
+        activate_boost = true;
+    }
+
+    if (motorcycle->self_boost_cooldown > 0.0f) {
+        motorcycle->self_boost_cooldown -= fixed_time_step;
+    }
+
+    if (activate_boost) {
+        if (inventory_has_item(ITEM_LONGER_BOOST)) {
+            motorcycle->boost_timer = UPGRADED_BOOST_TIME;
+        } else {
+            motorcycle->boost_timer = BASE_BOOST_TIME;
+        }
+
         motorcycle->vehicle.hit_boost_pad = false;
     }
 
     if (motorcycle->boost_timer > 0.0f) {
         motorcycle->boost_timer -= fixed_time_step;
-        motorcycle->vehicle.is_boosting = input.btn.a;
+        motorcycle->vehicle.is_boosting = input.btn.a || activate_boost;
 
         if (!input.btn.a) {
             motorcycle->boost_timer = 0.0f;
@@ -387,6 +420,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->is_active = true;
     motorcycle->boost_timer = 0.0f;
     motorcycle->last_ground_location = definition->position;
+    motorcycle->self_boost_cooldown = 0.0f;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;

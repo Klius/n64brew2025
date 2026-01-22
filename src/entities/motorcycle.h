@@ -29,6 +29,7 @@ struct motorcycle {
     bool is_active;
     
     float boost_timer;
+    float self_boost_cooldown;
 
     cast_point_t cast_points[CAST_POINT_COUNT];
 };

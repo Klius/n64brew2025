@@ -20,6 +20,7 @@ struct repair_part_pickup {
     bool is_active;
     bool has_tracker;
     bool is_particle;
+    entity_id entity_id;
 };
 
 typedef struct repair_part_pickup repair_part_pickup_t;
