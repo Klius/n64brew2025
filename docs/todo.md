@@ -17,6 +17,7 @@
 * force boosting while directly touching boost pads
 * add home base icon to map
 * indoor locations should show up on map
+* lap indicator
 
 After new map
 * have boost highways be more direct

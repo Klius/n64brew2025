@@ -32,14 +32,75 @@ global scrapbot_location: i8;
 global samson_location: i8;
 
 global nut_count: i16;
+global nut_count_spent: i16;
 
 global is_riding_motorcycle: bool;
+
+global upgrade_faster: bool;
+global upgrade_longer_boost: bool;
+global upgrade_detect_nuts: bool;
+global upgrade_boost_anywhere: bool;
 
 global garage_nut_0: bool;
 global garage_nut_1: bool;
 global garage_nut_2: bool;
 
+global overworld_nut_00: bool;
+global overworld_nut_01: bool;
+global overworld_nut_02: bool;
+global overworld_nut_03: bool;
+global overworld_nut_04: bool;
+global overworld_nut_05: bool;
+global overworld_nut_06: bool;
+global overworld_nut_07: bool;
+global overworld_nut_08: bool;
+global overworld_nut_09: bool;
+global overworld_nut_10: bool;
+global overworld_nut_11: bool;
+global overworld_nut_12: bool;
+global overworld_nut_13: bool;
+global overworld_nut_14: bool;
+global overworld_nut_15: bool;
+global overworld_nut_16: bool;
+global overworld_nut_17: bool;
+global overworld_nut_18: bool;
+global overworld_nut_19: bool;
+global overworld_nut_20: bool;
+global overworld_nut_21: bool;
+global overworld_nut_22: bool;
+global overworld_nut_23: bool;
+global overworld_nut_24: bool;
+global overworld_nut_25: bool;
+global overworld_nut_26: bool;
+global overworld_nut_27: bool;
+global overworld_nut_28: bool;
+global overworld_nut_29: bool;
+global overworld_nut_30: bool;
+global overworld_nut_31: bool;
+global overworld_nut_32: bool;
+global overworld_nut_33: bool;
+global overworld_nut_34: bool;
+global overworld_nut_35: bool;
+global overworld_nut_36: bool;
+global overworld_nut_37: bool;
+global overworld_nut_38: bool;
+global overworld_nut_39: bool;
+global overworld_nut_40: bool;
+global overworld_nut_41: bool;
+global overworld_nut_42: bool;
+global overworld_nut_43: bool;
+global overworld_nut_44: bool;
+global overworld_nut_45: bool;
+global overworld_nut_46: bool;
+global overworld_nut_47: bool;
+global overworld_nut_48: bool;
+global overworld_nut_49: bool;
+
 global has_race1_reward: bool;
+global has_race2_reward: bool;
+global has_race3_reward: bool;
 
 global race0_record: float = 200.0;
-global race1_record: float = 200.0;
+global race1_record: float = 190.0;
+global race2_record: float = 220.0;
+global race3_record: float = 160.0;

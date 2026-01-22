@@ -122,11 +122,11 @@ static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
     },
     [REPAIR_PART_MONEY] = {
         .particle_material = "rom:/materials/parts/nut_particle.mat",
-        .particle_radius = 0.1f,
+        .particle_radius = 0.2f,
         .particle_frame_max_x = 255,
         .particle_frame_step = 32,
         .collider = {
-            BOX_COLLIDER(0.1f, 0.1f, 0.1f),
+            BOX_COLLIDER(0.1f, 0.2f, 0.1f),
             .center = {0.0f, 0.0f, 0.0f},
             .friction = 0.5,
             .max_stable_slope = 0.219131191f,

@@ -410,3 +410,225 @@ func race1_entry()
     
     world_unpause;
 end
+
+scene race2_scrapbot: entity_id;
+
+func race2_bot_speak()
+    world_pause;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
+    cam_look_npc ENTITY_ID_SUBJECT;
+
+    npc_animate race2_scrapbot, "bot_talk", true;
+    if not has_race2_reward then
+        say "
+            Welcome.
+
+            I am RB2. If you complete 2 laps on my track in under {race3_record:duration} I will give you 20 nuts.
+        ";
+    else
+        say "
+            Welcome back. 
+        
+            I cannot give you more nuts but you can attempt to beat your time of {race2_record:duration}
+        ";
+    end     
+
+    ask "Would you like to race?";
+    npc_animate race2_scrapbot, "idle", true;
+
+    if ask_response() then
+        race_start "rom:/scenes/overworld.scene#race2", 2;
+        return;
+    end
+
+    cam_return;
+    world_unpause;
+end
+
+func race2_entry()
+    if race_get_state() == RACE_STATE_STARTED then
+        world_pause;
+        delay 0.5;
+        fade FADE_COLOR_NONE, 0.5;
+
+        delay 0.5;
+        stopwatch_show true;
+
+        delay 3;
+        stopwatch_run true;
+    elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        world_pause;
+        interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race2_scrapbot;
+        interact_with_npc INTERACTION_LOOK, race2_scrapbot, ENTITY_ID_PLAYER;
+        cam_look_npc race2_scrapbot;
+        stopwatch_show false;
+
+        npc_animate race2_scrapbot, "bot_talk", true;
+        if race_get_state() == RACE_STATE_MISS_CHECKPOINT then
+            say "You need to cross each checkpoint in order.";
+        else
+            say "You abandoned the race.";
+        end
+        
+        ask "Would you like to try again?";
+        npc_animate race2_scrapbot, "idle", true;
+            
+        if ask_response() then
+            race_start "rom:/scenes/overworld.scene#race2", 2;
+            return;
+        end
+
+        cam_return;
+    elif race_get_state() == RACE_STATE_FINISH then
+        stopwatch_show false;
+
+        npc_animate race2_scrapbot, "bot_talk", true;
+        if stopwatch_time() <= race2_record then
+            race2_record = stopwatch_time();
+
+            if not has_tablet_battery then
+                say "
+                    You did it!
+
+                    Your time was {stopwatch_time():duration}
+
+                    As promised here are your 20 nuts
+                ";
+
+                world_unpause;
+                cam_return;
+                has_race2_reward = true;
+                nut_count = nut_count + 20;
+                return;
+            else
+                say "Good work, you set a new track record of {stopwatch_time():duration}";
+            end
+        else
+            say "You didn't complete the race in under {race2_record:duration}.";
+            
+            ask "Would you like to try again?";
+                
+            if ask_response() then
+                race_start "rom:/scenes/overworld.scene#race2", 2;
+                return;
+            end
+        end
+        npc_animate race2_scrapbot, "idle", true;
+        
+        cam_return;
+    end
+    
+    world_unpause;
+end
+
+scene race3_scrapbot: entity_id;
+
+func race3_bot_speak()
+    world_pause;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
+    cam_look_npc ENTITY_ID_SUBJECT;
+
+    npc_animate ENTITY_ID_SUBJECT, "bot_talk", true;
+    if not has_race3_reward then
+        say "
+            Welcome.
+
+            I am RB3. If you race up the river in under {race2_record:duration} I will give you 10 nuts.
+        ";
+    else
+        say "
+            Welcome back. 
+        
+            I cannot give you more nuts but you can attempt to beat your time of {race3_record:duration}
+        ";
+    end     
+
+    ask "Would you like to race?";
+    npc_animate ENTITY_ID_SUBJECT, "idle", true;
+
+    if ask_response() then
+        race_start "rom:/scenes/overworld.scene#race3", 1;
+        return;
+    end
+
+    cam_return;
+    world_unpause;
+end
+
+func race3_entry()
+    if race_get_state() == RACE_STATE_STARTED then
+        world_pause;
+        delay 0.5;
+        fade FADE_COLOR_NONE, 0.5;
+
+        delay 0.5;
+        stopwatch_show true;
+
+        delay 3;
+        stopwatch_run true;
+    elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        world_pause;
+        interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race3_scrapbot;
+        interact_with_npc INTERACTION_LOOK, race3_scrapbot, ENTITY_ID_PLAYER;
+        cam_look_npc race3_scrapbot;
+        stopwatch_show false;
+
+        npc_animate race3_scrapbot, "bot_talk", true;
+        if race_get_state() == RACE_STATE_MISS_CHECKPOINT then
+            say "You need to cross each checkpoint in order.";
+        else
+            say "You abandoned the race.";
+        end
+        
+        ask "Would you like to try again?";
+        npc_animate race3_scrapbot, "idle", true;
+            
+        if ask_response() then
+            race_start "rom:/scenes/overworld.scene#race3", 1;
+            return;
+        end
+
+        cam_return;
+    elif race_get_state() == RACE_STATE_FINISH then
+        stopwatch_show false;
+
+        npc_animate race3_scrapbot, "bot_talk", true;
+        if stopwatch_time() <= race3_record then
+            race3_record = stopwatch_time();
+
+            if not has_tablet_battery then
+                say "
+                    You did it!
+
+                    Your time was {stopwatch_time():duration}
+
+                    As promised here are your 10 nuts
+                ";
+
+                world_unpause;
+                cam_return;
+                has_race3_reward = true;
+                nut_count = nut_count + 10;
+                return;
+            else
+                say "Good work, you set a new track record of {stopwatch_time():duration}";
+            end
+        else
+            say "You didn't complete the race in under {race3_record:duration}.";
+            
+            ask "Would you like to try again?";
+                
+            if ask_response() then
+                race_start "rom:/scenes/overworld.scene#race3", 1;
+                return;
+            end
+        end
+        npc_animate race3_scrapbot, "idle", true;
+        
+        cam_return;
+    end
+    
+    world_unpause;
+end
