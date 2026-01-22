@@ -12,6 +12,10 @@
 void drop_shadow_render(void* data, struct render_batch* batch) {
     struct drop_shadow* drop_shadow = (struct drop_shadow*)data;
 
+    if (!drop_shadow->enabled) {
+        return;
+    }
+
     struct contact* contact = dynamic_object_get_ground(drop_shadow->target);
 
     if (!contact) {

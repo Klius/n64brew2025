@@ -322,19 +322,28 @@ void motorcycle_update(void* data) {
     }
 #endif
 
+    bool are_brakes_on = true;
+    
+    float target_speed = current_speed;
+
     if (motorcycle->vehicle.driver && update_has_layer(UPDATE_LAYER_WORLD)) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;
 
-        float target_speed = motorcycle_target_speed(motorcycle, input);
-        current_speed = mathfMoveTowards(current_speed, target_speed, fixed_time_step * ACCEL_RATE);
+        float target_max_speed = motorcycle_target_speed(motorcycle, input);
+        are_brakes_on = target_max_speed == 0.0f;
+        target_speed = mathfMoveTowards(target_speed, target_max_speed, fixed_time_step * ACCEL_RATE);
+
+        if (target_speed > target_max_speed) {
+            target_speed = target_max_speed;
+        }
 
         float turn_rate = MAX_TURN_RATE;
 
         float slow_threshold = motorcycle->vehicle.is_boosting ? TURN_BOOST_SLOW_THESHOLD : TURN_SLOW_THRESHOLD;
         float turn_accel = motorcycle->vehicle.is_boosting ? MAX_BOOST_TURN_ACCEL : MAX_TURN_ACCEL;
 
-        if (current_speed > slow_threshold) {
-            turn_rate = turn_accel / current_speed;
+        if (target_speed > slow_threshold) {
+            turn_rate = turn_accel / target_speed;
         }
 
         vector2_t new_rot;
@@ -346,7 +355,7 @@ void motorcycle_update(void* data) {
         vector2ToLookDir(&new_rot, &forward);
         motorcycle->transform.rotation = new_rot;
     } else {
-        current_speed = mathfMoveTowards(current_speed, 0.0f, fixed_time_step * ACCEL_RATE);
+        target_speed = mathfMoveTowards(target_speed, 0.0f, fixed_time_step * ACCEL_RATE);
     }
 
     motorcycle->vehicle.is_stopped = vector3MagSqrd2D(&motorcycle->collider.velocity) < STOPPED_SPEED_THESHOLD * STOPPED_SPEED_THESHOLD;
@@ -363,24 +372,29 @@ void motorcycle_update(void* data) {
         float prev_y = vel->y;
 
         float is_going_up = vector3Dot(vel, &ground_normal) > 0.0f;
-        vector3_t ground_velocity;
-        vector3Project(vel, &ground_normal, &ground_velocity);
 
         vector3_t target_vel;
         vector2ToLookDir(&motorcycle->transform.rotation, &target_vel);
         vector3ProjectPlane(&target_vel, &ground_normal, &target_vel);
-        vector3Normalize(&target_vel, &target_vel);
-        vector3Scale(&target_vel, &target_vel, current_speed);
+        vector3Normalize(&target_vel, &target_vel);;
+        vector3Normalize(&ground_velocity, &ground_velocity);
+
+        float speed_in_target_direction = vector3Dot(&target_vel, &ground_velocity);
+
+        if (speed_in_target_direction > 0) {
+            float transferred_speed = 0.95f * current_speed * speed_in_target_direction;
+
+            if (transferred_speed > target_speed) {
+                target_speed = transferred_speed;
+            }
+        }
+
+        vector3Scale(&target_vel, &target_vel, target_speed);
         motorcycle->last_ground_location = motorcycle->transform.position;
 
         motorcycle->last_ground_location.y += 5.0f;
 
         float max_accel = motorcycle->has_traction ? MAX_TURN_ACCEL : DRIFT_ACCEL;
-
-        vector3_t accel;
-        vector3Sub(&target_vel, vel, &accel);
-
-        motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
 
         float target_offset = target_height - min_height_offset;
         float spring_accel = target_offset * HOVER_SPRING_STRENGTH;
@@ -393,7 +407,13 @@ void motorcycle_update(void* data) {
             }
         }
 
-        vel->y = prev_y * 0.9f + spring_accel * fixed_time_step;
+        if (are_brakes_on) {
+            target_vel.y += spring_accel * fixed_time_step;
+        } else {
+            vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
+        }
+
+        motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
     }
 
     if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
