@@ -47,7 +47,9 @@ void load_scene_or_repair(const char* filename) {
 
 
 void setup() {
+#if DEBUG_ENABLED
     debug_init_isviewer();
+#endif
     // rdpq_debug_start();
     savefile_check_for_data();
     init_engine();
@@ -64,6 +66,7 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
+    scene_queue_next("rom:/scenes/overworld.scene#gen_parts");
     // scene_queue_next("rom:/scenes/store.scene");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/garage.scene");
@@ -194,13 +197,15 @@ int main(void)
     joypad_init();
 
     surface_t zbuffer = surface_alloc(FMT_RGBA16, custom_res.width, custom_res.height);
-	
+
+#if DEBUG_ENABLED
     debug_init_usblog();
     console_set_debug(true);
 
     // give time for the debugger to connect
     long long start_time = timer_ticks();
     while (timer_ticks() - start_time < DEBUG_CONNECT_DELAY);
+#endif
 
     setup();
 

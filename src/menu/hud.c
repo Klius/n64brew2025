@@ -112,20 +112,23 @@ void hud_render_interaction_preview(struct hud* hud) {
 static color_t compass_color = {0x5d, 0x56, 0x9f, 0xff};
 
 static vector2_t arrow_vertices[] = {
-    {0.0f, 10.0f},
-    {-4.0f, -7.0f},
-    {0.0f, -4.0f},
-    {4.0f, -7.0f},
+    {0.0f, 7.0f},
+    {-3.0f, -5.0f},
+    {0.0f, -3.0f},
+    {3.0f, -5.0f},
 };
 
-static vector2_t compass_center = {284.0f, 39.0f};
+#define COMPASS_BORDER_W    24
+#define COMPASS_BORDER_H    25
+
+static vector2_t compass_center = {SCREEN_WD - 20 - COMPASS_BORDER_W * 0.5 , 34.0f};
 
 void hud_render_compass(struct hud* hud) {
     if (!current_scene || !current_scene->overworld) {
         return;
     }
     material_apply(hud->assets.icon_material);
-    rdpq_sprite_blit(hud->assets.compass_border, SCREEN_WD - 20 - 32, 18, NULL);
+    rdpq_sprite_blit(hud->assets.compass_border, SCREEN_WD - 20 - COMPASS_BORDER_W, 20, NULL);
     material_apply(hud->assets.compass_arrow);
     rdpq_set_prim_color(compass_color);
 
