@@ -47,6 +47,7 @@ void drop_shadow_render(void* data, struct render_batch* batch) {
 
 void drop_shadow_init(struct drop_shadow* drop_shadow, struct dynamic_object* target, const char* shadow_mesh) {
     drop_shadow->target = target;
+    drop_shadow->enabled = true;
 
     render_scene_add(target->position, 1.0f, drop_shadow_render, drop_shadow);
     drop_shadow->mesh = tmesh_cache_load(shadow_mesh);

@@ -213,6 +213,7 @@ void player_enter_vehicle(struct player* player, entity_id vehicle_id) {
     player->hover_interaction = 0;
     vehicle_enter(vehicle, ENTITY_ID_PLAYER);
     player->cutscene_actor.collider.collision_layers = 0;
+    player->drop_shadow.enabled = false;
     player_move_to_vehicle(player, vehicle);
     player_loop_animation(player, PLAYER_ANIMATION_RIDE_BIKE, 1.0f);
 
@@ -228,6 +229,7 @@ void player_exit_vehicle(struct player* player) {
 
     vehicle_t* vehicle = vehicle_get(player->state_data.in_vehicle.target);
     player->cutscene_actor.collider.collision_layers = PLAYER_LAYERS;
+    player->drop_shadow.enabled = true;
 
     player_enter_grounded_state(player);
     race_trigger_end(RACE_STATE_ABANDON);

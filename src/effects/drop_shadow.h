@@ -7,6 +7,7 @@
 struct drop_shadow {
     struct dynamic_object* target;
     struct tmesh* mesh;
+    bool enabled;
 };
 
 typedef struct drop_shadow drop_shadow_t;
