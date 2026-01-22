@@ -207,9 +207,7 @@ void scene_update(void* data) {
         
     }
 
-    if (scene->music && !audio_is_playing(scene->music_id)) {
-        scene->music_id = audio_play_2d(scene->music, 1.0f, 0.0f, 1.0f, 1);
-    }
+    overworld_music_update(&scene->music, player_get_position(&scene->player), scene->overworld != NULL);
 }
 
 void scene_queue_next(const char* scene_name) {

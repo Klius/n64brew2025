@@ -9,7 +9,7 @@
 
 struct checkpoint_assets
 {
-    wav64_t checkpoint_sound;
+    wav64_t* checkpoint_sound;
 };
 
 static struct checkpoint_assets assets;
@@ -38,7 +38,7 @@ void checkpoint_update(void* data) {
 
     if (contacts_are_touching(checkpoint->trigger.active_contacts, ENTITY_ID_MOTORCYLE)) {
         if (race_trigger_checkpoint(checkpoint->checkpoint_index, checkpoint->is_finish)) {
-            audio_play_2d(&assets.checkpoint_sound, 1.0f, 0.0f, 1.0f, 1);
+            audio_play_2d(assets.checkpoint_sound, 1.0f, 0.0f, 1.0f, 1);
         }
     }
 }
@@ -66,9 +66,9 @@ void checkpoint_destroy(checkpoint_t* checkpoint, struct checkpoint_definition* 
 }
 
 void checkpoint_common_init() {
-    wav64_open(&assets.checkpoint_sound, "rom:/sounds/race/checkpoint.wav64");
+    assets.checkpoint_sound = wav64_load("rom:/sounds/race/checkpoint.wav64", NULL);
 }
 
 void checkpoint_common_destroy() {
-    wav64_close(&assets.checkpoint_sound);
+    wav64_close(assets.checkpoint_sound);
 }

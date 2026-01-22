@@ -15,6 +15,7 @@
 #include "../cutscene/cutscene.h"
 #include "../menu/hud.h"
 #include "../audio/audio.h"
+#include "overworld_music.h"
 
 struct static_entity {
     struct tmesh tmesh;
@@ -129,8 +130,7 @@ struct scene {
     char* scene_vars;
     bool can_pause;
 
-    wav64_t* music;
-    audio_id music_id;
+    overworld_music_t music;
 
     struct camera_animation_list camera_animations;
 };

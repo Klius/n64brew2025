@@ -24,7 +24,7 @@ struct repair_part_type_def {
 };
 
 struct repair_part_pickup_assets {
-    wav64_t beacon_beep;
+    wav64_t* beacon_beep;
 };
 
 typedef struct repair_part_type_def repair_part_type_def_t;
@@ -141,11 +141,11 @@ static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
 static struct repair_part_pickup_assets assets;
 
 void repair_part_pickup_common_init() {
-    wav64_open(&assets.beacon_beep, "rom:/sounds/parts/tracker_ping.wav64");
+    assets.beacon_beep = wav64_load("rom:/sounds/parts/tracker_ping.wav64", NULL);
 }
 
 void repair_part_pickup_common_destroy() {
-    wav64_close(&assets.beacon_beep);
+    wav64_close(assets.beacon_beep);
 }
 
 void repair_part_interact(struct interactable* interactable, entity_id from) {
@@ -190,7 +190,7 @@ void repair_part_pickup_update(void* data) {
     float beep_threshold = mathfLerp(CLOSE_BEEP_INTERVAL, FAR_BEEP_INTERVAL, lerp);
 
     if (part->beep_timer >= beep_threshold) {
-        audio_play_2d(&assets.beacon_beep, 0.7f, 0.0f, mathfLerp(CLOSE_FREQ, FAR_FREQ, lerp), 0);
+        audio_play_2d(assets.beacon_beep, 0.7f, 0.0f, mathfLerp(CLOSE_FREQ, FAR_FREQ, lerp), 0);
         part->beep_timer = 0.0f;
     } else {
         part->beep_timer += scaled_time_step;

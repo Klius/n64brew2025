@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "../math/mathf.h"
+#include "../time/time.h"
 
 #define MAX_ACTIVE_SOUNDS       16
 #define SPEED_OF_SOUND          343
@@ -42,6 +43,8 @@ static struct audio_listener listener = {
     .right = {1.0f, 0.0f, 0.0f},
 };
 
+static wav64_t* target_music = NULL;
+
 static inline int audio_channel_from_id(audio_id id) {
     return id & (MAX_ACTIVE_SOUNDS - 1);
 }
@@ -55,14 +58,6 @@ audio_id audio_next_id(int channel) {
     }
 
     return result;
-}
-
-static inline int audio_sound_step(active_sound_t* curr) {
-    if (curr->wav && curr->wav->wave.channels > 1) {
-        return 2;
-    }
-
-    return 1;
 }
 
 void audio_active_sound_init(active_sound_t* active_sound) {
@@ -92,7 +87,7 @@ int audio_time_left(int ch) {
 }
 
 audio_id audio_find_available_sound(int16_t priority) {
-    for (uint16_t* curr = &active_sound_ids[0]; curr < &active_sound_ids[MAX_ACTIVE_SOUNDS]; curr += 1) {
+    for (uint16_t* curr = &active_sound_ids[2]; curr < &active_sound_ids[MAX_ACTIVE_SOUNDS]; curr += 1) {
         if (*curr == 0) {
             return audio_next_id(curr - active_sound_ids);
         }
@@ -101,7 +96,7 @@ audio_id audio_find_available_sound(int16_t priority) {
     active_sound_t* best = NULL;
     int best_index = -1;
 
-    for (int i = 0; i < MAX_ACTIVE_SOUNDS; i += audio_sound_step(&active_sounds[i])) {
+    for (int i = 2; i < MAX_ACTIVE_SOUNDS; i += 1) {
         active_sound_t* curr = &active_sounds[i];
 
         if (curr->priority > priority) {
@@ -171,6 +166,8 @@ void audio_process_3d(active_sound_t* sound, int channel) {
 }
 
 audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift, int16_t priority) {
+    assert(wav->wave.channels == 1);
+
     audio_id audio_id = audio_find_available_sound(priority);
 
     if (!audio_id) {
@@ -178,9 +175,7 @@ audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift,
     }
 
     int channel = audio_channel_from_id(audio_id);
-    for (int offset = 0; offset < wav->wave.channels; offset += 1) {
-        active_sound_ids[channel + offset] = audio_id;
-    }
+    active_sound_ids[channel] = audio_id;
 
     active_sound_t* sound = &active_sounds[channel];
     sound->priority = priority;
@@ -195,6 +190,8 @@ audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift,
 }
 
 audio_id audio_play_3d(wav64_t* wav, float volume, struct Vector3* pos, struct Vector3* vel, float pitch_shift, int16_t priority) {
+    assert(wav->wave.channels == 1);
+
     audio_id audio_id = audio_find_available_sound(priority);
 
     if (!audio_id) {
@@ -202,9 +199,7 @@ audio_id audio_play_3d(wav64_t* wav, float volume, struct Vector3* pos, struct V
     }
     
     int channel = audio_channel_from_id(audio_id);
-    for (int offset = 0; offset < wav->wave.channels; offset += 1) {
-        active_sound_ids[channel + offset] = audio_id;
-    }
+    active_sound_ids[channel] = audio_id;
 
     active_sound_t* sound = &active_sounds[channel];
     sound->priority = priority;
@@ -224,6 +219,10 @@ audio_id audio_play_3d(wav64_t* wav, float volume, struct Vector3* pos, struct V
 bool audio_is_playing(audio_id id) {
     int channel = audio_channel_from_id(id);
     return active_sound_ids[channel] == id;
+}
+
+void audio_play_music(wav64_t* wav) {
+    target_music = wav;
 }
 
 struct audio_sample {
@@ -255,17 +254,13 @@ short audio_sample_reverb(short current_output, short input, short* prev_lowpass
 }
 
 void audio_player_update() {
-    for (int i = 0; i < MAX_ACTIVE_SOUNDS; i += audio_sound_step(&active_sounds[i])) {
+    for (int i = 2; i < MAX_ACTIVE_SOUNDS; i += 1) {
         if (!active_sound_ids[i]) {
             continue;
         }
 
         if (!mixer_ch_playing(i)) {
             active_sound_ids[i] = 0;
-            wav64_t* wav = active_sounds[i].wav;
-            for (int offset = 0; wav && offset < wav->wave.channels; offset += 1) {
-                active_sound_ids[i + offset] = 0;
-            }
             active_sounds[i].wav = NULL;
             continue;
         }
@@ -281,6 +276,35 @@ void audio_player_update() {
         short *buf = audio_write_begin();
         mixer_poll(buf, audio_get_buffer_length());
         audio_write_end();
+    }
+
+    if (active_sounds[0].wav && !mixer_ch_playing(0)) {
+        active_sounds[0].wav = NULL;
+    }
+
+    if (target_music != active_sounds[0].wav) {
+        if (active_sounds[0].wav) {
+            active_sounds[0].volume = mathfMoveTowards(active_sounds[0].volume, 0.0f, 0.5f * fixed_time_step);
+
+            if (active_sounds[0].volume > 0) {
+                mixer_ch_set_vol(0, active_sounds[0].volume, active_sounds[0].volume);
+            } else {
+                mixer_ch_stop(0);
+                active_sounds[0].wav = NULL;
+            }
+        } else {
+            active_sounds[0] = (active_sound_t){
+                .frequency = 1.0f,
+                .is_3d = false,
+                .volume = 1.0f,
+                .wav = target_music,
+            };
+
+            if (target_music) {
+                mixer_ch_play(0, &target_music->wave);
+                mixer_ch_set_vol(0, 1, 1);
+            }
+        }
     }
 }
 
@@ -320,5 +344,9 @@ void audio_cancel(wav64_t* wav) {
             mixer_ch_stop(i);
             sound->wav = NULL;
         }
+    }
+
+    if (wav == target_music) {
+        target_music = NULL;
     }
 }

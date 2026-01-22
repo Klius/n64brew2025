@@ -55,7 +55,7 @@ struct map_asssets {
     material_t* map_icon;
     material_t* selection_cursor;
 
-    wav64_t save_sound;
+    wav64_t* save_sound;
 
     sprite_t* icons[MENU_ICON_TYPE_COUNT];
 };
@@ -843,7 +843,7 @@ void map_menu_update(void* data) {
 
     if (pressed.c_right) {
         if (savefile_save()) {
-            audio_play_2d(&assets.save_sound, 1.0f, 0.0f, 0.0f, 1);
+            audio_play_2d(assets.save_sound, 1.0f, 0.0f, 0.0f, 1);
         }
     }
 
@@ -898,7 +898,7 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.map_view = material_cache_load("rom:/materials/menu/map_view.mat");
     assets.map_icon = material_cache_load("rom:/materials/menu/map_icon.mat");
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
-    wav64_open(&assets.save_sound, "rom:/sounds/race/checkpoint.wav64");
+    assets.save_sound = wav64_load("rom:/sounds/race/checkpoint.wav64", NULL);
     
     map_menu.details_image = NULL;
 
@@ -963,7 +963,7 @@ void map_menu_hide() {
     material_cache_release(assets.map_view);
     material_cache_release(assets.map_icon);
     material_cache_release(assets.selection_cursor);
-    wav64_close(&assets.save_sound);
+    wav64_close(assets.save_sound);
     assets.map = NULL;
     assets.material = NULL;
     assets.map_background = NULL;
