@@ -39,4 +39,7 @@ global garage_nut_0: bool;
 global garage_nut_1: bool;
 global garage_nut_2: bool;
 
+global has_race1_reward: bool;
+
 global race0_record: float = 200.0;
+global race1_record: float = 200.0;
