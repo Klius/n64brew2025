@@ -18,6 +18,8 @@
 * add home base icon to map
 * indoor locations should show up on map
 * lap indicator
+* show nuts when you get them
+* show nuts in the shop
 
 After new map
 * have boost highways be more direct
