@@ -297,6 +297,12 @@ void motorcycle_update(void* data) {
         motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
         activate_boost = true;
     }
+    
+#if ENABLE_CHEATS
+    if (input.btn.z) {
+        activate_boost = true;
+    }
+#endif
 
     if (motorcycle->self_boost_cooldown > 0.0f) {
         motorcycle->self_boost_cooldown -= fixed_time_step;
@@ -310,6 +316,12 @@ void motorcycle_update(void* data) {
         }
 
         motorcycle->vehicle.hit_boost_pad = false;
+        
+        if (!motorcycle->boost_sound) {
+            motorcycle->boost_sound = audio_play_2d(assets.boost, 1.0f, 0.0f, 1.0f, 1);
+        }
+    } else if (motorcycle->boost_sound) {
+        motorcycle->boost_sound = 0;
     }
 
     if (motorcycle->boost_timer > 0.0f) {
@@ -321,23 +333,9 @@ void motorcycle_update(void* data) {
         }
     }
 
-#if ENABLE_CHEATS
-    if (input.btn.z) {
-        motorcycle->vehicle.is_boosting = true;
-    }
-#endif
-
     bool are_brakes_on = true;
     
     float target_speed = current_speed;
-
-    if (motorcycle->vehicle.is_boosting) {
-        if (!motorcycle->boost_sound) {
-            motorcycle->boost_sound = audio_play_2d(assets.boost, 1.0f, 0.0f, mathfRandomFloat(0.8f, 1.2f), 1);
-        }
-    } else {
-        motorcycle->boost_sound = 0;
-    }
 
     if (motorcycle->vehicle.driver && update_has_layer(UPDATE_LAYER_WORLD)) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;

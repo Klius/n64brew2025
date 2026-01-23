@@ -127,7 +127,7 @@ void repair_interaction_init(repair_interaction_t* repair, struct repair_interac
         interactable_init(&repair->interactable, entity_id, INTERACT_TYPE_REPAIR, repair_interact, repair);
     }
 
-    if (def->repaired_sound) {
+    if (def->repaired_sound && repair->is_repaired) {
         repair->sound = wav64_load(def->repaired_sound, NULL);
         repair->sound_id = audio_play_3d(repair->sound, 1.0f, &repair->transform.position, &repair->collider.velocity, 1.0f, 0);
     } else {
