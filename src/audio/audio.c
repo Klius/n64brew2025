@@ -162,7 +162,13 @@ void audio_process_3d(active_sound_t* sound, int channel) {
         denominator = SPEED_OF_SOUND - 1.0f;
     }
 
-    mixer_ch_set_freq(channel, sound->frequency * (SPEED_OF_SOUND - listener_direction * factor) / denominator);
+    float final_factor = (SPEED_OF_SOUND - listener_direction * factor) / denominator;
+
+    if (final_factor > 2.0f) {
+        final_factor = 2.0f;
+    }
+
+    mixer_ch_set_freq(channel, sound->frequency * final_factor);
 }
 
 audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift, int16_t priority) {

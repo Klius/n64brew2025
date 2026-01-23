@@ -83,6 +83,10 @@ void npc_update(void *data) {
         audio_stop(npc->walking_sound_id);
         npc->walking_sound_id = 0;
     }
+
+    if (npc->walking_sound_id) {
+        audio_update_position(npc->walking_sound_id, &npc->cutscene_actor.transform.position, &npc->cutscene_actor.collider.velocity);
+    }
 }
 
 void npc_init(struct npc* npc, struct npc_definition* definiton, entity_id id) {

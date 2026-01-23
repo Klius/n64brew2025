@@ -16,6 +16,7 @@
 #include "../render/coloru8.h"
 #include "../savefile/savefile.h"
 #include "../audio/audio.h"
+#include <libdragon.h>
 
 #define NEW_ITEM_ANIM_TIME      1.0f
 #define OPEN_ITEM_DELAY_TIME    1.0f
@@ -46,6 +47,16 @@ enum menu_icon_type {
     MENU_ICON_TYPE_COUNT,
 };
 
+enum menu_sound_effects {
+    MENU_SOUND_BACK,
+    MENU_SOUND_CURSOR,
+    MENU_SOUND_PAUSE,
+    MENU_SOUND_SELECT,
+    MENU_SOUND_SAVE,
+
+    MENU_SOUND_COUNT,
+};
+
 struct map_asssets {
     sprite_t* map;
     material_t* material;
@@ -55,7 +66,8 @@ struct map_asssets {
     material_t* map_icon;
     material_t* selection_cursor;
 
-    wav64_t* save_sound;
+    wav64_t* sounds[MENU_SOUND_COUNT];
+    wav64_t* unpause_sound;
 
     sprite_t* icons[MENU_ICON_TYPE_COUNT];
 };
@@ -830,6 +842,7 @@ void map_check_direction() {
         return;
     }
 
+    audio_play_2d(assets.sounds[MENU_SOUND_CURSOR], 1.0f, 0.0f, 1.0f, 1);
     map_menu.selected_item = new_selection;
 }
 
@@ -843,7 +856,7 @@ void map_menu_update(void* data) {
 
     if (pressed.c_right) {
         if (savefile_save()) {
-            audio_play_2d(assets.save_sound, 1.0f, 0.0f, 0.0f, 1);
+            audio_play_2d(assets.sounds[MENU_SOUND_SAVE], 1.0f, 0.0f, 1.0f, 1);
         }
     }
 
@@ -851,10 +864,12 @@ void map_menu_update(void* data) {
         case MAP_MENU_LIST:
             if ((pressed.start && map_menu.can_unpause) || pressed.b) {
                 map_menu_hide();
+                audio_play_2d(assets.unpause_sound, 1.0f, 0.0f, 1.0f, 1);
                 return;
             }
             map_check_direction();
             if (pressed.a) {
+                audio_play_2d(assets.sounds[MENU_SOUND_SELECT], 1.0f, 0.0f, 1.0f, 1);
                 map_menu_show_details();
             }
             break;
@@ -877,14 +892,24 @@ void map_menu_update(void* data) {
         case MAP_MENU_DETAILS:
             if (pressed.start && map_menu.can_unpause) {
                 map_menu_hide();
+                audio_play_2d(assets.unpause_sound, 1.0f, 0.0f, 1.0f, 1);
                 return;
             }
             if (pressed.b) {
+                audio_play_2d(assets.sounds[MENU_SOUND_BACK], 1.0f, 0.0f, 1.0f, 1);
                 map_menu_hide_details();
             }
             break;
     }
 }
+
+static const char* menu_sound_files[MENU_SOUND_COUNT] = {
+    [MENU_SOUND_BACK] = "rom:/sounds/menu/back.wav64",
+    [MENU_SOUND_CURSOR] = "rom:/sounds/menu/cursor.wav64",
+    [MENU_SOUND_PAUSE] = "rom:/sounds/menu/pause.wav64",
+    [MENU_SOUND_SELECT] = "rom:/sounds/menu/select.wav64",
+    [MENU_SOUND_SAVE] = "rom:/sounds/race/checkpoint.wav64",
+};
 
 void map_menu_show_with_item(enum inventory_item_type item) {
     if (current_scene) {
@@ -898,7 +923,13 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.map_view = material_cache_load("rom:/materials/menu/map_view.mat");
     assets.map_icon = material_cache_load("rom:/materials/menu/map_icon.mat");
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
-    assets.save_sound = wav64_load("rom:/sounds/race/checkpoint.wav64", NULL);
+
+    for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
+        assets.sounds[i] = wav64_load(menu_sound_files[i], NULL);
+    }
+    if (!assets.unpause_sound) {
+        assets.unpause_sound = wav64_load("rom:/sounds/menu/unpause.wav64", NULL);
+    }
     
     map_menu.details_image = NULL;
 
@@ -949,6 +980,8 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     } else if (map_menu.selected_item == ITEM_TYPE_NONE || !map_find_selected_item()) {
         map_menu.selected_item = map_get_default_selection();
     }
+    
+    audio_play_2d(assets.sounds[MENU_SOUND_PAUSE], 1.0f, 0.0f, 1.0f, 1);
 }
 
 void map_menu_show() {
@@ -963,7 +996,9 @@ void map_menu_hide() {
     material_cache_release(assets.map_view);
     material_cache_release(assets.map_icon);
     material_cache_release(assets.selection_cursor);
-    wav64_close(assets.save_sound);
+    for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
+        wav64_close(assets.sounds[i]);
+    }
     assets.map = NULL;
     assets.material = NULL;
     assets.map_background = NULL;

@@ -13,11 +13,20 @@
 #include "../savefile/savefile.h"
 #include "../menu/map_menu.h"
 
+enum main_menu_sound_effects {
+    MAIN_MENU_SOUND_CURSOR,
+    MAIN_MENU_SOUND_SELECT,
+
+    MAIN_MENU_SOUND_COUNT,
+};
+
 struct main_menu {
     bool is_showing;
     sprite_t* title;
     sprite_t* title_band;
     material_t* title_material;
+    
+    wav64_t* sounds[MAIN_MENU_SOUND_COUNT];
     
     int selected_item;
     float go_timer;
@@ -127,6 +136,7 @@ void main_menu_update(void *data) {
     if (savefile_has_save()) {
         if ((inputs.stick_y > 40 && prev_y <= 40) || (inputs.stick_y < -40 && prev_y >= -40)) {
             main_menu.selected_item = 1 - main_menu.selected_item;
+            audio_play_2d(main_menu.sounds[MAIN_MENU_SOUND_CURSOR], 1.0f, 0.0f, 1.0f, 1);
         }
     }
 
@@ -136,6 +146,7 @@ void main_menu_update(void *data) {
 
     if (pressed.a) {
         fade_effect_set((color_t){0, 0, 0, 255}, 1.0f);
+        audio_play_2d(main_menu.sounds[MAIN_MENU_SOUND_SELECT], 1.0f, 0.0f, 1.0f, 1);
         main_menu.go_timer = 1.0f;
     }
 
@@ -161,6 +172,12 @@ void main_menu_update(void *data) {
     }
 }
 
+
+static const char* menu_sound_files[MAIN_MENU_SOUND_COUNT] = {
+    [MAIN_MENU_SOUND_CURSOR] = "rom:/sounds/menu/cursor.wav64",
+    [MAIN_MENU_SOUND_SELECT] = "rom:/sounds/menu/pause.wav64",
+};
+
 void main_menu_show() {
     if (main_menu.is_showing) {
         return;
@@ -177,12 +194,21 @@ void main_menu_show() {
 
     font_type_use(FONT_DIALOG);
     update_add(&main_menu, main_menu_update, UPDATE_PRIORITY_PLAYER, UPDATE_LAYER_CUTSCENE | UPDATE_LAYER_PAUSE_MENU);
+    
+    for (int i = 0; i < MAIN_MENU_SOUND_COUNT; i += 1) {
+        main_menu.sounds[i] = wav64_load(menu_sound_files[i], NULL);
+    }
 }
 
 void main_menu_hide() {
     if (!main_menu.is_showing) {
         return;
     }
+    
+    for (int i = 0; i < MAIN_MENU_SOUND_COUNT; i += 1) {
+        wav64_close(main_menu.sounds[i]);
+    }
+
     main_menu.is_showing = false;
     menu_remove_callback(&main_menu);
 
