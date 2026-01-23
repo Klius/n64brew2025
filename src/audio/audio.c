@@ -221,6 +221,18 @@ bool audio_is_playing(audio_id id) {
     return active_sound_ids[channel] == id;
 }
 
+void audio_stop(audio_id id) {
+    int channel = audio_channel_from_id(id);
+
+    if (active_sound_ids[channel] != id) {
+        return;
+    }
+
+    mixer_ch_stop(channel);
+    active_sound_ids[channel] = 0;
+    active_sounds[channel].wav = NULL;
+}
+
 void audio_play_music(wav64_t* wav) {
     target_music = wav;
 }
@@ -330,10 +342,15 @@ void audio_update_position(audio_id id, struct Vector3* pos, struct Vector3* vel
     sound->velocity = *vel;
 }
 
-void audio_update_listener(struct Vector3* pos, struct Vector3* right, struct Vector3* velocity) {
+
+
+void audio_update_listener(struct Vector3* pos, struct Vector3* right) {
+    vector3_t offset;
+    vector3Sub(pos, &listener.position, &offset);
+
     listener.position = *pos;
     listener.right = *right;
-    listener.velocity = *velocity;
+    vector3Scale(&offset, &listener.velocity, scaled_time_step_inv);
 }
 
 void audio_cancel(wav64_t* wav) {

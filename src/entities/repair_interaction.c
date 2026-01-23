@@ -15,6 +15,7 @@ struct repair_interaction_type_def {
     const char* mesh_name;
     const char* repaired_mesh_name;
     const char* repaired_mesh_anim;
+    const char* repaired_sound;
     dynamic_object_type_t collider;
 };
 
@@ -32,6 +33,7 @@ static repair_interaction_type_def_t types[REPAIR_COUNT] = {
         .mesh_name = "rom:/meshes/repairs/water_pump_broken.tmesh",
         .repaired_mesh_name = "rom:/meshes/repairs/water_pump_fixed.tmesh",
         .repaired_mesh_anim = "rom:/meshes/repairs/water_pump_fixed.anim",
+        .repaired_sound = "rom:/sounds/objects/water_pump.wav64",
         .collider = {
             BOX_COLLIDER(0.9f, 1.6f, 1.0f),
             .center = {0.0f, 0.8f, 0.0f},
@@ -124,9 +126,26 @@ void repair_interaction_init(repair_interaction_t* repair, struct repair_interac
     if (!repair->is_repaired) {
         interactable_init(&repair->interactable, entity_id, INTERACT_TYPE_REPAIR, repair_interact, repair);
     }
+
+    if (def->repaired_sound) {
+        repair->sound = wav64_load(def->repaired_sound, NULL);
+        repair->sound_id = audio_play_3d(repair->sound, 1.0f, &repair->transform.position, &repair->collider.velocity, 1.0f, 0);
+    } else {
+        repair->sound = NULL;
+        repair->sound_id = 0;
+    }
 }
 
 void repair_interaction_destroy(repair_interaction_t* repair) {
+    if (repair->sound_id) {
+        audio_stop(repair->sound_id);
+    }
+
+    if (repair->sound) {
+        audio_cancel(repair->sound);
+        wav64_close(repair->sound);
+    }
+
     render_scene_remove(&repair->renderable);
     renderable_destroy(&repair->renderable);
     collision_scene_remove(&repair->collider);

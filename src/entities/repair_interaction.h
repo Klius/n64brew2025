@@ -10,6 +10,8 @@
 #include "../entity/interactable.h"
 #include "../render/animator.h"
 #include "../render/animation_clip.h"
+#include "../audio/audio.h"
+#include <libdragon.h>
 
 struct repair_interaction {
     transform_sa_t transform;
@@ -21,6 +23,8 @@ struct repair_interaction {
     enum repair_type repair_type;
     scene_entry_point repair_scene;
     bool is_repaired;
+    wav64_t* sound;
+    audio_id sound_id;
 };
 
 typedef struct repair_interaction repair_interaction_t;

@@ -24,6 +24,7 @@ struct npc_information npc_information[] = {
                 .center = {0.0f, 0.75f, 0.0f},
             },
         },
+        .walk_sound_loop = "rom:/sounds/characters/robot_walk.wav64",
     },
     [NPC_BROTHER_HURT] = {
         .mesh = "rom:/meshes/characters/brother.tmesh",
@@ -73,6 +74,15 @@ void npc_update(void *data) {
     struct npc* npc = (struct npc*)data;
 
     cutscene_actor_update(&npc->cutscene_actor);
+
+    if (npc->cutscene_actor.state & ACTOR_STATE_MOVING) {
+        if (!npc->walking_sound_id && npc->walking_sound) {
+            npc->walking_sound_id = audio_play_3d(npc->walking_sound, 1.0f, &npc->cutscene_actor.transform.position, &npc->cutscene_actor.collider.velocity, 1.0f, 0);
+        }
+    } else if (npc->walking_sound_id) {
+        audio_stop(npc->walking_sound_id);
+        npc->walking_sound_id = 0;
+    }
 }
 
 void npc_init(struct npc* npc, struct npc_definition* definiton, entity_id id) {
@@ -105,9 +115,25 @@ void npc_init(struct npc* npc, struct npc_definition* definiton, entity_id id) {
     }
 
     drop_shadow_init(&npc->drop_shadow, &npc->cutscene_actor.collider, "rom:/meshes/effects/drop-shadow.tmesh");
+
+    if (information->walk_sound_loop) {
+        npc->walking_sound = wav64_load(information->walk_sound_loop, NULL);
+        npc->walking_sound_id = 0;
+    } else {
+        npc->walking_sound = NULL;
+        npc->walking_sound_id = 0;
+    }
 }
 
 void npc_destroy(struct npc* npc) {
+    if (npc->walking_sound_id) {
+        audio_stop(npc->walking_sound_id);
+    }
+
+    if (npc->walking_sound) {
+        wav64_close(npc->walking_sound);
+    }
+
     render_scene_remove(&npc->renderable);
     renderable_destroy(&npc->renderable);
     cutscene_actor_destroy(&npc->cutscene_actor);

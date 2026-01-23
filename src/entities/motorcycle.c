@@ -11,6 +11,7 @@
 #include "../scene/scene.h"
 #include "../player/inventory.h"
 #include "../resource/animation_cache.h"
+#include "../math/mathf.h"
 
 #define HOVER_SAG_AMOUNT        0.25f
 #define HOVER_SPRING_STRENGTH   (-GRAVITY_CONSTANT / HOVER_SAG_AMOUNT)
@@ -46,6 +47,7 @@
 
 struct motorcyle_assets {
     tmesh_t* mesh;
+    wav64_t* boost;
 };
 
 typedef struct motorcyle_assets motorcyle_assets_t;
@@ -158,11 +160,14 @@ static vector3_t local_cast_points[CAST_POINT_COUNT] = {
 
 void motorcycle_common_init() {
     assets.mesh = tmesh_cache_load("rom:/meshes/vehicles/bike.tmesh");
+    assets.boost = wav64_load("rom:/sounds/vehicle/boost_pad.wav64", NULL);
 }
 
 void motorcycle_common_destroy() {
     tmesh_cache_release(assets.mesh);
+    wav64_close(assets.boost);
     assets.mesh = NULL;
+    assets.boost = NULL;
 }
 
 void motorcycle_ride(struct interactable* interactable, entity_id from) {
@@ -326,6 +331,14 @@ void motorcycle_update(void* data) {
     
     float target_speed = current_speed;
 
+    if (motorcycle->vehicle.is_boosting) {
+        if (!motorcycle->boost_sound) {
+            motorcycle->boost_sound = audio_play_2d(assets.boost, 1.0f, 0.0f, mathfRandomFloat(0.8f, 1.2f), 1);
+        }
+    } else {
+        motorcycle->boost_sound = 0;
+    }
+
     if (motorcycle->vehicle.driver && update_has_layer(UPDATE_LAYER_WORLD)) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;
 
@@ -441,6 +454,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->boost_timer = 0.0f;
     motorcycle->last_ground_location = definition->position;
     motorcycle->self_boost_cooldown = 0.0f;
+    motorcycle->boost_sound = 0;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;

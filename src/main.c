@@ -269,9 +269,9 @@ int main(void)
         struct Vector3 right;
         if (current_scene) {
             quatMultVector(&current_scene->camera.transform.rotation, &gRight, &right);
-            audio_update_listener(&current_scene->camera.transform.position, &right, &gZeroVec);
+            audio_update_listener(&current_scene->camera.transform.position, &right);
         } else {
-            audio_update_listener(&gZeroVec, &gRight, &gZeroVec);
+            audio_update_listener(&gZeroVec, &gRight);
         }
         audio_player_update();
         if (update_has_layer(UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE)) {

@@ -12,6 +12,7 @@
 #include "../render/animator.h"
 #include "../effects/drop_shadow.h"
 #include "vehicle.h"
+#include "../audio/audio.h"
 
 #define CAST_POINT_COUNT 5
 
@@ -32,6 +33,8 @@ struct motorcycle {
     float self_boost_cooldown;
 
     cast_point_t cast_points[CAST_POINT_COUNT];
+
+    audio_id boost_sound;
 };
 
 typedef struct motorcycle motorcycle_t;
