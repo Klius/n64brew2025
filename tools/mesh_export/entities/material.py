@@ -371,7 +371,7 @@ class Tex():
         self.height = self._png_metadata.height
         self.palette_data = self._png_metadata.palette
 
-    def set_frames(self, frames):
+    def set_frames(self, frames: list[str]):
         self.frames = frames
 
         self._png_metadata = PngMetadata(frames[0])

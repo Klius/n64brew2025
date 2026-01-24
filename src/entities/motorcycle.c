@@ -482,7 +482,6 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     motorcycle->boost_sound = 0;
     motorcycle->idle_sound = 0;
-    // motorcycle->fly_sound = 0;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;
