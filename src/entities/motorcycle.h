@@ -35,6 +35,7 @@ struct motorcycle {
     cast_point_t cast_points[CAST_POINT_COUNT];
 
     audio_id boost_sound;
+    audio_id idle_sound;
 };
 
 typedef struct motorcycle motorcycle_t;

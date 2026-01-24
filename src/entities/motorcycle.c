@@ -48,6 +48,7 @@
 struct motorcyle_assets {
     tmesh_t* mesh;
     wav64_t* boost;
+    wav64_t* idle;
 };
 
 typedef struct motorcyle_assets motorcyle_assets_t;
@@ -161,13 +162,16 @@ static vector3_t local_cast_points[CAST_POINT_COUNT] = {
 void motorcycle_common_init() {
     assets.mesh = tmesh_cache_load("rom:/meshes/vehicles/bike.tmesh");
     assets.boost = wav64_load("rom:/sounds/vehicle/boost_pad.wav64", NULL);
+    assets.idle = wav64_load("rom:/sounds/vehicle/cycle_idle.wav64", NULL);
 }
 
 void motorcycle_common_destroy() {
     tmesh_cache_release(assets.mesh);
     wav64_close(assets.boost);
+    wav64_close(assets.idle);
     assets.mesh = NULL;
     assets.boost = NULL;
+    assets.idle = NULL;
 }
 
 void motorcycle_ride(struct interactable* interactable, entity_id from) {
@@ -262,6 +266,27 @@ void motorcycle_check_for_mount(motorcycle_t* motorcycle) {
     }
 }
 
+void motorcycle_update_sound(motorcycle_t* motorcycle, float speed) {
+    if (motorcycle->vehicle.driver && !motorcycle->idle_sound) {
+        motorcycle->idle_sound = audio_play_3d(assets.idle, 0.3f, &motorcycle->transform.position, &motorcycle->collider.velocity, 1.0f, 2);
+    } else if (!motorcycle->vehicle.driver && motorcycle->idle_sound) {
+        audio_stop(motorcycle->idle_sound);
+        motorcycle->idle_sound = 0;
+    }
+
+    if (motorcycle->idle_sound) {
+        float idle_lerp = speed * (1.0f / UPGRADED_DRIVE_SPEED);
+
+        if (idle_lerp > 1.0f) {
+            idle_lerp = 1.0f;
+        }
+
+        audio_update_position(motorcycle->idle_sound, &motorcycle->transform.position, &motorcycle->collider.velocity);
+        audio_update_volume(motorcycle->idle_sound, mathfLerp(0.6f, 1.0f, idle_lerp));
+        audio_update_pitch(motorcycle->idle_sound, mathfLerp(0.9f, 1.5f, idle_lerp));
+    }
+}
+
 void motorcycle_update(void* data) {
     motorcycle_t* motorcycle = (motorcycle_t*)data;
 
@@ -288,18 +313,19 @@ void motorcycle_update(void* data) {
     vector2ToLookDir(&motorcycle->transform.rotation, &forward);
 
     joypad_inputs_t input = joypad_get_inputs(0);
+    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
 
     bool activate_boost = motorcycle->vehicle.hit_boost_pad;
 
     motorcycle->vehicle.is_boosting = activate_boost;
     
-    if (input.btn.z && motorcycle->self_boost_cooldown <= 0.0f && inventory_has_item(ITEM_BOOST_ANYWHERE)) {
+    if (pressed.z && motorcycle->self_boost_cooldown <= 0.0f && inventory_has_item(ITEM_BOOST_ANYWHERE)) {
         motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
         activate_boost = true;
     }
     
 #if ENABLE_CHEATS
-    if (input.btn.z) {
+    if (pressed.z) {
         activate_boost = true;
     }
 #endif
@@ -318,7 +344,7 @@ void motorcycle_update(void* data) {
         motorcycle->vehicle.hit_boost_pad = false;
         
         if (!motorcycle->boost_sound) {
-            motorcycle->boost_sound = audio_play_2d(assets.boost, 1.0f, 0.0f, 1.0f, 1);
+            motorcycle->boost_sound = audio_play_2d(assets.boost, 0.3f, 0.0f, 1.0f, 1);
         }
     } else if (motorcycle->boost_sound) {
         motorcycle->boost_sound = 0;
@@ -336,6 +362,8 @@ void motorcycle_update(void* data) {
     bool are_brakes_on = true;
     
     float target_speed = current_speed;
+
+    motorcycle_update_sound(motorcycle, current_speed);
 
     if (motorcycle->vehicle.driver && update_has_layer(UPDATE_LAYER_WORLD)) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;
@@ -451,8 +479,10 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->is_active = true;
     motorcycle->boost_timer = 0.0f;
     motorcycle->last_ground_location = definition->position;
-    motorcycle->self_boost_cooldown = 0.0f;
+    motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     motorcycle->boost_sound = 0;
+    motorcycle->idle_sound = 0;
+    // motorcycle->fly_sound = 0;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;

@@ -162,13 +162,13 @@ void audio_process_3d(active_sound_t* sound, int channel) {
         denominator = SPEED_OF_SOUND - 1.0f;
     }
 
-    float final_factor = (SPEED_OF_SOUND - listener_direction * factor) / denominator;
+    float final_freq = sound->frequency * (SPEED_OF_SOUND - listener_direction * factor) / denominator;
 
-    if (final_factor > 2.0f) {
-        final_factor = 2.0f;
+    if (final_freq > 44095) {
+        final_freq = 44095;
     }
 
-    mixer_ch_set_freq(channel, sound->frequency * final_factor);
+    mixer_ch_set_freq(channel, final_freq);
 }
 
 audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift, int16_t priority) {
@@ -349,6 +349,47 @@ void audio_update_position(audio_id id, struct Vector3* pos, struct Vector3* vel
 }
 
 
+void audio_update_volume(audio_id id, float volume) {
+    if (!id) {
+        return;
+    }
+
+    int channel = audio_channel_from_id(id);
+
+    if (active_sound_ids[channel] != id) {
+        return;
+    }
+
+    
+    active_sound_t* sound = &active_sounds[channel];
+
+    if (!sound->is_3d) {
+        return;
+    }
+
+    sound->volume = volume;
+}
+
+void audio_update_pitch(audio_id id, float pitch) {
+    if (!id) {
+        return;
+    }
+
+    int channel = audio_channel_from_id(id);
+
+    if (active_sound_ids[channel] != id) {
+        return;
+    }
+
+    
+    active_sound_t* sound = &active_sounds[channel];
+
+    if (!sound->is_3d) {
+        return;
+    }
+
+    sound->frequency = pitch * sound->wav->wave.frequency;
+}
 
 void audio_update_listener(struct Vector3* pos, struct Vector3* right) {
     vector3_t offset;

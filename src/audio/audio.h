@@ -20,6 +20,8 @@ void audio_play_music(wav64_t* wav);
 
 void audio_cancel(wav64_t* wav);
 void audio_update_position(audio_id id, struct Vector3* pos, struct Vector3* vel);
+void audio_update_volume(audio_id id, float volume);
+void audio_update_pitch(audio_id id, float pitch);
 void audio_update_listener(struct Vector3* pos, struct Vector3* right);
 
 #endif
