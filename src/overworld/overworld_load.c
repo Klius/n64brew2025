@@ -325,6 +325,16 @@ void overworld_free(struct overworld* overworld) {
     free(overworld);
 }
 
+void overworld_queue_tile_unload(struct overworld* overworld, struct overworld_tile* tile) {
+    for (int i = 0; i < UNLOAD_QUEUE_SIZE; i += 1) {
+        if (!overworld->unload_queue[i]) {
+            overworld->unload_queue[i] = tile;
+            return;
+        }
+    }
+    assert(false);
+}
+
 void overworld_check_loaded_tiles(struct overworld* overworld) {
     if (overworld->load_next.x == NO_TILE_COORD || overworld->load_next.y == NO_TILE_COORD) {
         return;
@@ -334,7 +344,8 @@ void overworld_check_loaded_tiles(struct overworld* overworld) {
     int slot_y = overworld->load_next.y & 0x3;
 
     if (overworld->loaded_tiles[slot_x][slot_y]) {
-        rdpq_call_deferred((void (*)(void*))overworld_tile_free, overworld->loaded_tiles[slot_x][slot_y]);
+        overworld_queue_tile_unload(overworld, overworld->loaded_tiles[slot_x][slot_y]);
+        overworld->loaded_tiles[slot_x][slot_y] = NULL;
     }
 
     fseek(overworld->file, overworld->tile_definitions[overworld->load_next.x + overworld->load_next.y * overworld->tile_x].visual_block_offset, SEEK_SET);
@@ -561,4 +572,14 @@ void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3*
     }
 
     overworld_check_actor_despawn(overworld, player_pos);
+}
+
+void overworld_check_unload_queue(struct overworld* overworld) {
+    rspq_wait();
+    for (int i = 0; i < UNLOAD_QUEUE_SIZE; i += 1) {
+        if (overworld->unload_queue[i]) {
+            overworld_tile_free(overworld->unload_queue[i]);
+            overworld->unload_queue[i] = NULL;
+        }
+    }
 }

@@ -94,6 +94,7 @@ struct overworld_lod1 {
 #define NO_TILE_COORD   0xFFFF
 #define MAX_ACTIVE_ACTORS   128
 #define LOADED_TILE_ARRAY_SIZE  2
+#define UNLOAD_QUEUE_SIZE   4
 
 struct overworld {
     uint16_t tile_x, tile_y;
@@ -107,6 +108,7 @@ struct overworld {
     // tile locations modulo wrap to share slots
     struct overworld_tile* loaded_tiles[4][4];
     struct overworld_tile_render_block render_blocks[4][4];
+    struct overworld_tile* unload_queue[UNLOAD_QUEUE_SIZE];
 
     struct overworld_actor_tile* loaded_actor_tiles[LOADED_TILE_ARRAY_SIZE][LOADED_TILE_ARRAY_SIZE];
 

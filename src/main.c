@@ -24,6 +24,7 @@
 #include "repair/repair_scene.h"
 #include "config.h"
 #include "menu/main_menu.h"
+#include "overworld/overworld_load.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -136,22 +137,11 @@ void render(surface_t* zbuffer) {
 }
 
 bool check_scene_load() {
-    static uint8_t frame_wait = 0;
-
     if (!scene_has_next()) {
         return false;
     }
 
-    if (frame_wait == 0) {
-        frame_wait = 2;
-        return true;
-    } 
-
-    --frame_wait;
-
-    if (frame_wait > 0) {
-        return true;
-    }
+    rspq_wait();
 
     if (current_scene) {
         scene_release(current_scene);
@@ -203,6 +193,9 @@ int main(void)
 
     while(1) {
         savefile_check_autosave();
+        if (current_scene && current_scene->overworld) {
+            overworld_check_unload_queue(current_scene->overworld);
+        }
 
         if (check_scene_load()) {
             continue;
