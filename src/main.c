@@ -67,10 +67,10 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    // scene_queue_next("rom:/scenes/overworld.scene#race0");
+    // scene_queue_next("rom:/scenes/overworld.scene#water_pump_parts");
     // scene_queue_next("rom:/scenes/store.scene");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
-    scene_queue_next("rom:/scenes/garage.scene");
+    // scene_queue_next("rom:/scenes/garage.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
 
     load_scene_or_repair(scene_get_next());
