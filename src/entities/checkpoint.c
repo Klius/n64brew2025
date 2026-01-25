@@ -29,6 +29,11 @@ static const char* checkpoint_meshes[CHECKPOINT_TYPE_COUNT] = {
     [CHECKPOINT_MIDDLE] = "rom:/meshes/objects/race_checkpoint.tmesh",
 };
 
+static const char* checkpoint_meshes_off[CHECKPOINT_TYPE_COUNT] = {
+    [CHECKPOINT_FINISH] = "rom:/meshes/objects/race_start+finish.tmesh",
+    [CHECKPOINT_MIDDLE] = "rom:/meshes/objects/race_checkpoint_off.tmesh",
+};
+
 void checkpoint_update(void* data) {
     checkpoint_t* checkpoint = (checkpoint_t*)data;
 
@@ -49,7 +54,7 @@ void checkpoint_init(checkpoint_t* checkpoint, struct checkpoint_definition* def
     spatial_trigger_init(&checkpoint->trigger, &checkpoint->transform, &trigger_type, COLLISION_LAYER_TANGIBLE, entity_id);
     collision_scene_add_trigger(&checkpoint->trigger);
 
-    renderable_single_axis_init(&checkpoint->renderable, &checkpoint->transform, checkpoint_meshes[definition->checkpoint_type]);
+    renderable_single_axis_init(&checkpoint->renderable, &checkpoint->transform, race_get_state() == RACE_STATE_STARTED ? checkpoint_meshes[definition->checkpoint_type] : checkpoint_meshes_off[definition->checkpoint_type]);
     render_scene_add_renderable(&checkpoint->renderable, 7.0f);
     update_add(checkpoint, checkpoint_update, UPDATE_PRIORITY_EFFECTS, UPDATE_LAYER_WORLD);
 
