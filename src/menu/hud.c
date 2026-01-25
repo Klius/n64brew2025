@@ -181,7 +181,7 @@ void hud_render_tracker_icon(struct hud* hud) {
 
     material_apply(hud->assets.tracker_icon); 
     if (hud->track_flash_timer < TRACKER_FLASHING_TIME) {
-        rdpq_set_prim_color((color_t){188, 232, 4, (uint8_t)(255.0f / TRACKER_FLASHING_TIME) * hud->track_flash_timer});
+        rdpq_set_prim_color((color_t){110, 232, 4, (uint8_t)(255.0f / TRACKER_FLASHING_TIME) * hud->track_flash_timer});
     }
     rdpq_texture_rectangle(
         TILE0,

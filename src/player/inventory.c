@@ -6,7 +6,7 @@
 extern struct global_location inventory_item_locations[ITEM_TYPE_COUNT];
 
 bool inventory_has_item(enum inventory_item_type item) {
-    return inventory_get_count(item);
+    return inventory_get_count(item) != 0;
 }
 
 void inventory_set_has_item(enum inventory_item_type item, bool value) {

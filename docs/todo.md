@@ -1,7 +1,7 @@
 
 * add fast travel back to home base
 * add fast travel back to motorcycle
-* make motorcycle boost feel faster
+* make motorcycle boost feel faster (camera tricks)
 * fix generator repair minigame
 * driving up steep hills feels bad
 * push motorcyle up hill without clipping
@@ -12,12 +12,15 @@
 * give hover indication repair part location and orientation is correct
 * part repair minigames should have obvious attachment points
 * make it more obvious when the gear is backwards
-* make water visible in photo where to find ram (or redesign puzzle)
 * add home base icon to map
 * indoor locations should show up on map
 * lap indicator
 * show nuts when you get them
 * show nuts in the shop
+* add instructions how to save
+* add instructions on how to get off motorcycle
+* fixup world intro cutscene
+* fix fading between scenes
 * fix tunneling through ground
 
 After new map

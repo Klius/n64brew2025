@@ -45,9 +45,9 @@ func on_enter()
         npc_wait scrapbot;
         npc_animate scrapbot, "bot_talk", true;
         say "
-            Although it appears the health juice went bad while the power was out.
+            Although it appears the nanites went bad while the power was out.
 
-            You will need to bring back more health juice.
+            You will need to bring back more nanites.
 
             Here is a map where you can find some south east of here.
         ";
@@ -161,21 +161,43 @@ func on_robot_talk()
         cam_return;
         load_scene "rom:/scenes/overworld.scene#generator";
         return;
-    elif has_generator_part_0 and has_generator_part_1 and has_generator_part_2 then
+    elif not has_repaired_generator then
         npc_animate scrapbot, "bot_talk", true;
-        if has_repaired_generator then
-            say "Use the map to locate more health juice for the machine";
+        if has_generator_part_0 and has_generator_part_1 and has_generator_part_2 then
+            say "You have aquired the generator parts. Now go outside to repair the generator.";
+        else
+            say "After you aquire the parts return here to fix the generator";
+        end
+        npc_animate scrapbot, "idle", true;
+    elif not has_repaired_health_machine then
+        npc_animate scrapbot, "bot_talk", true;
+        if has_health_juice then
+            cam_look_npc medical_machine;
+            say "You have the nanites. Now place them into the machine";
         else
             say "
                 The medical machine is back online.
 
-                You need to follow that new map I gave to get more health juice.
+                You need to follow that new map I gave to get more nanites.
             ";
         end
         npc_animate scrapbot, "idle", true;
+    elif not has_tablet then
+        npc_animate scrapbot, "bot_talk", true;
+        if has_tablet_note then
+            say "You have the images of the locations where you can find parts for the tablet.";
+        else
+            cam_look_npc repairs_tablet_broken;
+            say "Look on the desk over there. I left some information where you can find parts for the tablet.";
+        end
+        npc_animate scrapbot, "idle", true;
+    elif not has_given_tablet then
+        npc_animate scrapbot, "bot_talk", true;
+        say "You have repaired the tablet. I'm sure Samson would want to see it.";
+        npc_animate scrapbot, "idle", true;
     else
         npc_animate scrapbot, "bot_talk", true;
-        say "After you aquire the parts return here to fix the generator";
+        say "I have no more tasks for you.";
         npc_animate scrapbot, "idle", true;
     end
 

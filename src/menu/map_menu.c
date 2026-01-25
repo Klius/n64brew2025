@@ -65,6 +65,7 @@ struct map_asssets {
     material_t* map_view;
     material_t* map_icon;
     material_t* selection_cursor;
+    material_t* check_icon;
 
     wav64_t* sounds[MENU_SOUND_COUNT];
     wav64_t* unpause_sound;
@@ -85,7 +86,7 @@ struct menu_item {
     enum menu_item_type type;
     enum menu_icon_type icon;
     enum inventory_item_type inventory_item;
-    enum inventory_item_type hide_override;
+    enum inventory_item_type item_complete[3];
     const char* name;
     union menu_item_data data;
     bool show_count;
@@ -99,7 +100,7 @@ static struct menu_item menu_items[] = {
         .name = "Nuts",
         .data = {
             .part = {
-                .description = "These have become somthing like currency since the impact",
+                .description = "Valuable bits of metal used in trade",
             },
         },
         .show_count = true,
@@ -108,6 +109,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_MAP,
         .inventory_item = ITEM_WELL_PUMP_PART_MAP,
+        .item_complete = {ITEM_WELL_HAS_PUMP_GEAR},
         .name = "Well part map",
         .data = {
             .map = {
@@ -119,6 +121,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_MAP,
         .inventory_item = ITEM_GENERATOR_PART_MAP,
+        .item_complete = {ITEM_GENERATOR_PART_0, ITEM_GENERATOR_PART_1, ITEM_GENERATOR_PART_2},
         .name = "Power parts map",
         .data = {
             .map = {
@@ -130,7 +133,8 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_MAP,
         .inventory_item = ITEM_HEALTH_JUICE_MAP,
-        .name = "Health juice",
+        .item_complete= {ITEM_HEALTH_JUICE},
+        .name = "Nanite map",
         .data = {
             .map = {
                 .image_filename = "rom:/images/maps/health_juice_map.sprite",
@@ -141,10 +145,11 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_NOTE,
         .inventory_item = ITEM_TABLET_NOTE,
+        .item_complete = {ITEM_TABLET_BATTERY, ITEM_TABLET_MEMORY, ITEM_TABLET_SCREEN},
         .name = "Tablet parts",
         .data = {
             .part = {
-                .description = "Scrapbot found where parts could be located to repair the tablet.",
+                .description = "Scrapbot found where parts could be located to repair the tablet. Check the images to see the locations.",
             },
         },
     },
@@ -152,7 +157,8 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_IMAGE,
         .inventory_item = ITEM_TABLET_BATTERY_MAP,
-        .name = "Battery",
+        .item_complete = {ITEM_TABLET_BATTERY},
+        .name = "Battery location",
         .data = {
             .map = {
                 .image_filename = "rom:/images/maps/battery_location.sprite",
@@ -163,7 +169,8 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_IMAGE,
         .inventory_item = ITEM_TABLET_MEMORY_MAP,
-        .name = "Memory",
+        .item_complete = {ITEM_TABLET_MEMORY},
+        .name = "RAM location",
         .data = {
             .map = {
                 .image_filename = "rom:/images/maps/memory_location.sprite",
@@ -174,7 +181,8 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_IMAGE,
         .inventory_item = ITEM_TABLET_SCREEN_MAP,
-        .name = "Screen",
+        .item_complete = {ITEM_TABLET_SCREEN},
+        .name = "Screen location",
         .data = {
             .map = {
                 .image_filename = "rom:/images/maps/screen_location.sprite",
@@ -186,11 +194,11 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_MOTOR_PART,
         .inventory_item = ITEM_WELL_HAS_MOTOR,
-        .hide_override = ITEM_WELL_HAS_FIXED_MOTOR,
+        .item_complete = {ITEM_WELL_HAS_FIXED_MOTOR},
         .name = "Bike motor",
         .data = {
             .part = {
-                .description = "The motor to your hoverbike",
+                .description = "You were lucky to find this replacement for your hover bike",
             },
         },
     },
@@ -199,11 +207,11 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_WELL_PART,
         .inventory_item = ITEM_WELL_HAS_PUMP_GEAR,
-        .hide_override = ITEM_WELL_HAS_FIXED_PUMP,
+        .item_complete = {ITEM_WELL_HAS_FIXED_PUMP},
         .name = "Well parts",
         .data = {
             .part = {
-                .description = "The parts you need to fix the water well",
+                .description = "Replacement parts needed to fix the well damaged in the raid",
             },
         },
     },
@@ -212,7 +220,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_GEN_FAN_PART,
         .inventory_item = ITEM_GENERATOR_PART_0,
-        .hide_override = ITEM_GENERATOR_HAS_FIXED,
+        .item_complete = {ITEM_GENERATOR_HAS_FIXED},
         .name = "Fan",
         .data = {
             .part = {
@@ -224,7 +232,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_GEN_STARTER_PART,
         .inventory_item = ITEM_GENERATOR_PART_1,
-        .hide_override = ITEM_GENERATOR_HAS_FIXED,
+        .item_complete = {ITEM_GENERATOR_HAS_FIXED},
         .name = "Starter",
         .data = {
             .part = {
@@ -236,7 +244,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_GEN_BULB_PART,
         .inventory_item = ITEM_GENERATOR_PART_2,
-        .hide_override = ITEM_GENERATOR_HAS_FIXED,
+        .item_complete = {ITEM_GENERATOR_HAS_FIXED},
         .name = "Bulb",
         .data = {
             .part = {
@@ -248,11 +256,11 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_NANO_VIAL_PART,
         .inventory_item = ITEM_HEALTH_JUICE,
-        .hide_override = ITEM_HEALTH_MACHINE_FIXED,
-        .name = "Nano bots",
+        .item_complete = {ITEM_HEALTH_MACHINE_FIXED},
+        .name = "Nanites",
         .data = {
             .part = {
-                .description = "Medical nano bots used to treat wounds",
+                .description = "Medical nano bots used to treat wounds. They quickly break down oustide of controlled environments.",
             },
         },
     },
@@ -260,7 +268,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_TABLET_BATTERY,
         .inventory_item = ITEM_TABLET_BATTERY,
-        .hide_override = ITEM_TABLET_REPAIRED,
+        .item_complete = {ITEM_TABLET_REPAIRED},
         .name = "Nuclear battery",
         .data = {
             .part = {
@@ -272,11 +280,11 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_TABLET_MEMORY,
         .inventory_item = ITEM_TABLET_MEMORY,
-        .hide_override = ITEM_TABLET_REPAIRED,
-        .name = "Memory",
+        .item_complete = {ITEM_TABLET_REPAIRED},
+        .name = "DDR100 RAM",
         .data = {
             .part = {
-                .description = "This is hard to come by",
+                .description = "This memory module is hard to come by. They are mostly found in AI bots.",
             },
         },
     },
@@ -284,7 +292,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_TABLET_SCREEN,
         .inventory_item = ITEM_TABLET_SCREEN,
-        .hide_override = ITEM_TABLET_REPAIRED,
+        .item_complete = {ITEM_TABLET_REPAIRED},
         .name = "Video screen",
         .data = {
             .part = {
@@ -296,7 +304,7 @@ static struct menu_item menu_items[] = {
         .type = MENU_ITEM_PART,
         .icon = MENU_ICON_TABLET,
         .inventory_item = ITEM_TABLET,
-        .hide_override = ITEM_GIVEN_TABLET,
+        .item_complete = {ITEM_GIVEN_TABLET},
         .name = "Tablet",
         .data = {
             .part = {
@@ -370,9 +378,9 @@ static const char* icon_files[MENU_ICON_TYPE_COUNT] = {
 };
 
 static vector2_t player_cursor_points[3] = {
-    {0.0f, 4.0f},
-    {2.5f, -4.0f},
-    {-2.5f, -4.0f},
+    {0.0f, 5.0f},
+    {3.0f, -5.0f},
+    {-3.0f, -5.0f},
 };
 
 #define TAN_HORZ 0.93361004861225457857f
@@ -553,70 +561,104 @@ void map_render_details(struct menu_item* item) {
 }
 
 bool map_should_show_item(struct menu_item* item) {
-    return item->show_count || (inventory_has_item(item->inventory_item) && !inventory_has_item(item->hide_override));
+    return item->show_count || inventory_has_item(item->inventory_item);
 }
 
 #define FADE_IN_RATIO   0.3f
 
-enum inventory_item_type map_render_get_item_at(int xAt, int yAt) {
-    int x = 0;
-    int y = 0;
+static inline void map_next_tile_location(int* x, int* y) {
+    *x += ICON_SIZE;
+
+    if (*x >= MAP_SIZE) {
+        *x = 0;
+        *y += ICON_SIZE;
+    }
+}
+
+bool map_is_item_complete(struct menu_item* item) {
+    bool has_check = false;
+
+    for (int completion_index = 0; completion_index < 3; completion_index += 1) {
+        if (!item->item_complete[completion_index]) {
+            break;
+        }
+
+        has_check = inventory_has_item(item->item_complete[completion_index]);
+
+        if (!has_check) {
+            return false;
+        }
+    }
+
+    return has_check;
+}
+
+enum inventory_item_type map_render_get_item_at_pass(int* xPtr, int* yPtr, int xAt, int yAt, bool finished) {
     for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
         struct menu_item* item = &menu_items[i];
 
-        if (!map_should_show_item(&menu_items[i])) {
+        if (!map_should_show_item(&menu_items[i]) || map_is_item_complete(item) != finished) {
             continue;
         }
         
-        if (x == xAt && y == yAt) {
+        if (*xPtr == xAt && *yPtr == yAt) {
             return item->inventory_item;
         }
-        
-        x += ICON_SIZE;
 
-        if (x >= MAP_SIZE) {
-            x = 0;
-            y += ICON_SIZE;
-        }
+        map_next_tile_location(xPtr, yPtr);
     }
 
     return ITEM_TYPE_NONE;
 }
 
-bool map_render_get_position(enum menu_item_type type, int* xOut, int* yOut) {
+enum inventory_item_type map_render_get_item_at(int xAt, int yAt) {
     int x = 0;
     int y = 0;
+
+    enum inventory_item_type active = map_render_get_item_at_pass(&x, &y, xAt, yAt, false);
+
+    if (active != ITEM_TYPE_NONE) {
+        return active;
+    }
+
+    return map_render_get_item_at_pass(&x, &y, xAt, yAt, true);
+}
+
+bool map_render_get_position_pass(enum menu_item_type type, int* xPtr, int* yPtr, int* xOut, int* yOut, bool finished) {
     for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
         struct menu_item* item = &menu_items[i];
 
-        if (!map_should_show_item(&menu_items[i])) {
+        if (!map_should_show_item(&menu_items[i]) || map_is_item_complete(item) != finished) {
             continue;
         }
         
         if (item->inventory_item == map_menu.selected_item) {
-            *xOut = x;
-            *yOut = y;
+            *xOut = *xPtr;
+            *yOut = *yPtr;
             return true;
         }
         
-        x += ICON_SIZE;
-
-        if (x >= MAP_SIZE) {
-            x = 0;
-            y += ICON_SIZE;
-        }
+        map_next_tile_location(xPtr, yPtr);
     }
 
     return false;
 }
 
-void map_render_items(float lerp_amount) {
+bool map_render_get_position(enum menu_item_type type, int* xOut, int* yOut) {
     int x = 0;
     int y = 0;
+    return map_render_get_position_pass(type, &x, &y, xOut, yOut, false) || map_render_get_position_pass(type, &x, &y, xOut, yOut, true);
+}
+
+void map_items_render_pass(int* xPtr, int* yPtr, bool finished, float lerp_amount) {
     for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
+        int x = *xPtr;
+        int y = *yPtr;
         struct menu_item* item = &menu_items[i];
+
+        bool is_complete = map_is_item_complete(item);
         
-        if (!map_should_show_item(&menu_items[i])) {
+        if (!map_should_show_item(&menu_items[i]) || is_complete != finished) {
             continue;
         }
 
@@ -627,26 +669,28 @@ void map_render_items(float lerp_amount) {
 
         material_apply(assets.map_icon);
 
-        if (!map_menu.has_prev[i]) {
-            color_t prim_color;
-            if (lerp_amount >= 1.0f) {
-                prim_color = (color_t){0, 0, 0, 255};
-            } else if (lerp_amount < FADE_IN_RATIO) {
-                prim_color = coloru8_lerp(&(color_t){
-                    255, 255, 255, 0,
-                }, &(color_t){
-                    255, 255, 255, 255,
-                }, lerp_amount * (1.0f / FADE_IN_RATIO));
+        color_t prim_color;
+        if (lerp_amount >= 1.0f) {
+            if (is_complete) {
+                prim_color = (color_t){64, 64, 64, 196};
             } else {
-                prim_color = coloru8_lerp(&(color_t){
-                    255, 255, 255, 255,
-                }, &(color_t){
-                    0, 0, 0, 255,
-                }, (lerp_amount - FADE_IN_RATIO) * (1.0f / (1.0f - FADE_IN_RATIO)));
+                prim_color = (color_t){0, 0, 0, 255};
             }
-
-            rdpq_set_prim_color(prim_color);
+        } else if (lerp_amount < FADE_IN_RATIO) {
+            prim_color = coloru8_lerp(&(color_t){
+                255, 255, 255, 0,
+            }, &(color_t){
+                255, 255, 255, 255,
+            }, lerp_amount * (1.0f / FADE_IN_RATIO));
+        } else {
+            prim_color = coloru8_lerp(&(color_t){
+                255, 255, 255, 255,
+            }, &(color_t){
+                0, 0, 0, 255,
+            }, (lerp_amount - FADE_IN_RATIO) * (1.0f / (1.0f - FADE_IN_RATIO)));
         }
+
+        rdpq_set_prim_color(prim_color);
 
         rdpq_sprite_blit(assets.icons[item->icon], x + MENU_X, y + MAP_Y, NULL);
 
@@ -669,13 +713,59 @@ void map_render_items(float lerp_amount) {
             );
         }
 
-        x += ICON_SIZE;
+        map_next_tile_location(xPtr, yPtr);
+    }
+}
 
-        if (x >= MAP_SIZE) {
-            x = 0;
-            y += ICON_SIZE;
+void map_render_check_icons() {
+    int x = 0;
+    int y = 0;
+    
+    material_apply(assets.check_icon);
+
+    for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
+        struct menu_item* item = &menu_items[i];
+        
+        if (!map_should_show_item(&menu_items[i])) {
+            continue;
+        }
+
+        if (!map_is_item_complete(item)) {
+            map_next_tile_location(&x, &y);
         }
     }
+    
+    for (int i = 0; i < MENU_ITEM_COUNT; i += 1) {
+        struct menu_item* item = &menu_items[i];
+        
+        if (!map_should_show_item(&menu_items[i])) {
+            continue;
+        }
+
+        if (!map_is_item_complete(item)) {
+            continue;
+        }
+
+        rdpq_texture_rectangle(
+            TILE0, 
+            x + MENU_X + 16, 
+            y + MAP_Y + 16, 
+            x + MENU_X + ICON_SIZE, 
+            y + MAP_Y + ICON_SIZE, 
+            0, 0
+        );
+        
+        map_next_tile_location(&x, &y);
+    }
+}
+
+void map_render_items(float lerp_amount) {
+    int x = 0;
+    int y = 0;
+    
+    map_items_render_pass(&x, &y, false, lerp_amount);
+    map_items_render_pass(&x, &y, true, lerp_amount);
+    map_render_check_icons();
 }
 
 enum inventory_item_type map_get_default_selection() {
@@ -923,6 +1013,7 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.map_view = material_cache_load("rom:/materials/menu/map_view.mat");
     assets.map_icon = material_cache_load("rom:/materials/menu/map_icon.mat");
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
+    assets.check_icon = material_cache_load("rom:/materials/menu/check.mat");
 
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         assets.sounds[i] = wav64_load(menu_sound_files[i], NULL);
@@ -996,6 +1087,7 @@ void map_menu_hide() {
     material_cache_release(assets.map_view);
     material_cache_release(assets.map_icon);
     material_cache_release(assets.selection_cursor);
+    material_cache_release(assets.check_icon);
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         wav64_close(assets.sounds[i]);
     }

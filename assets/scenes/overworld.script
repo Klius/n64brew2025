@@ -50,7 +50,11 @@ func well_scrapbot()
         cam_animate "see_river"; 
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, towards_river;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, towards_river;
-        say "You can scavange for parts near the river.";
+        say "
+            You can scavange for parts near the river.
+
+            Your bike is equipped with a scanner. When you are near the parts it will beep to let you know.    
+        ";
         cam_return;
         cam_wait;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;

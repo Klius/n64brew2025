@@ -5,7 +5,8 @@ interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
 cam_look_npc ENTITY_ID_SUBJECT;
 
 if not has_repaired_health_machine then
-    ask "This machine has health juice. Take some?";
+    say "This machine has nanites. Transporting them will be time sensitive.";
+    ask "Take some?";
 
     if ask_response() then
         has_health_juice = true;
@@ -13,7 +14,7 @@ if not has_repaired_health_machine then
         start_timer 120, "rom:/scripts/health_juice_expire.script";
     end
 else
-    say "You no longer need health juice.";
+    say "You no longer need nanites.";
 end
 
 world_unpause;
