@@ -66,10 +66,10 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    // scene_queue_next("rom:/scenes/overworld.scene");
+    // scene_queue_next("rom:/scenes/overworld.scene#race0");
     // scene_queue_next("rom:/scenes/store.scene");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
-    // scene_queue_next("rom:/scenes/garage.scene");
+    scene_queue_next("rom:/scenes/garage.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
 
     load_scene_or_repair(scene_get_next());
@@ -135,15 +135,6 @@ void render(surface_t* zbuffer) {
     render_menu();
 }
 
-#define VI_PER_FRAME 2
-volatile static uint8_t vi_delay;
-
-void on_vi_interrupt() {
-    if (vi_delay > 0) {
-        vi_delay -= 1;
-    }
-}
-
 bool check_scene_load() {
     static uint8_t frame_wait = 0;
 
@@ -189,6 +180,7 @@ int main(void)
 	}
 
     display_init(custom_res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);
+    display_set_fps_limit(30.0f);
 	// *(volatile uint32_t*)0xA4400000 |= 0x300; //disables resampling on the VI
 	rdpq_init();
     t3d_init((T3DInitParams){});
@@ -209,13 +201,8 @@ int main(void)
 
     setup();
 
-    register_VI_handler(on_vi_interrupt);
-
     while(1) {
-        while (vi_delay > 0) {
-            savefile_check_autosave();
-        }
-        vi_delay = VI_PER_FRAME;
+        savefile_check_autosave();
 
         if (check_scene_load()) {
             continue;
@@ -254,7 +241,7 @@ int main(void)
 
             current_game_mode = GAME_MODE_MENU;
         } else {
-            surface_t* fb = display_try_get();
+            surface_t* fb = display_get();
 
             if (fb) {
                 rdpq_attach(fb, &zbuffer);

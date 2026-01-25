@@ -61,6 +61,7 @@ void scene_render_room(struct scene* scene, int room_index, struct render_batch*
                     particles = fade_particles;
                     particles->particle_scale_width = (uint16_t)((uint32_t)(scale * particles->particle_scale_width) >> 16);
                     particles->particle_scale_height = (uint16_t)((uint32_t)(scale * particles->particle_scale_height) >> 16);
+                    data_cache_hit_writeback_invalidate(fade_particles, sizeof(render_batch_particles_t));
                 }
             }
     

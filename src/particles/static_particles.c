@@ -110,6 +110,7 @@ void static_particles_render_instances(static_particles_t* particle_list, int pa
                     batch_particles = fade_particles;
                     batch_particles->particle_scale_width = (uint16_t)((uint32_t)(scale * batch_particles->particle_scale_width) >> 16);
                     batch_particles->particle_scale_height = (uint16_t)((uint32_t)(scale * batch_particles->particle_scale_height) >> 16);
+                    data_cache_hit_writeback_invalidate(fade_particles, sizeof(render_batch_particles_t));
                 }
             }
         

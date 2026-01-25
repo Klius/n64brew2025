@@ -161,6 +161,8 @@ struct render_batch_element* render_batch_add_tmesh(
                     if (!matrices) {
                         continue;
                     }
+
+                    matrices = UncachedAddr(matrices);
     
                     int matrix_index = 0;                
                     
