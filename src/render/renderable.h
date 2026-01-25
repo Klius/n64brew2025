@@ -22,6 +22,8 @@ struct renderable {
             struct material* material;
             uint8_t frame_max_x;
             uint8_t frame_step;
+            uint8_t current_stall_frame;
+            uint8_t stall_frame_count;
         } point_render;
     };
     enum transform_type type;

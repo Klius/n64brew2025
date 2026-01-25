@@ -34,6 +34,8 @@ void renderable_init_point(struct renderable* renderable, vector3_t* position, f
     renderable->hide = 0;
     renderable->point_render.frame_max_x = 0;
     renderable->point_render.frame_step = 0;
+    renderable->point_render.stall_frame_count = 3;
+    renderable->point_render.current_stall_frame = 0;
 
     renderable->point_render.particle_data = (TPXParticle){
         .sizeA = 127,
