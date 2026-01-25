@@ -1,4 +1,5 @@
 {
+    "tex0": "../../images/menu/tracker_icon.png",
     "combineMode": [{
         "color": ["0", "0", "0", "PRIM"],
         "alpha": ["PRIM", "0", "TEX0", "0"]

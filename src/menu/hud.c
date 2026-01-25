@@ -23,7 +23,8 @@
 #define BOX_HEIGHT              10
 #define AUTO_SAVE_MARGIN        25
 #define AUTO_SAVE_SIZE          16
-#define TRACKER_FLASHING_TIME   0.5f
+#define TRACKER_FLASHING_TIME   0.25f
+#define TRACKER_FULL_FLASH_TIME 0.25f
 
 static sprite_t* map_test;
 static material_t* map_render;
@@ -119,6 +120,7 @@ static vector2_t arrow_vertices[] = {
     {3.0f, -5.0f},
 };
 
+#define COMPASS_MARGIN      20
 #define COMPASS_BORDER_W    24
 #define COMPASS_BORDER_H    25
 
@@ -129,7 +131,7 @@ void hud_render_compass(struct hud* hud) {
         return;
     }
     material_apply(hud->assets.icon_material);
-    rdpq_sprite_blit(hud->assets.compass_border, SCREEN_WD - 20 - COMPASS_BORDER_W, 20, NULL);
+    rdpq_sprite_blit(hud->assets.compass_border, SCREEN_WD - COMPASS_MARGIN - COMPASS_BORDER_W, COMPASS_MARGIN, NULL);
     material_apply(hud->assets.compass_arrow);
     rdpq_set_prim_color(compass_color);
 
@@ -170,13 +172,23 @@ void hud_render_autosave(struct hud* hud) {
     );
 }
 
-void hud_render_tracking_icon(struct hud* hud) {
+#define TRACKER_ICON_SIZE   24
+
+void hud_render_tracker_icon(struct hud* hud) {
     if (hud->track_flash_timer <= 0.0f) {
         return;
     }
 
-    material_apply(hud->assets.tracking_icon);
-    rdpq_set_prim_color((color_t){188, 232, 4, (uint8_t)(255.0f / TRACKER_FLASHING_TIME) * hud->track_flash_timer});
+    material_apply(hud->assets.tracker_icon); 
+    if (hud->track_flash_timer < TRACKER_FLASHING_TIME) {
+        rdpq_set_prim_color((color_t){188, 232, 4, (uint8_t)(255.0f / TRACKER_FLASHING_TIME) * hud->track_flash_timer});
+    }
+    rdpq_texture_rectangle(
+        TILE0,
+        SCREEN_WD - COMPASS_MARGIN - COMPASS_BORDER_W - TRACKER_ICON_SIZE, COMPASS_MARGIN,
+        SCREEN_WD - COMPASS_MARGIN - COMPASS_BORDER_W, COMPASS_MARGIN + TRACKER_ICON_SIZE,
+        0, 0
+    );
 
     hud->track_flash_timer -= fixed_time_step;
 }
@@ -189,7 +201,7 @@ void hud_render(void *data) {
     hud_render_interaction_preview(data);
     hud_render_compass(data);
     hud_render_autosave(data);
-    hud_render_tracking_icon(data);
+    hud_render_tracker_icon(data);
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
@@ -204,7 +216,7 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->assets.icon_material = material_cache_load("rom:/materials/menu/map_icon.mat");
     hud->assets.compass_arrow = material_cache_load("rom:/materials/menu/map_arrow.mat");
     hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
-    hud->assets.tracking_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");   
+    hud->assets.tracker_icon = material_cache_load("rom:/materials/menu/tracker_icon.mat");   
 }
 
 void hud_destroy(struct hud* hud) {
@@ -214,7 +226,7 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.icon_material);
     material_cache_release(hud->assets.compass_arrow);
     material_cache_release(hud->assets.saving_icon);
-    material_cache_release(hud->assets.tracking_icon);
+    material_cache_release(hud->assets.tracker_icon);
     sprite_free(hud->assets.compass_border);
 }
 
@@ -223,5 +235,5 @@ void hud_flash_tracker() {
         return;
     }
 
-    current_scene->hud.track_flash_timer = TRACKER_FLASHING_TIME;
+    current_scene->hud.track_flash_timer = TRACKER_FLASHING_TIME + TRACKER_FULL_FLASH_TIME;
 }
