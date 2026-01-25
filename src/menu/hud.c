@@ -23,6 +23,7 @@
 #define BOX_HEIGHT              10
 #define AUTO_SAVE_MARGIN        25
 #define AUTO_SAVE_SIZE          16
+#define TRACKER_FLASHING_TIME   0.5f
 
 static sprite_t* map_test;
 static material_t* map_render;
@@ -169,6 +170,17 @@ void hud_render_autosave(struct hud* hud) {
     );
 }
 
+void hud_render_tracking_icon(struct hud* hud) {
+    if (hud->track_flash_timer <= 0.0f) {
+        return;
+    }
+
+    material_apply(hud->assets.tracking_icon);
+    rdpq_set_prim_color((color_t){188, 232, 4, (uint8_t)(255.0f / TRACKER_FLASHING_TIME) * hud->track_flash_timer});
+
+    hud->track_flash_timer -= fixed_time_step;
+}
+
 void hud_render(void *data) {
     if (!update_has_layer(UPDATE_LAYER_WORLD)) {
         return;
@@ -177,6 +189,7 @@ void hud_render(void *data) {
     hud_render_interaction_preview(data);
     hud_render_compass(data);
     hud_render_autosave(data);
+    hud_render_tracking_icon(data);
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
@@ -184,12 +197,14 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     font_type_use(FONT_DIALOG);
     hud->player = player;
     hud->camera = camera;
+    hud->track_flash_timer = 0.0f;
 
     hud->assets.overlay_material = material_cache_load("rom:/materials/menu/solid_primitive.mat");
     hud->assets.compass_border = sprite_load("rom:/images/menu/compass_border.sprite");
     hud->assets.icon_material = material_cache_load("rom:/materials/menu/map_icon.mat");
     hud->assets.compass_arrow = material_cache_load("rom:/materials/menu/map_arrow.mat");
     hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
+    hud->assets.tracking_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");   
 }
 
 void hud_destroy(struct hud* hud) {
@@ -199,5 +214,14 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.icon_material);
     material_cache_release(hud->assets.compass_arrow);
     material_cache_release(hud->assets.saving_icon);
+    material_cache_release(hud->assets.tracking_icon);
     sprite_free(hud->assets.compass_border);
+}
+
+void hud_flash_tracker() {
+    if (!current_scene) {
+        return;
+    }
+
+    current_scene->hud.track_flash_timer = TRACKER_FLASHING_TIME;
 }

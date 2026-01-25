@@ -11,6 +11,7 @@
 #include "../scene/scene.h"
 #include "../math/mathf.h"
 #include "../player/inventory.h"
+#include "../menu/hud.h"
 
 struct repair_part_type_def {
     union {
@@ -190,7 +191,8 @@ void repair_part_pickup_update(void* data) {
     float beep_threshold = mathfLerp(CLOSE_BEEP_INTERVAL, FAR_BEEP_INTERVAL, lerp);
 
     if (part->beep_timer >= beep_threshold) {
-        audio_play_2d(assets.beacon_beep, 0.7f, 0.0f, mathfLerp(CLOSE_FREQ, FAR_FREQ, lerp), 0);
+        audio_play_2d(assets.beacon_beep, 1.0f, 0.0f, mathfLerp(CLOSE_FREQ, FAR_FREQ, lerp), 0);
+        hud_flash_tracker();
         part->beep_timer = 0.0f;
     } else {
         part->beep_timer += scaled_time_step;
