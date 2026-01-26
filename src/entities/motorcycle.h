@@ -46,5 +46,8 @@ void motorcycle_common_destroy();
 void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* definition, entity_id entity_id);
 void motorcycle_destroy(motorcycle_t* motorcycle);
 
+motorcycle_t* motorcycle_get();
+bool motorcycle_check_active(motorcycle_t* motorcycle);
+
 
 #endif

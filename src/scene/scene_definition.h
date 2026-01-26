@@ -95,6 +95,8 @@ enum inventory_item_type {
 
     ITEM_NUT,
 
+    ITEM_BIKE_TELEPORT,
+
     ITEM_TYPE_COUNT,
 };
 

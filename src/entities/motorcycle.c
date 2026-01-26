@@ -250,9 +250,11 @@ bool motorcycle_check_active(motorcycle_t* motorcycle) {
     if (is_active && !motorcycle->is_active) {
         render_scene_init_add_renderable(&motorcycle->renderable, &motorcycle->transform, assets.mesh, 2.0f);
         collision_scene_add(&motorcycle->collider);
+        motorcycle->drop_shadow.enabled = false;
     } else if (!is_active && motorcycle->is_active) {
         render_scene_remove_renderable(&motorcycle->renderable);
         collision_scene_remove(&motorcycle->collider);
+        motorcycle->drop_shadow.enabled = true;
     }
 
     motorcycle->is_active = is_active;
@@ -461,6 +463,8 @@ void motorcycle_update(void* data) {
     }
 }
 
+static motorcycle_t* current_instance;
+
 void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* definition, entity_id entity_id) {
     transformSaInit(&motorcycle->transform, &definition->position, &definition->rotation, 1.0f);
     render_scene_init_add_renderable(&motorcycle->renderable, &motorcycle->transform, assets.mesh, 2.0f);
@@ -492,6 +496,8 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle_check_for_mount(motorcycle);
     animator_run_clip(&motorcycle->animator, animation_set_find_clip(motorcycle->animations, "idle"), 0.0f, true);
     drop_shadow_init(&motorcycle->drop_shadow, &motorcycle->collider, "rom:/meshes/effects/drop-shadow.tmesh");
+
+    current_instance = motorcycle;
 }
 
 void motorcycle_destroy(motorcycle_t* motorcycle) {
@@ -509,4 +515,10 @@ void motorcycle_destroy(motorcycle_t* motorcycle) {
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         collision_scene_remove_cast_point(&motorcycle->cast_points[i]);
     }
+
+    current_instance = NULL;
+}
+
+motorcycle_t* motorcycle_get() {
+    return current_instance;
 }

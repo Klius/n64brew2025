@@ -19,6 +19,7 @@ func room_default()
         world_unpause;
         cam_return;
         did_reset = true;
+        has_bike_teleport = true;
     end
 
     if are_touching(intro, ENTITY_ID_PLAYER) then

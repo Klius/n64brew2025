@@ -605,3 +605,10 @@ void camera_shake(struct camera_controller* controller, float strength) {
     controller->shake_offset.y += randomInRangef(-strength, strength);
     controller->shake_offset.z += randomInRangef(-strength, strength);
 }
+
+void camera_shift_by(struct camera_controller* controller, vector3_t* offset) {
+    vector3Add(&controller->look_target, offset, &controller->look_target);
+    vector3Add(&controller->target, offset, &controller->target);
+    vector3Add(&controller->looking_at, offset, &controller->looking_at);
+    vector3Add(&controller->stable_position, offset, &controller->stable_position);
+}

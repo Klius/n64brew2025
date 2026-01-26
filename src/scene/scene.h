@@ -161,4 +161,6 @@ struct named_location* scene_find_location(char* name);
 
 void scene_entity_apply_types(void* definition, char* string_table, struct entity_field_type_location* type_locations, int type_location_count);
 
+void scene_teleport_player_to(vector3_t* pos);
+
 #endif

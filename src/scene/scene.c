@@ -471,3 +471,17 @@ void scene_entity_apply_types(void* definition, char* string_table, struct entit
         }
     }
 }
+
+void scene_teleport_player_to(vector3_t* pos) {
+    if (current_scene->overworld) {
+        overworld_check_collider_tiles(current_scene->overworld, pos);
+    }
+
+    vector3_t* player_pos = player_get_position(&current_scene->player);
+    vector3_t offset;
+    vector3Sub(pos, player_pos, &offset);
+
+    camera_shift_by(&current_scene->camera_controller, &offset);
+
+    *player_pos = *pos;
+}

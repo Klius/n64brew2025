@@ -20,7 +20,10 @@
 #include "../config.h"
 #include "../cutscene/race.h"
 #include "../cutscene/cutscene_stopwatch.h"
+#include "../cutscene/cutscene_runner.h"
+#include "../cutscene/cutscene.h"
 #include "inventory.h"
+#include "../entities/motorcycle.h"
 
 #include "../effects/fade_effect.h"
 
@@ -379,14 +382,36 @@ void player_interact(struct player* player, interactable_t* interactable) {
     }
 }
 
-void player_update_grounded(struct player* player, struct contact* ground_contact) {
-    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
+void player_teleport_to_cycle(void* data) {
+    struct player* player = (player_t*)data;
 
-    if (ground_contact && dynamic_object_should_slide(MAX_SLIDING_SLOPE, ground_contact->normal.y, SURFACE_TYPE_DEFAULT)) {
+    motorcycle_t* motorcycle = motorcycle_get();
+
+    if (!motorcycle) {
         return;
     }
+
+    scene_teleport_player_to(&motorcycle->transform.position);
+    motorcycle_check_active(motorcycle);
+    player_enter_vehicle(player, ENTITY_ID_MOTORCYLE);
+}
+
+void player_update_grounded(struct player* player, struct contact* ground_contact) {
+    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
     
     interactable_t* interactable = player_find_interactable(player);
+
+    if (pressed.r && motorcycle_get()) {
+        cutscene_builder_t cutscene;
+        cutscene_builder_init(&cutscene);
+        cutscene_builder_fade(&cutscene, FADE_COLOR_BLACK, 0.5);
+        cutscene_builder_delay(&cutscene, 0.5f);
+        cutscene_builder_callback(&cutscene, player_teleport_to_cycle, player);
+        cutscene_builder_delay(&cutscene, 0.5f);
+        cutscene_builder_fade(&cutscene, FADE_COLOR_NONE, 0.5);
+        
+        cutscene_runner_run(cutscene_builder_finish(&cutscene), 0, cutscene_runner_free_on_finish(), NULL, 0);
+    }
 
     if (interactable) {
         player->hover_interaction = interactable->id;

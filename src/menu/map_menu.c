@@ -43,6 +43,7 @@ enum menu_icon_type {
     MENU_ICON_NOTE,
     MENU_ICON_IMAGE,
     MENU_ICON_NUT,
+    MENU_ICON_BIKE_TELEPORT,
 
     MENU_ICON_TYPE_COUNT,
 };
@@ -104,6 +105,17 @@ static struct menu_item menu_items[] = {
             },
         },
         .show_count = true,
+    },
+    {
+        .type = MENU_ITEM_PART,
+        .icon = MENU_ICON_BIKE_TELEPORT,
+        .inventory_item = ITEM_BIKE_TELEPORT,
+        .name = "Bike teleport",
+        .data = {
+            .part = {
+                .description = "Use R to teleport back to your hover bike. You got this at the shop in town.",
+            },
+        },
     },
     {
         .type = MENU_ITEM_MAP,
@@ -375,6 +387,7 @@ static const char* icon_files[MENU_ICON_TYPE_COUNT] = {
     [MENU_ICON_NOTE] = "rom:/images/maps/note.sprite",
     [MENU_ICON_IMAGE] = "rom:/images/maps/image_icon.sprite",
     [MENU_ICON_NUT] = "rom:/images/maps/nut.sprite",
+    [MENU_ICON_BIKE_TELEPORT] = "rom:/images/parts/bike_teleport.sprite",
 };
 
 static vector2_t player_cursor_points[3] = {

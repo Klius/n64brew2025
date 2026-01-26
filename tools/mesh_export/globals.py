@@ -39,6 +39,8 @@ mapping = {
 
     "is_riding_motorcycle": "ITEM_RIDING_MOTORCYCLE",
 
+    "has_bike_teleport": "ITEM_BIKE_TELEPORT",
+
     "nut_count": "ITEM_NUT",
 }
 

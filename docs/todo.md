@@ -4,9 +4,7 @@
 * make motorcycle boost feel faster (camera tricks)
 * fix generator repair minigame
 * driving up steep hills feels bad
-* push motorcyle up hill without clipping
 * check for memory leaks
-* fix getting stuck on the bottom of hills
 * add scraps piles in the area where parts are
 * feedback when a part is linked to the right spot
 * give hover indication repair part location and orientation is correct
@@ -21,7 +19,6 @@
 * add instructions on how to get off motorcycle
 * fixup world intro cutscene
 * fix fading between scenes
-* fix tunneling through ground
 * fix z fighting issues for distant objects
 
 After new map       
