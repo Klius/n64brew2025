@@ -595,6 +595,10 @@ void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3*
 }
 
 void overworld_check_unload_queue(struct overworld* overworld) {
+    if (!overworld->unload_queue[0]) {
+        return;
+    }
+
     rspq_wait();
     for (int i = 0; i < UNLOAD_QUEUE_SIZE; i += 1) {
         if (overworld->unload_queue[i]) {
