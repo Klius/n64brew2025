@@ -145,7 +145,7 @@ func on_exit_generator()
 
         fade FADE_COLOR_NONE, 0.5;
 
-        npc_animate water_pump_scrapbot, "bot_talk", true;
+        npc_animate generator_scrapbot, "bot_talk", true;
         say "Here is the broken generator";
         
         cam_animate "sand_dune_focus";
@@ -157,11 +157,13 @@ func on_exit_generator()
 
             This map will aid you in finding the generator parts.
         ";
-        npc_animate water_pump_scrapbot, "idle", true;
+        npc_animate generator_scrapbot, "bot_handover", false;
+        npc_wait generator_scrapbot;
         world_unpause;
         cam_return;
         has_generator_part_map = true;
         show_item ITEM_GENERATOR_PART_MAP;
+        npc_animate generator_scrapbot, "idle", true;
         scrapbot_location = SCRAPBOT_LOCATION_BROTHER;
         interact_with_npc INTERACTION_LOOK_MOVE, generator_scrapbot, house_entrance;
         npc_wait generator_scrapbot;

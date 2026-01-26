@@ -51,11 +51,13 @@ func on_enter()
 
             Here is a map where you can find some south east of here.
         ";
-        npc_animate scrapbot, "idle", true;
+        npc_animate scrapbot, "bot_handover", false;
+        npc_wait scrapbot;
         world_unpause;
         cam_return;
         has_health_juice_map = true;
         show_item ITEM_HEALTH_JUICE_MAP;
+        npc_animate scrapbot, "idle", true;
         return;
     end
 end
@@ -146,7 +148,7 @@ func on_robot_talk()
         say "
             There is a problem.
 
-            The medical machine has lost power.
+            The surgeon bot has lost power.
 
             The generator needs to be repaired.
 
@@ -176,7 +178,7 @@ func on_robot_talk()
             say "You have the nanites. Now place them into the machine";
         else
             say "
-                The medical machine is back online.
+                The surgeon bot has power now.
 
                 You need to follow that new map I gave to get more nanites.
             ";
@@ -213,7 +215,7 @@ func on_exit_medical_machine()
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, scrapbot;
         npc_animate scrapbot, "bot_talk", true;
         say "
-            The machine is functional again.
+            The surgeon bot is functional again.
 
             I will tend to his wounds now.
         ";

@@ -22,7 +22,8 @@
 * fixup world intro cutscene
 * fix fading between scenes
 * fix tunneling through ground
+* fix z fighting issues for distant objects
 
-After new map
+After new map       
 * have boost highways be more direct
 * A north indicator to paper maps+  

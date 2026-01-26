@@ -6,7 +6,7 @@
 #include "../cutscene/cutscene_reference.h"
 
 static dynamic_object_type_t collider = {
-    BOX_COLLIDER(2.0f, 1.0f, 1.0f),
+    BOX_COLLIDER(1.5f, 1.0f, 1.0f),
     .center = {0.0f, 1.0f, 0.0f},
 };
 
