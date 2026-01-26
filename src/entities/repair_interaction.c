@@ -49,7 +49,7 @@ static repair_interaction_type_def_t types[REPAIR_COUNT] = {
     },
     [REPAIR_MEDICAL_DEVICE] = {
         .mesh_name = "rom:/meshes/repairs/medical_machine_broken.tmesh",
-        .repaired_mesh_name = "rom:/meshes/repairs/medical_machine_broken.tmesh",
+        .repaired_mesh_name = "rom:/meshes/repairs/medical_machine_fixed.tmesh",
         .collider = {
             CYLINDER_COLLIDER(0.5f, 0.5f),
             .center = {0.0f, 0.5f, 0.0f},
