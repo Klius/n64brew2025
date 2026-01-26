@@ -306,7 +306,7 @@ void motorcycle_update(void* data) {
     vector3_t ground_velocity;
     vector3ProjectPlane(&motorcycle->collider.velocity, &ground_normal, &ground_velocity);
 
-    float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
+    float current_speed = sqrtf(vector3MagSqrd2D(&ground_velocity));
 
     float target_height = motorcycle_hover_height(motorcycle, current_speed) + HOVER_SAG_AMOUNT;
 

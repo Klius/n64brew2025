@@ -48,6 +48,7 @@ enum cutscene_step_type {
     CUTSCENE_STEP_STOPWATCH_RUN,
     CUTSCENE_STEP_START_RACE,
     CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE,
+    CUTSCENE_STEP_AUDIO_PAUSE,
 };
 
 typedef void (*cutscene_step_callback)(void* data);
@@ -168,6 +169,9 @@ union cutscene_step_data {
         char* on_finish;
         int lap_count;
     } race_start;
+    struct {
+        uint8_t is_paused;
+    } audio_pause;
 };
 
 struct cutscene_step {

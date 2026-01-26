@@ -12,7 +12,6 @@
 * make it more obvious when the gear is backwards
 * add home base icon to map
 * indoor locations should show up on map
-* lap indicator
 * show nuts when you get them
 * show nuts in the shop
 * add instructions how to save
@@ -20,6 +19,7 @@
 * fixup world intro cutscene
 * fix fading between scenes
 * fix z fighting issues for distant objects
+* pause sound when pausing game
 
 After new map       
 * have boost highways be more direct

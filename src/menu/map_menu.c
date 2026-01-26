@@ -1085,6 +1085,7 @@ void map_menu_show_with_item(enum inventory_item_type item) {
         map_menu.selected_item = map_get_default_selection();
     }
     
+    audio_pause_all();
     audio_play_2d(assets.sounds[MENU_SOUND_PAUSE], 1.0f, 0.0f, 1.0f, 1);
 }
 
@@ -1132,6 +1133,8 @@ void map_menu_hide() {
     menu_remove_callback(&map_menu);
     update_remove(&map_menu);
     font_type_release(FONT_DIALOG);
+
+    audio_unpause_all();
 }
 
 void map_mark_revealed(struct Vector3* pos) {

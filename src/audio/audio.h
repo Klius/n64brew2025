@@ -24,4 +24,7 @@ void audio_update_volume(audio_id id, float volume);
 void audio_update_pitch(audio_id id, float pitch);
 void audio_update_listener(struct Vector3* pos, struct Vector3* right);
 
+void audio_pause_all();
+void audio_unpause_all();
+
 #endif

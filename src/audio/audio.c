@@ -20,6 +20,7 @@
 struct active_sound {
     wav64_t* wav;
     bool is_3d;
+    bool is_paused;
     int16_t priority;
     float volume;
     float frequency;
@@ -63,6 +64,7 @@ audio_id audio_next_id(int channel) {
 void audio_active_sound_init(active_sound_t* active_sound) {
     active_sound->wav = NULL;
     active_sound->is_3d = false;
+    active_sound->is_paused = false;
     active_sound->priority = 0;
     active_sound->volume = 0;
     active_sound->position = gZeroVec;
@@ -186,7 +188,9 @@ audio_id audio_play_2d(wav64_t* wav, float volume, float pan, float pitch_shift,
     active_sound_t* sound = &active_sounds[channel];
     sound->priority = priority;
     sound->is_3d = false;
+    sound->is_paused = false;
     sound->wav = wav;
+    sound->frequency = pitch_shift;
 
     mixer_ch_play(channel, &wav->wave);
     audio_set_pan_volume(channel, volume, pan);
@@ -210,6 +214,7 @@ audio_id audio_play_3d(wav64_t* wav, float volume, struct Vector3* pos, struct V
     active_sound_t* sound = &active_sounds[channel];
     sound->priority = priority;
     sound->is_3d = true;
+    sound->is_paused = false;
     sound->wav = wav;
     sound->position = *pos;
     sound->velocity = *vel;
@@ -285,7 +290,7 @@ void audio_player_update() {
         
         active_sound_t* sound = &active_sounds[i];
 
-        if (sound->is_3d) {
+        if (sound->is_3d && !sound->is_paused) {
             audio_process_3d(sound, i);
         }
     }
@@ -412,5 +417,33 @@ void audio_cancel(wav64_t* wav) {
 
     if (wav == target_music) {
         target_music = NULL;
+    }
+}
+
+void audio_pause_all() {
+    for (int i = 2; i < MAX_ACTIVE_SOUNDS; i += 1) {
+        if (!active_sound_ids[i]) {
+            continue;
+        }
+
+        if (!active_sounds[i].is_paused) {
+            mixer_ch_set_freq(i, 0);
+            active_sounds[i].is_paused = true;   
+        }
+    }
+}
+
+void audio_unpause_all() {
+    for (int i = 2; i < MAX_ACTIVE_SOUNDS; i += 1) {
+        if (!active_sound_ids[i]) {
+            continue;
+        }
+
+        if (active_sounds[i].is_paused) {
+            if (!active_sounds[i].is_3d) {
+                mixer_ch_set_freq(i, active_sounds[i].wav->wave.frequency * active_sounds[i].frequency);
+            }
+            active_sounds[i].is_paused = false;   
+        }
     }
 }

@@ -382,6 +382,13 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
         case CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE:
             camera_follow_vehicle(&current_scene->camera_controller);
             break;
+        case CUTSCENE_STEP_AUDIO_PAUSE:
+            if (step->data.audio_pause.is_paused) {
+                audio_pause_all();
+            } else {
+                audio_unpause_all();
+            }
+            break;
     }
 }
 

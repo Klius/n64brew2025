@@ -168,6 +168,9 @@ struct cutscene* cutscene_load(const char* filename) {
                 step->data.race_start.on_finish = string_load(file);
                 fread(&step->data.race_start.lap_count, 4, 1, file);
                 break;
+            case CUTSCENE_STEP_AUDIO_PAUSE:
+                fread(&step->data.audio_pause.is_paused, 1, 1, file);
+                break;
         }
     }
     
