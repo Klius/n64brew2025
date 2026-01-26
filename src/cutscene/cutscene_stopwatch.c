@@ -3,14 +3,22 @@
 #include "../time/time.h"
 #include "../menu/menu_rendering.h"
 #include "../fonts/fonts.h"
+#include "../menu/menu_common.h"
+#include "../render/defs.h"
 
 struct cutscene_stopwatch {
     bool is_active;
     bool is_running;
     float current_time;
+    float count_down_time;
 };
 
 static struct cutscene_stopwatch timer;
+
+#define COUNTDOWN_WIDTH     20.0f
+#define COUNTDOWN_HEIGHT    20.0f
+#define COUNTDOWN_X         ((SCREEN_WD - COUNTDOWN_WIDTH) * 0.5f)
+#define COUNTDOWN_Y         ((SCREEN_HT - COUNTDOWN_HEIGHT) * 0.5f)
 
 int cutscene_stopwatch_format_time(char* into, float duration) {
     int sub_seconds = (int)ceilf(duration * 100.0f);
@@ -41,6 +49,27 @@ void cutscene_stopwatch_render(void* data) {
         time,
         len
     );
+
+    if (timer.count_down_time > total_time) {
+        int second_countdown = (int)ceilf(timer.count_down_time - total_time);
+
+        menu_common_render_background(COUNTDOWN_X, COUNTDOWN_Y, COUNTDOWN_WIDTH, COUNTDOWN_HEIGHT);
+
+        len = sprintf(time, "%d", second_countdown);
+        rdpq_text_printn(&(rdpq_textparms_t){
+                // .line_spacing = -3,
+                .align = ALIGN_CENTER,
+                .valign = VALIGN_CENTER,
+                .width = COUNTDOWN_WIDTH,
+                .height = COUNTDOWN_HEIGHT,
+                .wrap = WRAP_NONE,
+            }, 
+            FONT_DIALOG, 
+            COUNTDOWN_X, COUNTDOWN_Y, 
+            time,
+            len
+        );
+    }
 }
 
 void cutscene_stopwatch_update(void* data) {
@@ -69,6 +98,7 @@ void cutscene_stopwatch_set_active(bool value) {
         update_add(&timer, cutscene_stopwatch_update, UPDATE_PRIORITY_EFFECTS, UPDATE_LAYER_WORLD);
         menu_add_callback(cutscene_stopwatch_render, &timer, MENU_PRIORITY_HUD);
         font_type_use(FONT_DIALOG);
+        timer.count_down_time = total_time + 3.0f;
     } else {
         update_remove(&timer);
         menu_remove_callback(&timer);
