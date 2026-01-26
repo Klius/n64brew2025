@@ -21,6 +21,10 @@ static const char* completion_messages[] = {
     [RACE_STATE_ABANDON] = "Race abandoned",
 };
 
+void race_setup_laps(void *data) {
+    cutscene_stop_watch_set_lap_count(laps_left);
+}
+
 void race_start(const char* completion_script, int lap_count) {
     race_progress = 0;
     current_state = RACE_STATE_STARTED;
@@ -34,6 +38,7 @@ void race_start(const char* completion_script, int lap_count) {
     cutscene_builder_delay(&cutscene, 0.5f);
     cutscene_builder_set_boolean(&cutscene, inventory_get_item_ref(ITEM_RIDING_MOTORCYCLE), true);
     cutscene_builder_load_scene(&cutscene, completion_script);
+    cutscene_builder_callback(&cutscene, race_setup_laps, NULL);
     cutscene_builder_delay(&cutscene, 0.5f);
     cutscene_builder_camera_follow_vehicle(&cutscene);
     cutscene_builder_fade(&cutscene, FADE_COLOR_NONE, 0.5f);
@@ -49,6 +54,7 @@ void race_trigger_end(enum race_state state) {
     cutscene_stopwatch_set_running(false);
 
     current_state = state;
+    laps_left = 0;
     cutscene_builder_t cutscene;
     cutscene_builder_init(&cutscene);
 
@@ -57,6 +63,7 @@ void race_trigger_end(enum race_state state) {
     cutscene_builder_delay(&cutscene, 0.5f);
     cutscene_builder_set_boolean(&cutscene, inventory_get_item_ref(ITEM_RIDING_MOTORCYCLE), false);
     cutscene_builder_load_scene(&cutscene, g_completion_script);
+    cutscene_builder_callback(&cutscene, race_setup_laps, NULL);
     cutscene_builder_delay(&cutscene, 0.5f);
     cutscene_builder_fade(&cutscene, FADE_COLOR_NONE, 0.5f);
 
@@ -73,6 +80,7 @@ bool race_trigger_checkpoint(int index, bool is_finish) {
 
         if (is_finish) {
             laps_left -= 1;
+            cutscene_stop_watch_next_lap();
 
             if (laps_left) {
                 race_progress = 0;

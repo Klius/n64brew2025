@@ -11,6 +11,9 @@ struct cutscene_stopwatch {
     bool is_running;
     float current_time;
     float count_down_time;
+
+    uint8_t lap_count;
+    uint8_t lap;
 };
 
 static struct cutscene_stopwatch timer;
@@ -70,6 +73,23 @@ void cutscene_stopwatch_render(void* data) {
             len
         );
     }
+
+    if (timer.lap_count) {
+        len = sprintf(time, "%d/%d", timer.lap, timer.lap_count);
+        rdpq_text_printn(&(rdpq_textparms_t){
+                // .line_spacing = -3,
+                .align = ALIGN_LEFT,
+                .valign = VALIGN_TOP,
+                .width = 260,
+                .height = 60,
+                .wrap = WRAP_NONE,
+            }, 
+            FONT_DIALOG, 
+            30, 50, 
+            time,
+            len
+        );
+    }
 }
 
 void cutscene_stopwatch_update(void* data) {
@@ -112,4 +132,13 @@ float cutscene_last_stopwatch_time() {
 
 void cutscene_stopwatch_set(float value) {
     timer.current_time = value;
+}
+
+void cutscene_stop_watch_set_lap_count(int count) {
+    timer.lap_count = count;
+    timer.lap = 1;
+}
+
+void cutscene_stop_watch_next_lap() {
+    timer.lap += 1;
 }
