@@ -25,4 +25,4 @@
 
 After new map
 * have boost highways be more direct
-* A north indicator to paper maps+
+* A north indicator to paper maps+  
