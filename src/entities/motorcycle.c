@@ -18,7 +18,7 @@
 #define STOPPED_SPEED_THESHOLD  8.0f
 
 #define ACCEL_RATE              20.0f
-#define BOOST_ACCEL_RATE        50.0f
+#define BOOST_ACCEL_RATE        60.0f
 #define BASE_DRIVE_SPEED        25.0f
 #define UPGRADED_DRIVE_SPEED    35.0f
 #define BASE_BOOST_SPEED        50.0f
@@ -66,7 +66,7 @@ static dynamic_object_type_t collider_type = {
 
 static vehicle_camera_target_t boost_positions[VEHICLE_CAM_COUNT] = {
     {
-        .position = {0.0f, 1.75f, -3.0f},
+        .position = {0.0f, 1.75f, -4.0f},
         .look_at = {0.0f, 1.75f, 2.0f},
     },
     {
@@ -112,7 +112,7 @@ static vehicle_definiton_t vehicle_def = {
     .exit_position = {-1.0f, 0.0f, 0.0f},
     .camera_positions = {
         {
-            .position = {0.0f, 2.0f, -6.0f},
+            .position = {0.0f, 2.0f, -4.0f},
             .look_at = {0.0f, 2.0f, 2.0f},
         },
         {

@@ -362,7 +362,8 @@ void camera_controller_update_animation(struct camera_controller* controller) {
     camera_look_at_from_rotation(controller);
 }
 
-#define MAX_NEAR_PLANE  1.2f
+#define MAX_BIKE_NEAR_PLANE 2.2f
+#define MAX_NEAR_PLANE      1.2f
 #define MIN_NEAR_PLANE  0.3f
 #define PLAYER_CLIP_RADIUS 0.25f
 
@@ -372,7 +373,7 @@ void camera_controller_determine_near_plane(struct camera_controller* controller
 
     float target_near_plane = sqrtf(vector3MagSqrd2D(&offset)) - PLAYER_CLIP_RADIUS;
 
-    camera_set_near(controller->camera, clampf(target_near_plane, MIN_NEAR_PLANE, MAX_NEAR_PLANE));
+    camera_set_near(controller->camera, clampf(target_near_plane, MIN_NEAR_PLANE, controller->state == CAMERA_FOLLOW_VEHICLE ? MAX_BIKE_NEAR_PLANE : MAX_NEAR_PLANE));
 }
 
 void camera_follow_vehicle_update(struct camera_controller* controller) {

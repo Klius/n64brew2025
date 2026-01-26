@@ -1,6 +1,7 @@
 #include "vehicle.h"
 
 #include "../util/hash_map.h"
+#include "../collision/collision_scene.h"
 static struct hash_map entity_mapping;
 
 void vehicle_global_reset() {
@@ -85,4 +86,11 @@ void vehicle_get_camera_target(vehicle_t* vehicle, joypad_buttons_t held, vehicl
 
     transformSaTransformPoint(vehicle->transform, &local_pos->look_at, &result->look_at);
     transformSaTransformPoint(vehicle->transform, &local_pos->position, &result->position);
+    
+    dynamic_object_t* obj = collision_scene_find_object(vehicle->id);
+
+    if (obj) {
+        vector3AddScaled(&result->look_at, &obj->velocity, -0.05f, &result->look_at);
+        vector3AddScaled(&result->position, &obj->velocity, -0.05f, &result->position);
+    }
 }
