@@ -239,18 +239,38 @@ struct overworld* overworld_load(const char* filename) {
 
     result->lod1.entries = malloc(sizeof(struct overworld_lod1_entry) * result->lod1.entry_count);
 
-    for (int i = 0; i < result->lod1.entry_count; i += 1) {
-        struct overworld_lod1_entry* entry = &result->lod1.entries[i];
+    struct overworld_lod1_entry* curr = result->lod1.entries;
+    int skip_count = 0;
 
-        fread(&entry->x, sizeof(uint16_t), 1, result->file);
-        fread(&entry->z, sizeof(uint16_t), 1, result->file);
-        fread(&entry->priority, sizeof(uint16_t), 1, result->file);
-        fread(&entry->child_count, 1, 1, result->file);
-        fread(&entry->lod_scale, 1, 1, result->file);
-        for (int direction_index = 0; direction_index < LOD0_SORT_DIRECTION_COUNT; direction_index += 1) {
-            tmesh_load(&result->lod1.entries[i].meshes[direction_index], result->file);
+    for (int i = 0; i < result->lod1.entry_count; i += 1) {
+        fread(&curr->x, sizeof(uint16_t), 1, result->file);
+        fread(&curr->z, sizeof(uint16_t), 1, result->file);
+        fread(&curr->priority, sizeof(uint16_t), 1, result->file);
+        fread(&curr->child_count, 1, 1, result->file);
+        fread(&curr->lod_scale, 1, 1, result->file);
+
+        uint32_t mesh_size;
+        fread(&mesh_size, 4, 1, result->file);
+
+        if (skip_count) {
+            skip_count -= 1;
+            fseek(result->file, mesh_size, SEEK_CUR);
+            continue;
         }
+
+        if (USE_LESS_MEMORY && curr->child_count) {
+            skip_count = curr->child_count;
+            curr->child_count = 0;
+        }
+
+        for (int direction_index = 0; direction_index < LOD0_SORT_DIRECTION_COUNT; direction_index += 1) {
+            tmesh_load(&curr->meshes[direction_index], result->file);
+        }
+
+        curr += 1;
     }
+
+    result->lod1.entry_count = curr - result->lod1.entries;
 
     result->inv_tile_size = 1.0f / result->tile_size;
     result->tile_definitions = malloc(result->tile_x * result->tile_y * sizeof(struct overworld_tile_def));

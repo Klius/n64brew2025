@@ -96,6 +96,9 @@ struct overworld_lod1 {
 #define LOADED_TILE_ARRAY_SIZE  2
 #define UNLOAD_QUEUE_SIZE   4
 
+// #define USE_LESS_MEMORY     true
+#define USE_LESS_MEMORY  !is_memory_expanded()
+
 struct overworld {
     uint16_t tile_x, tile_y;
     struct Vector2 min;

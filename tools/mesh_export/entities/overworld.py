@@ -336,13 +336,22 @@ def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: exp
 
         file.write(struct.pack('>hhHBB', int(center.x), int(center.z), priority, tile.child_count(), 2 ** (tile.level - 1)))
 
+        mesh_bytes_file = io.BytesIO()
+
         if len(mesh_data) > 0:
             lod_1_settings.default_material_name = material_extract.material_romname(mesh_data[0].mat)
             lod_1_settings.default_material = material_extract.load_material_with_name(mesh_data[0].mat)
 
         for dir in sort_directions:
             lod_1_settings.sort_direction = dir
-            tiny3d_mesh_writer.write_mesh(mesh_data, None, [], lod_1_settings, file)
+            tiny3d_mesh_writer.write_mesh(mesh_data, None, [], lod_1_settings, mesh_bytes_file)
+
+        mesh_bytes = mesh_bytes_file.getvalue()
+
+        print(len(mesh_bytes))
+
+        file.write(len(mesh_bytes).to_bytes(4, 'big'))
+        file.write(mesh_bytes)
 
     print(f"lod_1 creation time {time.perf_counter() - lod_1_start_time}")
 

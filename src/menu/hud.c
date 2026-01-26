@@ -17,6 +17,7 @@
 #include "../savefile/savefile.h"
 #include "menu_common.h"
 #include <string.h>
+#include "../config.h"
 
 #define SCREEN_EDGE_MARGIN      20.0f
 #define TEXT_PADDING            2
@@ -193,7 +194,51 @@ void hud_render_tracker_icon(struct hud* hud) {
     hud->track_flash_timer -= fixed_time_step;
 }
 
+#define MEM_PADDING 20
+#define MEM_HEIGHT  8
+#define MEM_WIDTH   100
+
+void hud_render_memory_usage(struct hud* hud) {
+    heap_stats_t heap_stats;
+    sys_get_heap_stats(&heap_stats);
+
+    material_apply(hud->assets.compass_arrow);
+
+    rdpq_set_prim_color((color_t){0, 0, 0, 255});
+
+    rdpq_texture_rectangle(
+        TILE0,
+        MEM_PADDING, MEM_PADDING,
+        MEM_PADDING + MEM_WIDTH / 2, MEM_PADDING + MEM_HEIGHT,
+        0, 0
+    );
+
+    rdpq_sync_pipe();
+    rdpq_set_prim_color((color_t){128, 0, 0, 255});
+    
+    rdpq_texture_rectangle(
+        TILE0,
+        MEM_PADDING + MEM_WIDTH / 2, MEM_PADDING,
+        MEM_PADDING + MEM_WIDTH, MEM_PADDING + MEM_HEIGHT,
+        0, 0
+    );
+
+    rdpq_sync_pipe();
+    rdpq_set_prim_color((color_t){0, 255, 0, 255});
+    
+    rdpq_texture_rectangle(
+        TILE0,
+        MEM_PADDING, MEM_PADDING,
+        MEM_PADDING + MEM_WIDTH * heap_stats.used / heap_stats.total, MEM_PADDING + MEM_HEIGHT,
+        0, 0
+    );
+}
+
 void hud_render(void *data) {
+#if ENABLE_CHEATS
+    hud_render_memory_usage(data);
+#endif
+
     if (!update_has_layer(UPDATE_LAYER_WORLD)) {
         return;
     }
