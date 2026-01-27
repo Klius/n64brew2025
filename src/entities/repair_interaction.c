@@ -42,6 +42,7 @@ static repair_interaction_type_def_t types[REPAIR_COUNT] = {
     [REPAIR_GENERATOR] = {
         .mesh_name = "rom:/meshes/repairs/generator_broken.tmesh",
         .repaired_mesh_name = "rom:/meshes/repairs/generator_fixed.tmesh",
+        .repaired_sound = "rom:/sounds/objects/generator.wav64",
         .collider = {
             BOX_COLLIDER(0.6f, 0.6f, 1.0f),
             .center = {0.0f, 0.6f, 0.0f},

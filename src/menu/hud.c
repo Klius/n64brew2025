@@ -307,6 +307,7 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->player = player;
     hud->camera = camera;
     hud->track_flash_timer = 0.0f;
+    hud->nut_show_timer = 0.0f;
 
     hud->assets.overlay_material = material_cache_load("rom:/materials/menu/solid_primitive.mat");
     hud->assets.compass_border = sprite_load("rom:/images/menu/compass_border.sprite");
