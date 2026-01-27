@@ -389,6 +389,9 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
                 audio_unpause_all();
             }
             break;
+        case CUTSCENE_STEP_SHOW_NUTS:
+            hud_show_nuts(&current_scene->hud);
+            break;
     }
 }
 

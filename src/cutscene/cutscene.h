@@ -49,6 +49,7 @@ enum cutscene_step_type {
     CUTSCENE_STEP_START_RACE,
     CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE,
     CUTSCENE_STEP_AUDIO_PAUSE,
+    CUTSCENE_STEP_SHOW_NUTS,
 };
 
 typedef void (*cutscene_step_callback)(void* data);

@@ -48,6 +48,7 @@ CUTSCENE_STEP_STOPWATCH_RUN = 37
 CUTSCENE_STEP_START_RACE = 38
 CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE = 39
 CUTSCENE_STEP_AUDIO_PAUSE = 40
+CUTSCENE_STEP_SHOW_NUTS = 41
 
 class ParameterType():
     def __init__(self, name: str, is_static: bool):
@@ -97,6 +98,7 @@ _step_args = {
     "stopwatch_run": [ParameterType("bool", True)],
     "race_start": [ParameterType("str", True), ParameterType("int", True)],
     "audio_pause": [ParameterType("bool", True)],
+    "show_nuts": [],
 }
 
 _step_ids = {
@@ -131,6 +133,7 @@ _step_ids = {
     "stopwatch_run": CUTSCENE_STEP_STOPWATCH_RUN,
     "race_start": CUTSCENE_STEP_START_RACE,
     "audio_pause": CUTSCENE_STEP_AUDIO_PAUSE,
+    "show_nuts": CUTSCENE_STEP_SHOW_NUTS,
 }
 
 _steps_that_need_idle = {

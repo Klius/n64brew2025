@@ -11,6 +11,7 @@
 #include "../render/defs.h"
 #include "../fonts/fonts.h"
 #include "../resource/material_cache.h"
+#include "../player/inventory.h"
 #include "../scene/scene.h"
 #include "../math/vector2.h"
 #include "../render/defs.h"
@@ -234,10 +235,61 @@ void hud_render_memory_usage(struct hud* hud) {
     );
 }
 
+void hud_render_nuts(struct hud* hud) {
+    int nut_count = inventory_get_count(ITEM_NUT);
+
+    if (nut_count != hud->prev_nut_count) {
+        hud->nut_show_timer = 4.0f;
+    }
+
+    if (hud->nut_show_timer <= 0.0f) {
+        return;
+    }
+
+    if (update_has_layer(UPDATE_LAYER_WORLD)) {
+        hud->nut_show_timer -= scaled_time_step;
+    }
+
+    material_apply(hud->assets.nut_icon);
+    
+    int frame = (int)(total_time * 8) % 8;
+
+    int nut_y = current_scene && current_scene->overworld ? 20 + 30 : 20;
+
+    rdpq_texture_rectangle_scaled(
+        TILE0,
+        SCREEN_WD - 20 - 16, nut_y,
+        SCREEN_WD - 20, nut_y + 16,
+        frame * 8, 0,
+        frame * 8 + 8, 8
+    );
+    
+    char text[16];
+    int len = sprintf(text, "%d", nut_count);
+
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_RIGHT,
+            .valign = VALIGN_TOP,
+            .width = 100,
+            .height = 20,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        SCREEN_WD - 100 - 20 - 18, nut_y + 1, 
+        text,
+        len
+    );
+
+    hud->prev_nut_count = nut_count;
+}
+
 void hud_render(void *data) {
 #if ENABLE_CHEATS
     hud_render_memory_usage(data);
 #endif
+
+    hud_render_nuts(data);
 
     if (!update_has_layer(UPDATE_LAYER_WORLD)) {
         return;
@@ -262,6 +314,9 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->assets.compass_arrow = material_cache_load("rom:/materials/menu/map_arrow.mat");
     hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
     hud->assets.tracker_icon = material_cache_load("rom:/materials/menu/tracker_icon.mat");   
+    hud->assets.nut_icon = material_cache_load("rom:/materials/parts/nut_particle.mat");
+
+    hud->prev_nut_count = inventory_get_count(ITEM_NUT);
 }
 
 void hud_destroy(struct hud* hud) {
@@ -272,6 +327,7 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.compass_arrow);
     material_cache_release(hud->assets.saving_icon);
     material_cache_release(hud->assets.tracker_icon);
+    material_cache_release(hud->assets.nut_icon);
     sprite_free(hud->assets.compass_border);
 }
 
@@ -281,4 +337,8 @@ void hud_flash_tracker() {
     }
 
     current_scene->hud.track_flash_timer = TRACKER_FLASHING_TIME + TRACKER_FULL_FLASH_TIME;
+}
+
+void hud_show_nuts(struct hud* hud) {
+    hud->nut_show_timer = 4.0f;
 }

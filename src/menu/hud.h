@@ -12,6 +12,7 @@ struct hud_assets {
     material_t* compass_arrow;
     material_t* saving_icon;
     material_t* tracker_icon;
+    material_t* nut_icon;
     sprite_t* compass_border;
 };
 
@@ -22,6 +23,8 @@ struct hud {
     camera_t* camera;
     hud_assets_t assets;
     float track_flash_timer;
+    float nut_show_timer;
+    uint16_t prev_nut_count;
 };
 
 typedef struct hud hud_t;
@@ -29,5 +32,6 @@ typedef struct hud hud_t;
 void hud_init(struct hud* hud, struct player* player, camera_t* camera);
 void hud_destroy(struct hud* hud);
 void hud_flash_tracker();
+void hud_show_nuts(struct hud* hud);
 
 #endif
