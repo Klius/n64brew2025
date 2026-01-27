@@ -137,6 +137,15 @@ static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
             .max_stable_slope = 0.219131191f,
         }
     },
+    [REPAIR_PART_BOAT_SWITCH] = {
+        .mesh_name = "rom:/meshes/parts/boat_switch.tmesh",
+        .collider = {
+            BOX_COLLIDER(0.3f, 0.1f, 0.3f),
+            .center = {0.0f, 0.0f, 0.0f},
+            .friction = 0.5,
+            .max_stable_slope = 0.219131191f,
+        }
+    },
 };
 
 static struct repair_part_pickup_assets assets;

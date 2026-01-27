@@ -16,7 +16,6 @@
 * show nuts in the shop
 * add instructions how to save
 * add instructions on how to get off motorcycle
-* fixup world intro cutscene
 * fix fading between scenes
 * fix z fighting issues for distant objects
 * pause sound when pausing game

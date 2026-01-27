@@ -167,6 +167,9 @@ bool entity_despawn(entity_id entity_id) {
         return false;
     }
 
+    // kinda heavy handed but I don't care
+    rspq_wait();
+
     struct entity_header* header = entity;
     entity_remove_reference(header->entity_def->entity_type);
 

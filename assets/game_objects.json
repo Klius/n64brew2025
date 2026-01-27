@@ -43,6 +43,12 @@
             "type": "checkpoint"
         },
         {
+            "name": "objects_race_checkpoint_off",
+            "description": "",
+            "mesh": "meshes/objects/race_checkpoint_off.blend#Cube",
+            "type": "checkpoint"
+        },
+        {
             "name": "objects_race_start+finish",
             "description": "",
             "mesh": "meshes/objects/race_start+finish.blend#Cube",
@@ -59,6 +65,12 @@
             "description": "",
             "mesh": "meshes/objects/trigger_cube.blend#Cube",
             "type": "trigger_cube"
+        },
+        {
+            "name": "parts_boat_switch",
+            "description": "",
+            "mesh": "meshes/parts/boat_switch.blend#part_switch",
+            "type": "repair_part_pickup"
         },
         {
             "name": "parts_gen_bulb",
@@ -157,6 +169,12 @@
             "type": "repair_interaction"
         },
         {
+            "name": "repairs_medical_machine_fixed",
+            "description": "",
+            "mesh": "meshes/repairs/medical_machine_fixed.blend#repair_device",
+            "type": "repair_interaction"
+        },
+        {
             "name": "repairs_tablet_broken",
             "description": "",
             "mesh": "meshes/repairs/tablet_broken.blend#case",
@@ -178,6 +196,24 @@
             "name": "vehicles_bike",
             "description": "",
             "mesh": "meshes/vehicles/bike.blend#Motorcycle",
+            "type": "motorcycle_spawner"
+        },
+        {
+            "name": "vehicles_bike",
+            "description": "",
+            "mesh": "meshes/vehicles/bike.blend#Motorcycle.003",
+            "type": "motorcycle_spawner"
+        },
+        {
+            "name": "vehicles_bike",
+            "description": "",
+            "mesh": "meshes/vehicles/bike.blend#Motorcycle.004",
+            "type": "motorcycle_spawner"
+        },
+        {
+            "name": "vehicles_bike",
+            "description": "",
+            "mesh": "meshes/vehicles/bike.blend#Motorcycle.005",
             "type": "motorcycle_spawner"
         },
         {

@@ -12,6 +12,8 @@ global has_generator_part_map: bool;
 global has_generator_part_0: bool;
 global has_generator_part_1: bool;
 global has_generator_part_2: bool;
+global has_ship_switch_repair_parts: bool;
+global has_repaired_ship_switch: bool;
 global has_repaired_generator: bool;
 
 global has_health_juice_map: bool;

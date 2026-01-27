@@ -69,8 +69,8 @@ void setup() {
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
     // scene_queue_next("rom:/scenes/overworld.scene#race0");
     // scene_queue_next("rom:/scenes/store.scene");
-    // scene_queue_next("rom:/repair/motorycle_engine.repair");
-    // scene_queue_next("rom:/scenes/garage.scene");
+    // scene_queue_next("rom:/repair/boat_switch.repair");
+    scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
 
     load_scene_or_repair(scene_get_next());
