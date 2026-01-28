@@ -67,8 +67,8 @@ static repair_interaction_type_def_t types[REPAIR_COUNT] = {
         .mesh_name = "rom:/meshes/repairs/ship_switch_broken.tmesh",
         .repaired_mesh_name = "rom:/meshes/repairs/ship_switch_fixed.tmesh",
         .collider = {
-            BOX_COLLIDER(0.5f, 0.5f, 0.5f),
-            .center = {0.0f, 0.1f, 0.0f},
+            BOX_COLLIDER(0.25f, 0.3f, 0.25f),
+            .center = {0.0f, 0.0f, 0.0f},
         }
     },
 };

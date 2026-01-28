@@ -157,12 +157,6 @@
             "type": "repair_interaction"
         },
         {
-            "name": "repairs_generator_broken",
-            "description": "",
-            "mesh": "meshes/repairs/generator_broken.blend#generator_static",
-            "type": "repair_interaction"
-        },
-        {
             "name": "repairs_hoverbike_no_motor",
             "description": "",
             "mesh": "meshes/repairs/hoverbike_no_motor.blend#hoverbike_WOmotor",
