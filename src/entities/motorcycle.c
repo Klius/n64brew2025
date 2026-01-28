@@ -284,7 +284,7 @@ void motorcycle_update_sound(motorcycle_t* motorcycle, float speed) {
         }
 
         audio_update_position(motorcycle->idle_sound, &motorcycle->transform.position, &motorcycle->collider.velocity);
-        audio_update_volume(motorcycle->idle_sound, mathfLerp(0.6f, 1.0f, idle_lerp));
+        audio_update_volume(motorcycle->idle_sound, mathfLerp(0.3f, 0.5f, idle_lerp));
         audio_update_pitch(motorcycle->idle_sound, mathfLerp(0.9f, 1.5f, idle_lerp));
     }
 }

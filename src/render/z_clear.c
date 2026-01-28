@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include "../render/defs.h"
 
-#define IMG_W   32
-#define IMG_H   64
+#define IMG_W   64
+#define IMG_H   32
 
 #define DEPTH_OFFSET    0x0400
 
@@ -37,11 +37,16 @@ static uint32_t index_bayer_pattern(uint32_t x, uint32_t y) {
 void z_clear_init() {
     z_clear_surface = surface_make(z_clear_image, FMT_RGBA16, IMG_W, IMG_H, IMG_W * 2);
 
+    sprite_t* sprite = sprite_load("rom:/images/effects/noise.sprite");
+    
     for (int y = 0; y < IMG_H; y += 1) {
         for (int x = 0; x < IMG_W; x += 1) {
-            z_clear_image[y * IMG_W + x] = (0x7FFF - (uint16_t)(index_bayer_pattern(x, y) * (DEPTH_OFFSET / 256.0f))) << 1;
+            uint8_t px = ((uint8_t*)sprite->data)[x + y * IMG_W];
+            z_clear_image[y * IMG_W + x] = (0x7FFF - (uint16_t)(px * (DEPTH_OFFSET / 256.0f))) << 1;
         }
     }
+
+    sprite_free(sprite);
 
     data_cache_hit_writeback_invalidate(z_clear_image, sizeof(z_clear_image));
 }
