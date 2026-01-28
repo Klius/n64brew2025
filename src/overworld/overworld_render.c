@@ -327,7 +327,7 @@ void overworld_render_lod_1(struct overworld* overworld, struct Camera* camera, 
 
     float lod_scale = 1.0f / overworld->tile_x;
 
-    float near = (camera->far - 5.0f) * lod_scale * WORLD_SCALE;
+    float near = (camera->far * 0.25f) * lod_scale * WORLD_SCALE;
     float far = overworld->tile_size * (1.4f * WORLD_SCALE);
     
     matrixPerspective(

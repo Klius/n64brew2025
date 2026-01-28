@@ -25,6 +25,7 @@
 #include "config.h"
 #include "menu/main_menu.h"
 #include "overworld/overworld_load.h"
+#include "render/z_clear.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -46,7 +47,6 @@ void load_scene_or_repair(const char* filename) {
     }
 }
 
-
 void setup() {
 #if DEBUG_ENABLED
     debug_init_isviewer();
@@ -55,6 +55,7 @@ void setup() {
     savefile_check_for_data();
     init_engine();
     interactable_reset();
+    z_clear_init();
 
     fade_effect_init();
     fade_effect_set((color_t){0, 0, 0, 255}, 0.0f);
@@ -67,10 +68,10 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    // scene_queue_next("rom:/scenes/overworld.scene#race0");
+    scene_queue_next("rom:/scenes/overworld.scene#race0");
     // scene_queue_next("rom:/scenes/garage.scene");
     // scene_queue_next("rom:/repair/boat_switch.repair");
-    scene_queue_next("rom:/scenes/inside_boat.scene");
+    // scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
 
     load_scene_or_repair(scene_get_next());
@@ -86,14 +87,19 @@ void reset() {
 static struct frame_memory_pool frame_memory_pools[2];
 static uint8_t next_frame_memory_pool;
 
-void render_3d() {
+void render_3d(surface_t* col, surface_t* z_buffer) {
     uint8_t colorAmbient[4] = {0xFF, 0xFF, 0xFF, 0xFF};
 
-    t3d_frame_start();
-
-
-    t3d_screen_clear_depth();
+    if (current_scene && current_scene->overworld) {
+        z_clear_dithered(z_buffer);
+    } else {
+        t3d_screen_clear_depth();
+    }
+    rdpq_set_color_image(col);
+    rdpq_set_z_image(z_buffer);
 	t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
+    
+    t3d_frame_start();
 
     t3d_light_set_ambient(colorAmbient); // one global ambient light, always active
     t3d_light_set_count(0);
@@ -121,11 +127,11 @@ void render_menu() {
     screen_debug_render();
 }
 
-void render(surface_t* zbuffer) {
+void render(surface_t* col, surface_t* zbuffer) {
     update_render_time();
 
     if (current_game_mode == GAME_MODE_3D || current_game_mode == GAME_MODE_TRANSITION_TO_MENU) {
-        render_3d();
+        render_3d(col, zbuffer);
     } else if (current_game_mode == GAME_MODE_MENU) {
         static surface_t background;
         background = surface_make_linear(zbuffer->buffer, FMT_RGBA16, zbuffer->width, zbuffer->height);
@@ -207,7 +213,7 @@ int main(void)
 
             rdpq_attach(fb, &zbuffer);
 
-            render_3d();
+            render_3d(fb, &zbuffer);
             rdpq_sync_pipe();
 
             // copy the frame buffer into the z buffer
@@ -240,7 +246,7 @@ int main(void)
             if (fb) {
                 rdpq_attach(fb, &zbuffer);
 
-                render(&zbuffer);
+                render(fb, &zbuffer);
 
                 rdpq_detach_show();
             } 
