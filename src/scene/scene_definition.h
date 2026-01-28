@@ -86,6 +86,8 @@ enum inventory_item_type {
     ITEM_TABLET,
     ITEM_GIVEN_TABLET,
     
+    ITEM_HAS_DISMOUNTED,
+    
     ITEM_UPGRADE_FASTER,
     ITEM_LONGER_BOOST,
     ITEM_DETECT_NUTS,

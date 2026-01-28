@@ -1,0 +1,9 @@
+{
+    "tex0": "../../images/menu/b_button.png",
+    "combineMode": [{
+        "color": ["0", "0", "0", "TEX0"],
+        "alpha": ["PRIM", "0", "TEX0", "0"]
+    }],
+    "primColor": [255, 255, 255, 255],
+    "blendMode": "TRANSPARENT"
+}

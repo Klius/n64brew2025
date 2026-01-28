@@ -53,6 +53,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
 
         is_riding_motorcycle = false;
+        has_dismounted = false;
 
         load_scene "rom:/scenes/intro.scene#default";
     elif are_touching(repair_well, ENTITY_ID_PLAYER) then
@@ -86,6 +87,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
 
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/overworld.scene#exit_repair_well";
     elif are_touching(gen_parts, ENTITY_ID_PLAYER) then
@@ -119,6 +121,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
         
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/overworld.scene#gen_parts";
     elif are_touching(repair_generator, ENTITY_ID_PLAYER) then
@@ -152,6 +155,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
         
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/overworld.scene#generator";
     elif are_touching(health_juice, ENTITY_ID_PLAYER) then
@@ -185,6 +189,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
         
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/overworld.scene#health_juice";
     elif are_touching(health_juice_repair, ENTITY_ID_PLAYER) then
@@ -220,6 +225,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_BED;
         
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/inside_house.scene#health_machine";
     elif are_touching(tablet_repair, ENTITY_ID_PLAYER) then
@@ -253,6 +259,7 @@ func room_default()
         samson_location = SAMSON_LOCATION_HEALED;
         
         is_riding_motorcycle = false;
+        has_dismounted = true;
 
         load_scene "rom:/scenes/inside_house.scene#tablet";
     end

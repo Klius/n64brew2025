@@ -460,6 +460,7 @@ void player_update_in_vehicle(struct player* player, struct contact* ground_cont
     if (pressed.b && vehicle->is_stopped) {
         player_exit_vehicle(player);
         inventory_set_has_item(ITEM_RIDING_MOTORCYCLE, false);
+        inventory_set_has_item(ITEM_HAS_DISMOUNTED, true);
     }
 }
 

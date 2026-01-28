@@ -31,6 +31,8 @@ global has_tablet: bool;
 
 global has_given_tablet: bool;
 
+global has_dismounted: bool;
+
 global scrapbot_location: i8;
 global samson_location: i8;
 

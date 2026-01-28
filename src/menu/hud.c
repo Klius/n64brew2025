@@ -284,6 +284,45 @@ void hud_render_nuts(struct hud* hud) {
     hud->prev_nut_count = nut_count;
 }
 
+void hud_render_dismount(struct hud* hud) {
+    if (!current_scene || 
+        !current_scene->overworld || 
+        !inventory_has_item(ITEM_RIDING_MOTORCYCLE) || 
+        inventory_has_item(ITEM_HAS_DISMOUNTED)
+    ) {
+        return;
+    }
+
+    material_apply(hud->assets.overlay_material);
+    rdpq_set_prim_color((color_t){0, 0, 0, 128});
+
+    int x = (SCREEN_WD - 54) / 2;
+    int y = 190;
+
+    rdpq_texture_rectangle(
+        TILE0, 
+        x - TEXT_PADDING, y - TEXT_PADDING, 
+        x + 54 + TEXT_PADDING, y + TEXT_PADDING + 25,
+        0, 0
+    );
+
+    material_apply(hud->assets.b_button);
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 25, 0, 0);
+    
+    rdpq_text_printn(&(rdpq_textparms_t){
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_TOP,
+            .width = 100,
+            .height = 20,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 28, y + 4, 
+        "Exit",
+        4
+    );
+}
+
 void hud_render(void *data) {
 #if ENABLE_CHEATS
     hud_render_memory_usage(data);
@@ -299,6 +338,7 @@ void hud_render(void *data) {
     hud_render_compass(data);
     hud_render_autosave(data);
     hud_render_tracker_icon(data);
+    hud_render_dismount(data);
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
@@ -317,6 +357,12 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->assets.tracker_icon = material_cache_load("rom:/materials/menu/tracker_icon.mat");   
     hud->assets.nut_icon = material_cache_load("rom:/materials/parts/nut_particle.mat");
 
+    if (!inventory_has_item(ITEM_HAS_DISMOUNTED)) {
+        hud->assets.b_button = material_cache_load("rom:/materials/menu/b_button.mat");   
+    } else {
+        hud->assets.b_button = NULL;
+    }
+
     hud->prev_nut_count = inventory_get_count(ITEM_NUT);
 }
 
@@ -329,6 +375,9 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.saving_icon);
     material_cache_release(hud->assets.tracker_icon);
     material_cache_release(hud->assets.nut_icon);
+    if (hud->assets.b_button) {
+        material_cache_release(hud->assets.b_button);
+    }
     sprite_free(hud->assets.compass_border);
 }
 
