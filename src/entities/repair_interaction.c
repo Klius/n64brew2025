@@ -63,6 +63,14 @@ static repair_interaction_type_def_t types[REPAIR_COUNT] = {
             .center = {0.0f, 0.1f, 0.0f},
         }
     },
+    [REPAIR_BOATSWITCH] = {
+        .mesh_name = "rom:/meshes/repairs/ship_switch_broken.tmesh",
+        .repaired_mesh_name = "rom:/meshes/repairs/ship_switch_fixed.tmesh",
+        .collider = {
+            BOX_COLLIDER(0.5f, 0.5f, 0.5f),
+            .center = {0.0f, 0.1f, 0.0f},
+        }
+    },
 };
 
 void repair_interaction_common_init() {
@@ -125,7 +133,7 @@ void repair_interaction_init(repair_interaction_t* repair, struct repair_interac
     repair->repair_scene = definition->repair_scene;
 
     if (!repair->is_repaired) {
-        interactable_init(&repair->interactable, entity_id, INTERACT_TYPE_REPAIR, repair_interact, repair);
+        interactable_init(&repair->interactable, entity_id, definition->is_check_interaction ? INTERACT_TYPE_CHECK : INTERACT_TYPE_REPAIR, repair_interact, repair);
     }
 
     if (def->repaired_sound && repair->is_repaired) {

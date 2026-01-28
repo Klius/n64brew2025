@@ -16,6 +16,7 @@
 * add instructions on how to get off motorcycle
 * fix fading between scenes
 * fix z fighting issues for distant objects
+* exit repair minigame
 
 After new map       
 * have boost highways be more direct

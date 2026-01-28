@@ -157,6 +157,12 @@
             "type": "repair_interaction"
         },
         {
+            "name": "repairs_generator_broken",
+            "description": "",
+            "mesh": "meshes/repairs/generator_broken.blend#generator_static",
+            "type": "repair_interaction"
+        },
+        {
             "name": "repairs_hoverbike_no_motor",
             "description": "",
             "mesh": "meshes/repairs/hoverbike_no_motor.blend#hoverbike_WOmotor",
@@ -172,6 +178,12 @@
             "name": "repairs_medical_machine_fixed",
             "description": "",
             "mesh": "meshes/repairs/medical_machine_fixed.blend#repair_device",
+            "type": "repair_interaction"
+        },
+        {
+            "name": "repairs_ship_switch_broken",
+            "description": "",
+            "mesh": "meshes/repairs/ship_switch_broken.blend#wall_switch_broken",
             "type": "repair_interaction"
         },
         {

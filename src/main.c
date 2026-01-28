@@ -70,7 +70,7 @@ void setup() {
     // scene_queue_next("rom:/scenes/overworld.scene#race0");
     // scene_queue_next("rom:/scenes/garage.scene");
     // scene_queue_next("rom:/repair/boat_switch.repair");
-    // scene_queue_next("rom:/scenes/inside_boat.scene");
+    scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
 
     load_scene_or_repair(scene_get_next());
@@ -91,8 +91,9 @@ void render_3d() {
 
     t3d_frame_start();
 
-	t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
+
     t3d_screen_clear_depth();
+	t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
 
     t3d_light_set_ambient(colorAmbient); // one global ambient light, always active
     t3d_light_set_count(0);
