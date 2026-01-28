@@ -392,6 +392,24 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
         case CUTSCENE_STEP_SHOW_NUTS:
             hud_show_nuts(&current_scene->hud);
             break;
+        case CUTSCENE_STEP_SET_EXPRESSION: {
+            entity_id subject_id = evaluation_context_pop(&cutscene->context);
+            cutscene_actor_t* subject = cutscene_runner_lookup_actor(cutscene, subject_id);
+            if (!subject) {
+                break;
+            }
+            cutscene_actor_set_expression(subject, step->data.set_expression.expression);
+            break;
+        }
+        case CUTSCENE_STEP_MOVE_MOUTH: {
+            entity_id subject_id = evaluation_context_pop(&cutscene->context);
+            cutscene_actor_t* subject = cutscene_runner_lookup_actor(cutscene, subject_id);
+            if (!subject) {
+                break;
+            }
+            cutscene_actor_animate_mouth(subject, step->data.move_mouth.time);
+            break;
+        }
     }
 }
 

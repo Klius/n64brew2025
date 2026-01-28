@@ -60,6 +60,20 @@ func on_enter()
         npc_animate scrapbot, "idle", true;
         return;
     end
+    
+    if not has_given_tablet then
+        npc_animate characters_brother_healed, "depressed", true;
+        set_expression characters_brother_healed, NPC_EXPRESSION_SAD;
+    end
+end
+
+func on_tablet_exit()
+    npc_animate characters_brother_healed, "depressed", true;
+    set_expression characters_brother_healed, NPC_EXPRESSION_SAD;
+
+    if has_tablet_repaired_tablet then
+        show_item ITEM_TABLET_REPAIRED;
+    end
 end
 
 func on_brother_talk()
@@ -70,33 +84,48 @@ func on_brother_talk()
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
 
+        move_mouth characters_brother_healed, 4.0;
+        set_expression characters_brother_healed, NPC_EXPRESSION_HAPPY;
+        set_expression ENTITY_ID_PLAYER, NPC_EXPRESSION_HAPPY;
         say "
             Things are going to be okay.
 
             Thank you jax.
         ";
-    elif has_tablet and not has_given_tablet then
+        set_expression characters_brother_healed, NPC_EXPRESSION_NEUTRAL;
+    elif has_tablet_repaired_tablet and not has_given_tablet then
         cam_look_npc ENTITY_ID_SUBJECT;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
 
         has_given_tablet = true;
 
+        move_mouth characters_brother_healed, 3.0;
         say "
             What is this?
 
             ...
-
+        ";
+        set_expression characters_brother_healed, NPC_EXPRESSION_NEUTRAL;
+        move_mouth characters_brother_healed, 6.0;
+        npc_animate characters_brother_healed, "acceptance", false;
+        say "
             You fixed that old broken tablet.
 
             Is that mom and dad?
-
+        ";
+        set_expression ENTITY_ID_PLAYER, NPC_EXPRESSION_HAPPY;
+        set_expression characters_brother_healed, NPC_EXPRESSION_HAPPY;
+        npc_animate characters_brother_healed, "idle", false;
+        move_mouth characters_brother_healed, 8.0;
+        say "
             I remember now. They wouldn't want me to lose hope like this.
 
             We can make it Jax. I know we can if we stick together.
 
             Thank you jax.
         ";
+        move_mouth characters_brother_healed, 0.0;
 
         fade FADE_COLOR_BLACK, 2.0;
         delay 2.5;
@@ -117,12 +146,15 @@ func on_brother_talk()
 
             Thank you for playing
         ";
+        set_expression characters_brother_healed, NPC_EXPRESSION_NEUTRAL;
         
         fade FADE_COLOR_NONE, 2.0;
     elif samson_location == SAMSON_LOCATION_HEALED then
         if is_samson_sad then
+            move_mouth characters_brother_healed, 1.0;
             say "It hurts";
         else
+            move_mouth characters_brother_healed, 4.0;
             say "
                 I don't remember what mom and dad looked like anymore.
 
@@ -130,6 +162,7 @@ func on_brother_talk()
             ";
         end
     else
+        move_mouth characters_brother, 1.0;
         say "It hurts";
     end
 
@@ -184,10 +217,14 @@ func on_robot_talk()
             ";
         end
         npc_animate scrapbot, "idle", true;
-    elif not has_tablet then
+    elif not has_tablet_repaired_tablet then
         npc_animate scrapbot, "bot_talk", true;
-        if has_tablet_note then
-            say "You have the images of the locations where you can find parts for the tablet.";
+        if has_tablet_battery and has_tablet_memory and has_tablet_screen then
+            say "You have the tablet parts";
+            cam_look_npc repairs_tablet_broken;
+            say "Now repair the broken tablet";
+        elif has_tablet_note then
+            say "You have the images in your inventory of the locations where you can find parts for the tablet.";
         else
             cam_look_npc repairs_tablet_broken;
             say "Look on the desk over there. I left some information where you can find parts for the tablet.";
@@ -232,6 +269,8 @@ func on_samson_heal()
     interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, characters_brother_healed;
     interact_with_npc INTERACTION_LOOK, characters_brother_healed, ENTITY_ID_PLAYER;
     interact_with_npc INTERACTION_LOOK, scrapbot, characters_brother_healed;
+    set_expression characters_brother_healed, NPC_EXPRESSION_SAD;
+    set_expression ENTITY_ID_PLAYER, NPC_EXPRESSION_HAPPY;
     fade FADE_COLOR_NONE, 0.5;
     delay 0.5;
 
@@ -239,9 +278,13 @@ func on_samson_heal()
         Thank you Jax.
 
         I wasn't sure if I was going to make it
+    ";
 
-        ...
+    npc_animate characters_brother_healed, "depressed", true;
+    delay 0.5;
 
+    set_expression ENTITY_ID_PLAYER, NPC_EXPRESSION_SAD;
+    say "
         but maybe we are just delaying the inevitable.
 
         It has been so hard since mom and dad died. I don't think I remember what their faces look like anymore.
@@ -275,6 +318,9 @@ func on_samson_heal()
         Perhaps it will have something from life before the impact to cheer samson up
     ";
     npc_animate scrapbot, "idle", true;
+
+    npc_wait characters_brother_healed;
+    npc_animate characters_brother_healed, "sulk", false;
 
     world_unpause;
     cam_return;

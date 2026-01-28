@@ -49,6 +49,8 @@ CUTSCENE_STEP_START_RACE = 38
 CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE = 39
 CUTSCENE_STEP_AUDIO_PAUSE = 40
 CUTSCENE_STEP_SHOW_NUTS = 41
+CUTSCENE_STEP_SET_EXPRESSION = 42
+CUTSCENE_STEP_MOVE_MOUTH = 43
 
 class ParameterType():
     def __init__(self, name: str, is_static: bool):
@@ -99,6 +101,8 @@ _step_args = {
     "race_start": [ParameterType("str", True), ParameterType("int", True)],
     "audio_pause": [ParameterType("bool", True)],
     "show_nuts": [],
+    "set_expression": [ParameterType("entity_id", False), ParameterType("int", True)],
+    "move_mouth": [ParameterType("entity_id", False), ParameterType("float", True)],
 }
 
 _step_ids = {
@@ -134,6 +138,8 @@ _step_ids = {
     "race_start": CUTSCENE_STEP_START_RACE,
     "audio_pause": CUTSCENE_STEP_AUDIO_PAUSE,
     "show_nuts": CUTSCENE_STEP_SHOW_NUTS,
+    "set_expression": CUTSCENE_STEP_SET_EXPRESSION,
+    "move_mouth": CUTSCENE_STEP_MOVE_MOUTH,
 }
 
 _steps_that_need_idle = {

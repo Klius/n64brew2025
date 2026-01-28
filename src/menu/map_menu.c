@@ -313,14 +313,14 @@ static struct menu_item menu_items[] = {
         },
     },
     {
-        .type = MENU_ITEM_PART,
+        .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_TABLET,
-        .inventory_item = ITEM_TABLET,
+        .inventory_item = ITEM_TABLET_REPAIRED,
         .item_complete = {ITEM_GIVEN_TABLET},
         .name = "Tablet",
         .data = {
-            .part = {
-                .description = "This tablet has memories of life before the world ended",
+            .map = {
+                .image_filename = "rom:/images/menu/tablet_image.sprite",
             },
         },
     },
@@ -683,7 +683,7 @@ void map_items_render_pass(int* xPtr, int* yPtr, bool finished, float lerp_amoun
         material_apply(assets.map_icon);
 
         color_t prim_color;
-        if (lerp_amount >= 1.0f) {
+        if (lerp_amount >= 1.0f || map_menu.has_prev[i]) {
             if (is_complete) {
                 prim_color = (color_t){64, 64, 64, 196};
             } else {
@@ -777,7 +777,7 @@ void map_render_items(float lerp_amount) {
     int y = 0;
     
     map_items_render_pass(&x, &y, false, lerp_amount);
-    map_items_render_pass(&x, &y, true, lerp_amount);
+    map_items_render_pass(&x, &y, true, 1.0f);
     map_render_check_icons();
 }
 
@@ -1049,7 +1049,6 @@ void map_menu_show_with_item(enum inventory_item_type item) {
             }            
 
             has_new = true;
-            break;
         }
     }
 

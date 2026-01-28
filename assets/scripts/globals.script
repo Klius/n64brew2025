@@ -27,7 +27,6 @@ global has_tablet_memory_map: bool;
 global has_tablet_screen: bool;
 global has_tablet_screen_map: bool;
 global has_tablet_repaired_tablet: bool;
-global has_tablet: bool;
 
 global has_given_tablet: bool;
 

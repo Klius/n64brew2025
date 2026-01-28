@@ -75,6 +75,9 @@ void cutscene_actor_init(
     actor->collider.collision_group = def->collision_group;
     actor->collider.weight_class = WEIGHT_CLASS_HEAVY;
     actor->last_animator_events.all = 0;
+    actor->expression = NPC_EXPRESSION_UNSET;
+    actor->blink_timer = 0.0f;
+    actor->talk_timer = 0.0f;
 
     collision_scene_add(&actor->collider);
 }
@@ -124,6 +127,25 @@ void cutscene_actor_check_anim_events(struct cutscene_actor* actor) {
 bool cutscene_actor_update(struct cutscene_actor* actor) {
     actor->last_animator_events = actor->animator.events;
     animator_update(&actor->animator, actor->armature, fixed_time_step * actor->animate_speed);
+
+    if (actor->expression != NPC_EXPRESSION_UNSET) {
+        actor->armature->image_frame_0 = EXPRESSION_TO_INDEX(actor->expression);
+    }
+
+    if (actor->armature->image_frame_0 == EXPRESSION_TO_INDEX(NPC_EXPRESSION_NEUTRAL) && actor->blink_timer < 0.0f) {
+        actor->armature->image_frame_0 = EXPRESSION_TO_INDEX(NPC_EXPRESSION_CLOSED);
+        actor->blink_timer = randomInRangef(4.0f, 5.0f);
+    } else {
+        actor->blink_timer -= fixed_time_step;
+    }
+
+    if (actor->talk_timer > 0.0f) {
+        if (fmodf(actor->talk_timer, 0.5f) > 0.25f) {
+            actor->armature->image_frame_0 += 1;
+        }
+        
+        actor->talk_timer -= fixed_time_step;
+    }
 
     cutscene_actor_check_anim_events(actor);
 

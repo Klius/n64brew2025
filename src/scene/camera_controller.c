@@ -17,6 +17,7 @@ static struct move_towards_parameters camera_move_parameters = {
 };
 
 #define CAMERA_FOLLOW_DISTANCE  3.4f
+#define CAMERA_CUTSCENE_DISTNACE    1.8f
 #define CAMERA_LOWER_FOLLOW_DISTANCE    0.5f
 #define CAMERA_UPPER_FOLLOW_DISTANCE    8.0f
 
@@ -24,6 +25,7 @@ static struct move_towards_parameters camera_move_parameters = {
 #define MAX_ANGLE                       1.5f
 
 #define CAMERA_FOLLOW_HEIGHT    1.6f
+#define CAMERA_CUTSCENE_HEIGHT  1.2f
 
 #define ASPECT_RATIO            (4.0f/3.0f)
 #define OVER_SHOULDER_DISTANCE  1.1f
@@ -48,9 +50,13 @@ void camera_cached_calcuations_check(struct camera_cached_calcuations* cache, st
     cache->sin_1_3_fov_horz = sinf(cache->fov_horz * 0.33333f);
 }
 
+static inline float camera_get_distnace(struct camera_controller* controller) {
+    return controller->state == CAMERA_STATE_LOOK_AT_WITH_PLAYER ? CAMERA_CUTSCENE_DISTNACE : CAMERA_FOLLOW_DISTANCE;
+}
+
 void camera_look_at_from_rotation(struct camera_controller* controller) {
     quatMultVector(&controller->camera->transform.rotation, &gForward, &controller->looking_at);
-    vector3AddScaled(&controller->stable_position, &controller->looking_at, -CAMERA_FOLLOW_DISTANCE, &controller->looking_at);
+    vector3AddScaled(&controller->stable_position, &controller->looking_at, -camera_get_distnace(controller), &controller->looking_at);
 }
 
 #define MAX_SIN_ANGLE DEFAULT_CAMERA_COS_FOV_2
@@ -64,7 +70,7 @@ void camera_controller_direct_target(struct camera_controller* controller, struc
     offset.y = 0.0f;
     vector3Normalize(&offset, &offset);
 
-    vector3AddScaled(player_pos, &offset, CAMERA_FOLLOW_DISTANCE, &controller->target);
+    vector3AddScaled(player_pos, &offset, camera_get_distnace(controller), &controller->target);
     controller->target.y += CAMERA_FOLLOW_HEIGHT;
 
     move_towards(&controller->looking_at, &controller->looking_at_speed, target, &camera_move_parameters);
@@ -83,10 +89,10 @@ void camera_controller_watch_target(struct camera_controller* controller, struct
     float target_distance_inv = 1.0f / target_distance;
 
     struct Vector2 rotation_amount = {
-        .y = DEFAULT_CAMERA_SIN_TRI_CORNER * CAMERA_FOLLOW_DISTANCE * target_distance_inv
+        .y = DEFAULT_CAMERA_SIN_TRI_CORNER * CAMERA_CUTSCENE_DISTNACE * target_distance_inv
     };
 
-    float follow_distance = CAMERA_FOLLOW_DISTANCE;
+    float follow_distance = CAMERA_CUTSCENE_DISTNACE;
 
     if (rotation_amount.y > MAX_SIN_ANGLE) {
         rotation_amount.x = MAX_COS_ANGLE;
@@ -125,38 +131,38 @@ void camera_controller_watch_target(struct camera_controller* controller, struct
 
     controller->target = (struct Vector3){
         .x = player_pos->x + rotated_camera_offset.x,
-        .y = player_pos->y + CAMERA_FOLLOW_HEIGHT,
+        .y = player_pos->y + CAMERA_CUTSCENE_HEIGHT,
         .z = player_pos->z + rotated_camera_offset.y,
     };
     struct Vector3 looking_at = {
-        .x = controller->target.x + camera_rotation.y * CAMERA_FOLLOW_DISTANCE,
-        .y = player_pos->y + CAMERA_FOLLOW_HEIGHT,
-        .z = controller->target.z - camera_rotation.x * CAMERA_FOLLOW_DISTANCE,
+        .x = controller->target.x + camera_rotation.y * CAMERA_CUTSCENE_DISTNACE,
+        .y = player_pos->y + CAMERA_CUTSCENE_HEIGHT,
+        .z = controller->target.z - camera_rotation.x * CAMERA_CUTSCENE_DISTNACE,
     };
 
-    if (target->y < player_pos->y || target->y > player_pos->y + CAMERA_FOLLOW_HEIGHT) {        
+    if (target->y < player_pos->y || target->y > player_pos->y + CAMERA_CUTSCENE_HEIGHT) {        
         struct Vector3 offset;
         vector3Sub(target, player_pos, &offset);
 
         if (target->y > player_pos->y) {
-            offset.y -= CAMERA_FOLLOW_HEIGHT;
+            offset.y -= CAMERA_CUTSCENE_HEIGHT;
         }
 
         float distance = sqrtf(vector3MagSqrd2D(&offset));
 
         if (distance > 0.001f) {
             float slope = offset.y / distance;
-            controller->target.y -= slope * CAMERA_FOLLOW_DISTANCE;
+            controller->target.y -= slope * CAMERA_CUTSCENE_DISTNACE;
 
             vector3Sub(&controller->target, player_pos, &offset);
-            offset.y -= CAMERA_FOLLOW_HEIGHT;
+            offset.y -= CAMERA_CUTSCENE_HEIGHT;
 
             vector3Normalize(&offset, &offset);
 
-            float followDistance = offset.y < 0.0 ? mathfLerp(CAMERA_FOLLOW_DISTANCE, OVER_SHOULDER_DISTANCE, -offset.y) : CAMERA_FOLLOW_DISTANCE;
+            float followDistance = offset.y < 0.0 ? mathfLerp(CAMERA_CUTSCENE_DISTNACE, OVER_SHOULDER_DISTANCE, -offset.y) : CAMERA_CUTSCENE_DISTNACE;
 
             vector3AddScaled(player_pos, &offset, followDistance, &controller->target);
-            controller->target.y += CAMERA_FOLLOW_HEIGHT;
+            controller->target.y += CAMERA_CUTSCENE_HEIGHT;
         }
     }
 
@@ -224,9 +230,9 @@ float camera_controller_determine_vert_movement(struct camera_controller* contro
     offset->z *= cos_angle;
 
     if (sin_angle < 0.0f) {
-        return mathfLerp(CAMERA_FOLLOW_DISTANCE, CAMERA_UPPER_FOLLOW_DISTANCE, -sin_angle);
+        return mathfLerp(camera_get_distnace(controller), CAMERA_UPPER_FOLLOW_DISTANCE, -sin_angle);
     } else {
-        return mathfLerp(CAMERA_FOLLOW_DISTANCE, CAMERA_LOWER_FOLLOW_DISTANCE, sin_angle);
+        return mathfLerp(camera_get_distnace(controller), CAMERA_LOWER_FOLLOW_DISTANCE, sin_angle);
     }
 }
 
@@ -296,7 +302,7 @@ void camera_controller_return_target(struct camera_controller* controller, struc
     offset.y = 0.0f;
     vector3Scale(&offset, &offset, -1.0f);
     vector3Normalize(&offset, &offset);
-    vector3AddScaled(player_get_position(controller->player), &offset, -CAMERA_FOLLOW_DISTANCE, target);
+    vector3AddScaled(player_get_position(controller->player), &offset, -camera_get_distnace(controller), target);
     target->y += CAMERA_FOLLOW_HEIGHT;
 
     move_towards(&controller->stable_position, &controller->speed, &controller->target, &camera_move_parameters);
@@ -428,7 +434,7 @@ void camera_follow_vehicle_update(struct camera_controller* controller) {
 }
 
 void camera_controller_update(struct camera_controller* controller) {
-    float follow_distance = CAMERA_FOLLOW_DISTANCE;
+    float follow_distance = camera_get_distnace(controller);
 
     switch (controller->state) {
         case CAMERA_STATE_FOLLOW: {
@@ -478,7 +484,7 @@ void camera_controller_init_position(struct camera_controller* controller) {
     vector3_t offset;
     vector2ToLookDir(player_rotation, &offset);
     quatLook(&offset, &gUp, &controller->camera->transform.rotation);
-    vector3AddScaled(player_pos, &offset, -CAMERA_FOLLOW_DISTANCE / sqrtf(vector3MagSqrd(&offset)), &controller->target);
+    vector3AddScaled(player_pos, &offset, -camera_get_distnace(controller) / sqrtf(vector3MagSqrd(&offset)), &controller->target);
     controller->target.y += CAMERA_FOLLOW_HEIGHT;
     controller->stable_position = controller->target;
     controller->speed = 0.0f;

@@ -10,6 +10,8 @@
 * add instructions on how to get off motorcycle
 * fix fading between scenes
 * fix z fighting issues for distant objects
+* animation blending
+* fix brother headband texture
 
 Repair minigame
 * exit repair minigame early

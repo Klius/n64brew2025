@@ -53,6 +53,9 @@ struct cutscene_actor {
     enum actor_state state;
     struct cutscene_actor_def* def;
     animator_events_t last_animator_events;
+    enum npc_expression expression;
+    float blink_timer;
+    float talk_timer;
 };
 
 typedef struct cutscene_actor cutscene_actor_t;
@@ -115,6 +118,14 @@ static inline animator_events_t cutscene_actor_get_animator_events(cutscene_acto
 
 static inline entity_id cutscene_actor_get_id(cutscene_actor_t* actor) {
     return actor->collider.entity_id;
+}
+
+static inline void cutscene_actor_set_expression(cutscene_actor_t* actor, enum npc_expression expression) {
+    actor->expression = expression;
+}
+
+static inline void cutscene_actor_animate_mouth(cutscene_actor_t* actor, float time) {
+    actor->talk_timer = time;
 }
 
 #endif

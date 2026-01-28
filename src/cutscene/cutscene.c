@@ -171,6 +171,12 @@ struct cutscene* cutscene_load(const char* filename) {
             case CUTSCENE_STEP_AUDIO_PAUSE:
                 fread(&step->data.audio_pause.is_paused, 1, 1, file);
                 break;
+            case CUTSCENE_STEP_SET_EXPRESSION:
+                fread(&step->data.set_expression.expression, 4, 1, file);
+                break;
+            case CUTSCENE_STEP_MOVE_MOUTH:
+                fread(&step->data.move_mouth.time, 4, 1, file);
+                break;
         }
     }
     

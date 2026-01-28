@@ -240,6 +240,16 @@ enum samson_locations {
     SAMSON_LOCATION_HEALED,
 };
 
+enum npc_expression {
+    NPC_EXPRESSION_UNSET,
+    NPC_EXPRESSION_NEUTRAL,
+    NPC_EXPRESSION_CLOSED,
+    NPC_EXPRESSION_HAPPY,
+    NPC_EXPRESSION_SAD,
+};
+
+#define EXPRESSION_TO_INDEX(expr) ((expr - 1) * 2)
+
 enum npc_type {
     NPC_TYPE_SCRAPBOT1,
     NPC_BROTHER_HURT,

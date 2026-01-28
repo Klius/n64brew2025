@@ -29,7 +29,6 @@ mapping = {
     "has_tablet_memory_map": 'ITEM_TABLET_MEMORY_MAP',
     "has_tablet_screen_map": 'ITEM_TABLET_SCREEN_MAP',
     "has_tablet_repaired_tablet": 'ITEM_TABLET_REPAIRED',
-    "has_tablet": 'ITEM_TABLET',
     "has_given_tablet": 'ITEM_GIVEN_TABLET',
     
     "has_dismounted": 'ITEM_HAS_DISMOUNTED',

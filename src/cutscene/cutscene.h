@@ -50,6 +50,8 @@ enum cutscene_step_type {
     CUTSCENE_STEP_CAMERA_FOLLOW_VEHICLE,
     CUTSCENE_STEP_AUDIO_PAUSE,
     CUTSCENE_STEP_SHOW_NUTS,
+    CUTSCENE_STEP_SET_EXPRESSION,
+    CUTSCENE_STEP_MOVE_MOUTH,
 };
 
 typedef void (*cutscene_step_callback)(void* data);
@@ -173,6 +175,12 @@ union cutscene_step_data {
     struct {
         uint8_t is_paused;
     } audio_pause;
+    struct {
+        int expression;
+    } set_expression;
+    struct {
+        float time;
+    } move_mouth;
 };
 
 struct cutscene_step {
