@@ -65,41 +65,41 @@ static dynamic_object_type_t collider_type = {
 };
 
 static vehicle_camera_target_t boost_positions[VEHICLE_CAM_COUNT] = {
-    {
+    [VEHICLE_CAM_NEUTRAL] = {
         .position = {0.0f, 1.75f, -4.0f},
         .look_at = {0.0f, 1.75f, 2.0f},
     },
-    {
-        .position = {0.0f, 6.5f, -5.0f},
-        .look_at = {0.0f, 1.5f, 8.0f},
+    [VEHICLE_CAM_U] = {
+        .position = {0.0f, 12.5f, -6.0f},
+        .look_at = {0.0f, 1.5f, 2.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_UR] = {
+        .position = {-6.0f, 6.5f, -3.0f},
+        .look_at = {0.0f, 1.5f, 2.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_R] = {
+        .position = {-4.0f, 2.5f, 1.0f},
+        .look_at = {0.0f, 2.0f, 1.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_DR] = {
+        .position = {-3.0f, 1.0f, -2.0f},
+        .look_at = {0.0f, 3.0f, 1.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_D] = {
+        .position = {0.0f, 1.0f, -3.0f},
+        .look_at = {0.0f, 2.5f, 2.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_DL] = {
+        .position = {3.0f, 1.0f, -2.0f},
+        .look_at = {0.0f, 3.0f, 1.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_L] = {
+        .position = {4.0f, 2.5f, 1.0f},
+        .look_at = {0.0f, 2.0f, 1.0f},
     },
-    {
-        .position = {0.0f, 1.5f, -4.0f},
-        .look_at = {0.0f, 1.5f, 16.0f},
+    [VEHICLE_CAM_UL] = {
+        .position = {6.0f, 6.5f, -3.0f},
+        .look_at = {0.0f, 1.5f, 2.0f},
     },
 };
 
@@ -111,41 +111,41 @@ static vehicle_definiton_t vehicle_def = {
     },
     .exit_position = {-1.0f, 0.0f, 0.0f},
     .camera_positions = {
-        {
+        [VEHICLE_CAM_NEUTRAL] = {
             .position = {0.0f, 2.0f, -4.0f},
             .look_at = {0.0f, 2.0f, 2.0f},
         },
-        {
-            .position = {0.0f, 15.5f, -8.0f},
+        [VEHICLE_CAM_U] = {
+            .position = {0.0f, 12.5f, -6.0f},
             .look_at = {0.0f, 1.5f, 2.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_UR] = {
+            .position = {-6.0f, 6.5f, -3.0f},
+            .look_at = {0.0f, 1.5f, 2.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_R] = {
+            .position = {-4.0f, 2.5f, 1.0f},
+            .look_at = {0.0f, 2.0f, 1.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_DR] = {
+            .position = {-3.0f, 1.0f, -2.0f},
+            .look_at = {0.0f, 3.0f, 1.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_D] = {
+            .position = {0.0f, 1.0f, -3.0f},
+            .look_at = {0.0f, 2.5f, 2.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_DL] = {
+            .position = {3.0f, 1.0f, -2.0f},
+            .look_at = {0.0f, 3.0f, 1.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_L] = {
+            .position = {4.0f, 2.5f, 1.0f},
+            .look_at = {0.0f, 2.0f, 1.0f},
         },
-        {
-            .position = {0.0f, 1.5f, -4.0f},
-            .look_at = {0.0f, 1.5f, 16.0f},
+        [VEHICLE_CAM_UL] = {
+            .position = {6.0f, 6.5f, -3.0f},
+            .look_at = {0.0f, 1.5f, 2.0f},
         },
     },
     .boost_camera_positions = boost_positions,

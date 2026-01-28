@@ -34,6 +34,7 @@ func room_default()
         has_generator_part_0 = false;
         has_generator_part_1 = false;
         has_generator_part_2 = false;
+        has_repaired_ship_switch = false;
         has_repaired_generator = false;
 
         has_health_juice_map = false;
@@ -66,6 +67,7 @@ func room_default()
         has_generator_part_0 = false;
         has_generator_part_1 = false;
         has_generator_part_2 = false;
+        has_repaired_ship_switch = false;
         has_repaired_generator = false;
 
         has_health_juice_map = false;
@@ -98,6 +100,7 @@ func room_default()
         has_generator_part_0 = false;
         has_generator_part_1 = false;
         has_generator_part_2 = false;
+        has_repaired_ship_switch = false;
         has_repaired_generator = false;
 
         has_health_juice_map = false;
@@ -130,6 +133,7 @@ func room_default()
         has_generator_part_0 = true;
         has_generator_part_1 = true;
         has_generator_part_2 = true;
+        has_repaired_ship_switch = true;
         has_repaired_generator = false;
 
         has_health_juice_map = false;
@@ -162,6 +166,7 @@ func room_default()
         has_generator_part_0 = true;
         has_generator_part_1 = true;
         has_generator_part_2 = true;
+        has_repaired_ship_switch = true;
         has_repaired_generator = true;
 
         has_health_juice_map = true;
@@ -194,6 +199,7 @@ func room_default()
         has_generator_part_0 = true;
         has_generator_part_1 = true;
         has_generator_part_2 = true;
+        has_repaired_ship_switch = true;
         has_repaired_generator = true;
 
         has_health_juice_map = true;
@@ -228,6 +234,7 @@ func room_default()
         has_generator_part_0 = true;
         has_generator_part_1 = true;
         has_generator_part_2 = true;
+        has_repaired_ship_switch = true;
         has_repaired_generator = true;
 
         has_health_juice_map = true;
