@@ -1,5 +1,4 @@
 
-* add fast travel back to home base
 * make motorcycle boost feel faster (camera tricks)
 * driving up steep hills feels bad
 * check for memory leaks
@@ -7,7 +6,6 @@
 * add home base icon to map
 * indoor locations should show up on map
 * add instructions how to save
-* add instructions on how to get off motorcycle
 * fix fading between scenes
 * fix z fighting issues for distant objects
 * animation blending
