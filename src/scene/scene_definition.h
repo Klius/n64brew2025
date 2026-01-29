@@ -92,6 +92,7 @@ enum inventory_item_type {
     ITEM_LONGER_BOOST,
     ITEM_DETECT_NUTS,
     ITEM_BOOST_ANYWHERE,
+    ITEM_FAST_TRAVEL,
 
     ITEM_RIDING_MOTORCYCLE,
 
@@ -282,6 +283,10 @@ struct health_machine_definition {
 
 enum sign_type {
     SIGN_TYPE_WALL_POSTER,
+    SIGN_TYPE_SPEED_UPGRADE,
+    SIGN_TYPE_DETECTOR_UPGRADE,
+    SIGN_TYPE_BOOST_ANYWHERE,
+    SIGN_TYPE_FAST_TRAVEL,
 };
 
 struct sign_definition {

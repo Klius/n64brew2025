@@ -73,6 +73,18 @@
             "type": "repair_part_pickup"
         },
         {
+            "name": "parts_boost_upgrade",
+            "description": "",
+            "mesh": "meshes/parts/boost_upgrade.blend#boost_upgrade",
+            "type": "sign"
+        },
+        {
+            "name": "parts_fast_travel_upgrade",
+            "description": "",
+            "mesh": "meshes/parts/fast_travel_upgrade.blend#fast_travel_upgrade",
+            "type": "sign"
+        },
+        {
             "name": "parts_gen_bulb",
             "description": "",
             "mesh": "meshes/parts/gen_bulb.blend#gen_bulb",
@@ -107,6 +119,18 @@
             "description": "",
             "mesh": "meshes/parts/nut.blend#nut",
             "type": "repair_part_pickup"
+        },
+        {
+            "name": "parts_scanner_upgrade",
+            "description": "",
+            "mesh": "meshes/parts/scanner_upgrade.blend#scanner_upgrade",
+            "type": "sign"
+        },
+        {
+            "name": "parts_speed_upgrade",
+            "description": "",
+            "mesh": "meshes/parts/speed_upgrade.blend#speed_upgrade",
+            "type": "sign"
         },
         {
             "name": "parts_tablet",

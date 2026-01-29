@@ -396,6 +396,60 @@ void player_teleport_to_cycle(void* data) {
     player_enter_vehicle(player, ENTITY_ID_MOTORCYLE);
 }
 
+const char* fast_travel_entries[] = {
+    "rom:/scenes/overworld.scene#fast_travel_0",
+    "rom:/scenes/overworld.scene#fast_travel_1",
+    "rom:/scenes/overworld.scene#fast_travel_2",
+    "rom:/scenes/overworld.scene#fast_travel_3",
+};
+
+vector3_t fast_travel_locations[] = {
+    {185.788f, 14.3553f, 99.5688f},
+    {-1076.15f, 63.0153f, 935.548f},
+    {-1369.71f, 119.597f, -1647.77f},
+    {1424.01f, 16.2132f, 1838.28f},
+};
+
+void player_check_for_fast_travel(joypad_buttons_t pressed) {
+    if (!inventory_has_item(ITEM_FAST_TRAVEL)) {
+        return;
+    }
+
+    int fast_travel_index = -1;
+
+    if (pressed.d_down) {
+        fast_travel_index = 0;
+    } else if (pressed.d_left) {
+        fast_travel_index = 1;
+    } else if (pressed.d_up) {
+        fast_travel_index = 2;
+    } else if (pressed.d_right) {
+        fast_travel_index = 3;
+    }
+
+    if (fast_travel_index == -1) {
+        return;
+    }
+
+#if !ENABLE_CHEATS
+    if (!map_menu_has_revealed(&fast_travel_locations[fast_travel_index])) {
+        return;
+    }
+#endif
+
+    cutscene_builder_t cutscene;
+    cutscene_builder_init(&cutscene);
+
+    cutscene_builder_init(&cutscene);
+    cutscene_builder_fade(&cutscene, FADE_COLOR_BLACK, 0.5);
+    cutscene_builder_delay(&cutscene, 0.5f);
+    cutscene_builder_load_scene(&cutscene, fast_travel_entries[fast_travel_index]);
+    cutscene_builder_delay(&cutscene, 0.5f);
+    cutscene_builder_fade(&cutscene, FADE_COLOR_NONE, 0.5);
+    
+    cutscene_runner_run(cutscene_builder_finish(&cutscene), 0, cutscene_runner_free_on_finish(), NULL, 0);
+}
+
 void player_update_grounded(struct player* player, struct contact* ground_contact) {
     joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
     
@@ -412,6 +466,8 @@ void player_update_grounded(struct player* player, struct contact* ground_contac
         
         cutscene_runner_run(cutscene_builder_finish(&cutscene), 0, cutscene_runner_free_on_finish(), NULL, 0);
     }
+
+    player_check_for_fast_travel(pressed);
 
     if (interactable) {
         player->hover_interaction = interactable->id;

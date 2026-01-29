@@ -329,6 +329,7 @@ struct scene* scene_load(const char* filename) {
         scene->overworld = overworld_load(overworld_filename);
     } else {
         scene->overworld = NULL;
+        scene->camera.far = 50.0f;
     }
 
     scene_load_minimap(scene, file);

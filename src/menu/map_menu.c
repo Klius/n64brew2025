@@ -118,6 +118,17 @@ static struct menu_item menu_items[] = {
         },
     },
     {
+        .type = MENU_ITEM_PART,
+        .icon = MENU_ICON_BIKE_TELEPORT,
+        .inventory_item = ITEM_FAST_TRAVEL,
+        .name = "Upgraded teleport",
+        .data = {
+            .part = {
+                .description = "Use R to teleport back to your hover bike. Use D-pad to teleport other places.",
+            },
+        },
+    },
+    {
         .type = MENU_ITEM_MAP,
         .icon = MENU_ICON_MAP,
         .inventory_item = ITEM_WELL_PUMP_PART_MAP,
@@ -1188,4 +1199,22 @@ void map_mark_revealed(struct Vector3* pos) {
 
 uint8_t* map_get_revealed() {
     return map_revealed;
+}
+
+bool map_menu_has_revealed(vector3_t* pos) {
+    if (!current_scene || !current_scene->overworld) {
+        return false;
+    }
+
+    vector2_t screen_pos;
+    map_get_position(pos, &screen_pos);
+
+    int x = (int)screen_pos.x;
+    int y = (int)screen_pos.y;
+
+    if (x < 0 || y < 0 || x >= MAP_SIZE || y >= MAP_SIZE) {
+        return false;
+    }
+
+    return map_revealed[x + y * MAP_SIZE] != 0;
 }

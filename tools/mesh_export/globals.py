@@ -37,6 +37,7 @@ mapping = {
     "upgrade_longer_boost": 'ITEM_LONGER_BOOST',
     "upgrade_detect_nuts": 'ITEM_DETECT_NUTS',
     "upgrade_boost_anywhere": 'ITEM_BOOST_ANYWHERE',
+    "upgrade_fast_travel": 'ITEM_FAST_TRAVEL',
 
     "is_riding_motorcycle": "ITEM_RIDING_MOTORCYCLE",
 

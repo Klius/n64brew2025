@@ -44,6 +44,7 @@ global upgrade_faster: bool;
 global upgrade_longer_boost: bool;
 global upgrade_detect_nuts: bool;
 global upgrade_boost_anywhere: bool;
+global upgrade_fast_travel: bool;
 
 global garage_nut_0: bool;
 global garage_nut_1: bool;

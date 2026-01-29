@@ -1,6 +1,16 @@
 
 scene store_bot: entity_id;
 
+scene upgrade_faster_item: entity_id;
+scene upgrade_boost_anywhere_item: entity_id;
+scene upgrade_detect_nuts_item: entity_id;
+scene upgrade_fast_travel_item: entity_id;
+
+scene faster_cost: i8 = 10;
+scene detect_nuts_cost: i8 = 15;
+scene boost_anywhere_cost: i8 = 20;
+scene fast_travel_cost: i8 = 20;
+
 func store_bot_talk()
     world_pause;
     interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
@@ -14,8 +24,6 @@ func store_bot_talk()
         I am SB0. Walk up to the inventory and push A to get learn more about the items.
     ";
     npc_animate ENTITY_ID_SUBJECT, "idle", true;
-
-    nut_count = 100;
 
     cam_return;
     world_unpause;
@@ -41,12 +49,13 @@ func store_buy_upgrade_faster()
         This will upgrade the speed of your hover bike.
     ";
 
-    ask "Do you wish to buy it for 10 nuts?";
+    ask "Do you wish to buy it for {faster_cost} nuts?";
 
     if ask_response() then
-        if nut_count >= 10 then
+        if nut_count >= faster_cost then
+            despawn upgrade_faster_item;
             upgrade_faster = true;
-            nut_count = nut_count - 10;
+            nut_count = nut_count - faster_cost;
             say "Good doing business with you";
         else
             say "You don't have enough nuts";
@@ -117,12 +126,13 @@ func store_buy_upgrade_detect_nuts()
         This will upgrade you part scanner to detect nuts.
     ";
 
-    ask "Do you wish to buy it for 15 nuts?";
+    ask "Do you wish to buy it for {detect_nuts_cost} nuts?";
 
     if ask_response() then
-        if nut_count >= 15 then
+        if nut_count >= detect_nuts_cost then
+            despawn upgrade_detect_nuts_item;
             upgrade_detect_nuts = true;
-            nut_count = nut_count - 15;
+            nut_count = nut_count - detect_nuts_cost;
             say "Good doing business with you";
         else
             say "You don't have enough nuts";
@@ -155,12 +165,53 @@ func store_buy_upgrade_boost_anywhere()
         This upgrade will give your hoverbike a boost on command by pressing Z.
     ";
 
-    ask "Do you wish to buy it for 20 nuts?";
+    ask "Do you wish to buy it for {boost_anywhere_cost} nuts?";
 
     if ask_response() then
-        if nut_count >= 20 then
+        if nut_count >= boost_anywhere_cost then
+            despawn upgrade_boost_anywhere_item;
             upgrade_boost_anywhere = true;
-            nut_count = nut_count - 20;
+            nut_count = nut_count - boost_anywhere_cost;
+            say "Good doing business with you";
+        else
+            say "You don't have enough nuts";
+        end
+    end
+
+    npc_animate store_bot, "idle", true;
+
+    cam_return;
+    world_unpause;
+end
+
+func store_buy_upgrade_fast_travel()
+    world_pause;
+
+    if upgrade_fast_travel then
+        say "Sold out";
+        world_unpause;
+        return;
+    end
+
+    world_pause;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, store_bot;
+    interact_with_npc INTERACTION_LOOK, store_bot, ENTITY_ID_PLAYER;
+    cam_look_npc store_bot;
+    show_nuts;
+
+    npc_animate store_bot, "bot_talk", true;
+    say "
+        This upgrade will teleport to take you to places you have been using the D-pad.
+    ";
+
+    ask "Do you wish to buy it for {fast_travel_cost} nuts?";
+
+    if ask_response() then
+        if nut_count >= fast_travel_cost then
+            despawn upgrade_fast_travel_item;
+            upgrade_fast_travel = true;
+            has_bike_teleport = false;
+            nut_count = nut_count - fast_travel_cost;
             say "Good doing business with you";
         else
             say "You don't have enough nuts";

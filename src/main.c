@@ -69,7 +69,7 @@ void setup() {
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
     // scene_queue_next("rom:/scenes/overworld.scene#race0");
-    // scene_queue_next("rom:/scenes/garage.scene");
+    scene_queue_next("rom:/scenes/store.scene");
     // scene_queue_next("rom:/repair/boat_switch.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
@@ -97,7 +97,7 @@ void render_3d(surface_t* col, surface_t* z_buffer) {
     }
     rdpq_set_color_image(col);
     rdpq_set_z_image(z_buffer);
-	t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
+	// t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
     
     t3d_frame_start();
 
