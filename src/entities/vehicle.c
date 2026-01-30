@@ -41,7 +41,7 @@ void vehicle_exit(vehicle_t* vehicle) {
 
 void vehicle_apply_driver_transform(vehicle_t* vehicle, transform_sa_t* driver_transform) {
     transformSaTransformPoint(vehicle->transform, &vehicle->def->local_player_position, &driver_transform->position);
-    driver_transform->rotation = vehicle->transform->rotation;
+    vector2ComplexMul(&vehicle->transform->rotation, &vehicle->def->local_player_rotation, &driver_transform->rotation);
 }
 
 void vehicle_apply_exit_transform(vehicle_t* vehicle, transform_sa_t* driver_transform) {

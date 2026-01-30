@@ -254,6 +254,8 @@ func room_default()
         is_riding_motorcycle = false;
         has_dismounted = true;
 
+        nut_count = 100;
+
         load_scene "rom:/scenes/inside_house.scene#tablet";
     end
 end

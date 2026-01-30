@@ -15,6 +15,7 @@ struct hud_assets {
     material_t* nut_icon;
     material_t* b_button;
     sprite_t* compass_border;
+    sprite_t* boost_indicator;
 };
 
 typedef struct hud_assets hud_assets_t;

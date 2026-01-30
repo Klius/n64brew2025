@@ -30,6 +30,7 @@ typedef enum vehicle_cam vehicle_cam_t;
 
 struct vehicle_definiton {
     vector3_t local_player_position;
+    vector2_t local_player_rotation;
     vector3_t exit_position;
 
     vehicle_camera_target_t camera_positions[VEHICLE_CAM_COUNT];

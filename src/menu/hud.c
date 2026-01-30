@@ -16,6 +16,7 @@
 #include "../math/vector2.h"
 #include "../render/defs.h"
 #include "../savefile/savefile.h"
+#include "../entities/motorcycle.h"
 #include "menu_common.h"
 #include <string.h>
 #include "../config.h"
@@ -123,8 +124,11 @@ static vector2_t arrow_vertices[] = {
 };
 
 #define COMPASS_MARGIN      20
-#define COMPASS_BORDER_W    24
-#define COMPASS_BORDER_H    25
+#define COMPASS_BORDER_W    28
+#define COMPASS_BORDER_H    38
+
+#define BOOST_OFFSET_X      3
+#define BOOST_OFFSET_Y      27
 
 static vector2_t compass_center = {SCREEN_WD - 20 - COMPASS_BORDER_W * 0.5 , 34.0f};
 
@@ -133,7 +137,23 @@ void hud_render_compass(struct hud* hud) {
         return;
     }
     material_apply(hud->assets.icon_material);
+
     rdpq_sprite_blit(hud->assets.compass_border, SCREEN_WD - COMPASS_MARGIN - COMPASS_BORDER_W, COMPASS_MARGIN, NULL);
+
+    int boost_width = (int)(22.0f * motorcycle_get_boost_charge(motorcycle_get()));
+
+    if (boost_width) {
+        rdpq_sprite_blit(
+            hud->assets.boost_indicator,
+            SCREEN_WD - COMPASS_MARGIN - COMPASS_BORDER_W + BOOST_OFFSET_X, COMPASS_MARGIN + BOOST_OFFSET_Y,
+            &(rdpq_blitparms_t){
+                .width = boost_width,
+                .height = 8,
+                .t0 = boost_width == 22 ? 8 : 0,
+            }
+        );
+    }
+
     material_apply(hud->assets.compass_arrow);
     rdpq_set_prim_color(compass_color);
 
@@ -254,7 +274,7 @@ void hud_render_nuts(struct hud* hud) {
     
     int frame = (int)(total_time * 8) % 8;
 
-    int nut_y = current_scene && current_scene->overworld ? 20 + 30 : 20;
+    int nut_y = current_scene && current_scene->overworld ? 20 + COMPASS_BORDER_H + 4 : 20;
 
     rdpq_texture_rectangle_scaled(
         TILE0,
@@ -351,6 +371,7 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
 
     hud->assets.overlay_material = material_cache_load("rom:/materials/menu/solid_primitive.mat");
     hud->assets.compass_border = sprite_load("rom:/images/menu/compass_border.sprite");
+    hud->assets.boost_indicator = sprite_load("rom:/images/menu/boost_indicator.sprite");
     hud->assets.icon_material = material_cache_load("rom:/materials/menu/map_icon.mat");
     hud->assets.compass_arrow = material_cache_load("rom:/materials/menu/map_arrow.mat");
     hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
@@ -379,6 +400,7 @@ void hud_destroy(struct hud* hud) {
         material_cache_release(hud->assets.b_button);
     }
     sprite_free(hud->assets.compass_border);
+    sprite_free(hud->assets.boost_indicator);
 }
 
 void hud_flash_tracker() {

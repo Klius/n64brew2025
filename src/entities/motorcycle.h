@@ -28,6 +28,7 @@ struct motorcycle {
     drop_shadow_t drop_shadow;
     bool has_traction;
     bool is_active;
+    int8_t drift_direction;
     
     float boost_timer;
     float self_boost_cooldown;
@@ -49,5 +50,6 @@ void motorcycle_destroy(motorcycle_t* motorcycle);
 motorcycle_t* motorcycle_get();
 bool motorcycle_check_active(motorcycle_t* motorcycle);
 
+float motorcycle_get_boost_charge(motorcycle_t* motorcycle);
 
 #endif

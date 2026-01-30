@@ -12,6 +12,7 @@
 #include "../player/inventory.h"
 #include "../resource/animation_cache.h"
 #include "../math/mathf.h"
+#include "../util/input.h"
 
 #define HOVER_SAG_AMOUNT        0.25f
 #define HOVER_SPRING_STRENGTH   (-GRAVITY_CONSTANT / HOVER_SAG_AMOUNT)
@@ -24,6 +25,10 @@
 #define BASE_BOOST_SPEED        50.0f
 #define UPGRADED_BOOST_SPEED    60.0f
 #define MAX_TURN_RATE           2.0f
+
+#define DRIFT_SPEED_REDUNCTION  3.0f
+#define MIN_DRIFT_TURN_RATE     1.3f
+#define MAX_DRIFT_TURN_RATE     2.6f
 
 #define MAX_BOOST_TURN_ACCEL    50.0f
 #define MAX_TURN_ACCEL          30.0f
@@ -38,10 +43,11 @@
 #define BOB_HEIGHT              0.1f
 #define BOB_TIME                4.0f
 
-#define BASE_BOOST_TIME         2.5f
+#define BASE_BOOST_TIME         3.0f
 #define UPGRADED_BOOST_TIME     3.5f
 
 #define SELF_BOOST_COOLDOWN     10.0f
+#define DRIFT_BOOST_COOLDOWN    2.0f
 
 #define CAST_CENTER             0.3f
 
@@ -109,6 +115,7 @@ static vehicle_definiton_t vehicle_def = {
         .y = 0.0f,
         .z = 0.0f,
     },
+    .local_player_rotation = {1.0f, 0.0f},
     .exit_position = {-1.0f, 0.0f, 0.0f},
     .camera_positions = {
         [VEHICLE_CAM_NEUTRAL] = {
@@ -242,17 +249,55 @@ float motorycle_get_ground_height(motorcycle_t* motorcycle, float target_height,
     return min_height_offset;
 }
 
+void motorcycle_render(void* data, render_batch_t* batch) {
+    motorcycle_t* motorcycle = (motorcycle_t*)data;
+
+    renderable_t* renderable = &motorcycle->renderable;
+
+    if (renderable->hide) {
+        return;
+    }
+    
+    T3DMat4FP* mtxfp = render_batch_get_transformfp(batch);
+
+    if (!mtxfp) {
+        return;
+    }
+
+    transform_sa_t rotated_transform = motorcycle->transform;
+
+    vector2ComplexMul(&motorcycle->transform.rotation, &vehicle_def.local_player_rotation, &rotated_transform.rotation);
+
+    mat4x4 mtx;
+    transformSAToMatrix(&rotated_transform, mtx);
+    render_batch_relative_mtx(batch, mtx);
+    t3d_mat4_to_fixed_3x4(mtxfp, (T3DMat4*)mtx);
+
+    struct render_batch_element* element = render_batch_add_tmesh(
+        batch, 
+        renderable->mesh_render.mesh, 
+        mtxfp, 
+        &renderable->mesh_render.armature, 
+        renderable->mesh_render.attachments,
+        renderable->attrs
+    );
+
+    if (element && renderable->mesh_render.force_material) {
+        element->material = renderable->mesh_render.force_material;
+    }
+}
+
 #define MOTORCYCLE_CULL_DISTANCE    70.0f
 
 bool motorcycle_check_active(motorcycle_t* motorcycle) {
     bool is_active = vector3DistSqrd(&motorcycle->transform.position, player_get_position(&current_scene->player)) < MOTORCYCLE_CULL_DISTANCE * MOTORCYCLE_CULL_DISTANCE;
 
     if (is_active && !motorcycle->is_active) {
-        render_scene_init_add_renderable(&motorcycle->renderable, &motorcycle->transform, assets.mesh, 2.0f);
+        render_scene_add(&motorcycle->transform.position, 2.0f, motorcycle_render, motorcycle);
         collision_scene_add(&motorcycle->collider);
         motorcycle->drop_shadow.enabled = false;
     } else if (!is_active && motorcycle->is_active) {
-        render_scene_remove_renderable(&motorcycle->renderable);
+        render_scene_remove(motorcycle);
         collision_scene_remove(&motorcycle->collider);
         motorcycle->drop_shadow.enabled = true;
     }
@@ -260,6 +305,22 @@ bool motorcycle_check_active(motorcycle_t* motorcycle) {
     motorcycle->is_active = is_active;
 
     return is_active;
+}
+
+float motorcycle_get_boost_charge(motorcycle_t* motorcycle) {
+    if (!motorcycle) {
+        return 0.0f;
+    }
+
+    if (motorcycle->self_boost_cooldown <= 0.0f) {
+        return 1.0f;
+    }
+
+    if (motorcycle->self_boost_cooldown >= SELF_BOOST_COOLDOWN) {
+        return 0.0f;
+    }
+
+    return 1.0f - motorcycle->self_boost_cooldown * (1.0f / SELF_BOOST_COOLDOWN);
 }
 
 void motorcycle_check_for_mount(motorcycle_t* motorcycle) {
@@ -332,9 +393,26 @@ void motorcycle_update(void* data) {
     }
 #endif
 
-    if (motorcycle->self_boost_cooldown > 0.0f) {
-        motorcycle->self_boost_cooldown -= fixed_time_step;
+    vector2_t target_rotation_offset = gRight2;
+
+    if (motorcycle->drift_direction) {
+        motorcycle->self_boost_cooldown -= fixed_time_step * (SELF_BOOST_COOLDOWN / DRIFT_BOOST_COOLDOWN);
+
+        if (!input.btn.r) {
+            motorcycle->drift_direction = 0;
+
+            if (motorcycle->self_boost_cooldown <= 0.0f) {
+                activate_boost = true;
+                motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
+            }
+        } else {
+            vector2ComplexFromAngle(motorcycle->drift_direction > 0 ? 0.3f : -0.3f, &target_rotation_offset);
+        }
     }
+
+    vector2_t max_rotation;
+    vector2ComplexFromAngle(1.4f * fixed_time_step, &max_rotation);
+    vector2RotateTowards(&vehicle_def.local_player_rotation, &target_rotation_offset, &max_rotation, &vehicle_def.local_player_rotation);
 
     if (activate_boost) {
         if (inventory_has_item(ITEM_LONGER_BOOST)) {
@@ -351,6 +429,14 @@ void motorcycle_update(void* data) {
     } else if (motorcycle->boost_sound) {
         motorcycle->boost_sound = 0;
     }
+    
+    if (inventory_has_item(ITEM_BOOST_ANYWHERE)) {
+        if (motorcycle->self_boost_cooldown > 0.0f) {
+            motorcycle->self_boost_cooldown -= fixed_time_step;
+        }
+    } else if (!motorcycle->drift_direction && motorcycle->self_boost_cooldown < SELF_BOOST_COOLDOWN) {
+        motorcycle->self_boost_cooldown += fixed_time_step * (SELF_BOOST_COOLDOWN / DRIFT_BOOST_COOLDOWN);
+    }
 
     if (motorcycle->boost_timer > 0.0f) {
         motorcycle->boost_timer -= fixed_time_step;
@@ -359,7 +445,7 @@ void motorcycle_update(void* data) {
         if (!input.btn.a) {
             motorcycle->boost_timer = 0.0f;
         }
-    }
+    } 
 
     bool are_brakes_on = true;
     
@@ -371,8 +457,12 @@ void motorcycle_update(void* data) {
         float accel = motorcycle->vehicle.is_boosting ? BOOST_ACCEL_RATE : ACCEL_RATE;
 
         float target_max_speed = motorcycle_target_speed(motorcycle, input);
+        if (motorcycle->drift_direction != 0) {
+            target_max_speed -= DRIFT_SPEED_REDUNCTION;
+        }
         are_brakes_on = target_max_speed == 0.0f;
         target_speed = mathfMoveTowards(target_speed, target_max_speed, fixed_time_step * ACCEL_RATE);
+
 
         if (target_speed > target_max_speed) {
             target_speed = target_max_speed;
@@ -387,16 +477,31 @@ void motorcycle_update(void* data) {
             turn_rate = turn_accel / target_speed;
         }
 
+        float rotate_rate;
+
+        float input_normalized = clampf(input_handle_deadzone(input.stick_x) * (1.0f / 80.0f), -1.0f, 1.0f);
+
+        if (motorcycle->drift_direction) {
+            rotate_rate = (input_normalized + motorcycle->drift_direction * MIN_DRIFT_TURN_RATE) * turn_rate * (0.5f * MAX_DRIFT_TURN_RATE / MAX_TURN_RATE);
+        } else {
+            rotate_rate = turn_rate * input_normalized;
+
+            if (input.btn.r) {
+                motorcycle->drift_direction = input_normalized > 0.0f ? 1 : -1;
+            }
+        }
+
         vector2_t new_rot;
         vector2_t rotation_amount;
 
-        vector2ComplexFromAngle(fixed_time_step * turn_rate * input.stick_x * (1.0f / 80.0f), &rotation_amount);
+        vector2ComplexFromAngle(fixed_time_step * rotate_rate, &rotation_amount);
         vector2ComplexMul(&motorcycle->transform.rotation, &rotation_amount, &new_rot);
         
         vector2ToLookDir(&new_rot, &forward);
         motorcycle->transform.rotation = new_rot;
     } else {
         target_speed = mathfMoveTowards(target_speed, 0.0f, fixed_time_step * ACCEL_RATE);
+        motorcycle->drift_direction = 0;
     }
 
     motorcycle->vehicle.is_stopped = vector3MagSqrd2D(&motorcycle->collider.velocity) < STOPPED_SPEED_THESHOLD * STOPPED_SPEED_THESHOLD;
@@ -435,7 +540,7 @@ void motorcycle_update(void* data) {
 
         motorcycle->last_ground_location.y += 5.0f;
 
-        float max_accel = motorcycle->has_traction ? MAX_TURN_ACCEL : DRIFT_ACCEL;
+        float max_accel = motorcycle->has_traction && motorcycle->drift_direction == 0 ? MAX_TURN_ACCEL : DRIFT_ACCEL;
 
         float target_offset = target_height - min_height_offset;
         float spring_accel = target_offset * HOVER_SPRING_STRENGTH;
@@ -467,7 +572,8 @@ static motorcycle_t* current_instance;
 
 void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* definition, entity_id entity_id) {
     transformSaInit(&motorcycle->transform, &definition->position, &definition->rotation, 1.0f);
-    render_scene_init_add_renderable(&motorcycle->renderable, &motorcycle->transform, assets.mesh, 2.0f);
+    renderable_single_axis_init_direct(&motorcycle->renderable, &motorcycle->transform, assets.mesh);
+    render_scene_add(&motorcycle->transform.position, 2.0f, motorcycle_render, motorcycle);
     dynamic_object_init(entity_id, &motorcycle->collider, &collider_type, COLLISION_LAYER_TANGIBLE, &motorcycle->transform.position, &motorcycle->transform.rotation);
     
     armature_t* armature = renderable_get_armature(&motorcycle->renderable);
@@ -486,6 +592,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     motorcycle->boost_sound = 0;
     motorcycle->idle_sound = 0;
+    motorcycle->drift_direction = 0;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;
@@ -505,6 +612,7 @@ void motorcycle_destroy(motorcycle_t* motorcycle) {
         render_scene_remove_renderable(&motorcycle->renderable);
         collision_scene_remove(&motorcycle->collider);
     }
+    renderable_destroy_direct(&motorcycle->renderable);
     interactable_destroy(&motorcycle->interactable);
     update_remove(motorcycle);
     vehicle_destroy(&motorcycle->vehicle);

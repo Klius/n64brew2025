@@ -162,7 +162,7 @@ func store_buy_upgrade_boost_anywhere()
 
     npc_animate store_bot, "bot_talk", true;
     say "
-        This upgrade will give your hoverbike a boost on command by pressing Z.
+        Boost charges without drifting. Activates with Z
     ";
 
     ask "Do you wish to buy it for {boost_anywhere_cost} nuts?";
