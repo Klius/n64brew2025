@@ -210,13 +210,13 @@ int main(void)
     register_VI_handler(on_vi_interrupt);
 
     while(1) {
-        while (vi_delay > 0) {
-            savefile_check_autosave();
-            
-            if (current_scene && current_scene->overworld) {
-                overworld_check_unload_queue(current_scene->overworld);
-            }
+        savefile_check_autosave();
+        if (current_scene && current_scene->overworld) {
+            overworld_check_unload_queue(current_scene->overworld);
         }
+
+        while (vi_delay > 0) {}
+        
         vi_delay = VI_PER_FRAME;
 
         if (check_scene_load()) {
