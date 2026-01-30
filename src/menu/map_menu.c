@@ -527,8 +527,6 @@ void map_render_minimap(int map_x, int map_y) {
     
     material_apply(assets.map_arrow);
 
-    map_get_position(player_get_position(&current_scene->player), &screen_pos);
-
     vector2_t* rot = player_get_rotation(&current_scene->player);
     for (int i = 0; i < 3; i += 1) {
         menu_transform_point(&player_cursor_points[i], rot, &screen_pos, &cursor_points[i].pos);
@@ -1162,7 +1160,7 @@ void map_menu_hide() {
 }
 
 void map_mark_revealed(struct Vector3* pos) {
-    if (!current_scene) {
+    if (!current_scene || (current_scene->minimap_location.x == 0.0f && current_scene->minimap_location.y == 0.0f)) {
         return;
     }
 
