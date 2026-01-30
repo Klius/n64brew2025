@@ -644,6 +644,80 @@ func race3_entry()
     world_unpause;
 end
 
+scene servo_cost: i8 = 10;
+
 func trader_scrapbot_talk()
-    
+    world_pause;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, ENTITY_ID_SUBJECT;
+    interact_with_npc INTERACTION_LOOK, ENTITY_ID_SUBJECT, ENTITY_ID_PLAYER;
+    cam_look_npc ENTITY_ID_SUBJECT;
+    npc_animate ENTITY_ID_SUBJECT, "bot_talk", true;
+
+    if not upgrade_detect_servo then
+        upgrade_detect_servo = true;
+
+        say "
+            I trade in spare parts. What do you need?
+
+            So you are looking for a replacment tablet screen. I have that. They are hard to come by so it will cost you.
+
+            If you bring me 3 industrial servo motors I will trade for it.
+
+            I will even upgrade your scanner to detect them free of charge.
+        ";
+
+        npc_animate ENTITY_ID_SUBJECT, "bot_handover", false;
+        npc_wait ENTITY_ID_SUBJECT;
+
+        say "
+            They should all be near here.
+            
+            Try looking under the big dome for your first servo.
+
+            Come back and talk to me if you need help finding more of them.
+        ";
+    elif has_tablet_screen then
+        if servo_count == 0 and has_servo_0 and has_servo_1 and has_servo_2 and has_servo_3 and has_servo_4 then
+            say "Good doing business with you.";
+        elif servo_count > 0 then
+            show_nuts;
+            say "It looks like you found more servos.";
+            ask "Trade them for {servo_cost} nuts each?";
+
+            if ask_response() then
+                nut_count = nut_count + servo_count * servo_cost;
+                servo_count = 0;
+            end
+        else
+            say "Bring me more servos and I will buy them from you";
+        end
+    elif servo_count > 3 then
+        ask "It looks like you found 3 servos. Do we have a deal?";
+
+        if ask_response() then
+            npc_animate ENTITY_ID_SUBJECT, "bot_handover", false;
+            say "Good doing business with you.";
+            
+            npc_wait ENTITY_ID_SUBJECT;
+            world_unpause;
+            cam_return;
+            servo_count = servo_count - 3;
+            has_tablet_screen = true;
+            show_item ITEM_TABLET_SCREEN;
+            npc_animate ENTITY_ID_SUBJECT, "idle", true;
+            return;
+        end
+    elif not has_servo_0 then
+        say "Try looking under the big dome for your first servo.";
+    elif not has_servo_1 then
+        say "Look behind a group of 4 crates.";
+    elif not has_servo_2 then
+        say "Look in a dead end inside the canyons.";
+    else
+        say "It is a secret to everyone";
+    end
+
+    npc_animate ENTITY_ID_SUBJECT, "idle", true;
+    cam_return;
+    world_unpause;
 end

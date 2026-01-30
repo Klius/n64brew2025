@@ -44,6 +44,8 @@ enum menu_icon_type {
     MENU_ICON_IMAGE,
     MENU_ICON_NUT,
     MENU_ICON_BIKE_TELEPORT,
+    MENU_ICON_SERVO,
+
 
     MENU_ICON_TYPE_COUNT,
 };
@@ -91,6 +93,7 @@ struct menu_item {
     const char* name;
     union menu_item_data data;
     bool show_count;
+    bool always_visible;
 };
 
 static struct menu_item menu_items[] = {
@@ -102,6 +105,19 @@ static struct menu_item menu_items[] = {
         .data = {
             .part = {
                 .description = "Valuable bits of metal used in trade",
+            },
+        },
+        .show_count = true,
+        .always_visible = true,
+    },
+    {
+        .type = MENU_ITEM_PART,
+        .icon = MENU_ICON_SERVO,
+        .inventory_item = ITEM_SERVO,
+        .name = "Servo",
+        .data = {
+            .part = {
+                .description = "Some industrial servos the trader bot wants for a replacement screen.",
             },
         },
         .show_count = true,
@@ -399,6 +415,7 @@ static const char* icon_files[MENU_ICON_TYPE_COUNT] = {
     [MENU_ICON_IMAGE] = "rom:/images/maps/image_icon.sprite",
     [MENU_ICON_NUT] = "rom:/images/maps/nut.sprite",
     [MENU_ICON_BIKE_TELEPORT] = "rom:/images/parts/bike_teleport.sprite",
+    [MENU_ICON_SERVO] = "rom:/images/parts/server_motor_icon.sprite",
 };
 
 static vector2_t player_cursor_points[3] = {
@@ -597,7 +614,7 @@ void map_render_details(struct menu_item* item) {
 }
 
 bool map_should_show_item(struct menu_item* item) {
-    return item->show_count || inventory_has_item(item->inventory_item);
+    return item->always_visible || inventory_has_item(item->inventory_item);
 }
 
 #define FADE_IN_RATIO   0.3f
