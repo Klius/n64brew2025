@@ -239,6 +239,13 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
                 camera_look_at(&current_scene->camera_controller, &center);
                 break;
             }
+
+            empty_t* empty = empty_find(entity_id);
+
+            if (empty) {
+                camera_look_at(&current_scene->camera_controller, &empty->position);
+                break;
+            }
         }
         case CUTSCENE_STEP_CAMERA_FOLLOW: {
             camera_follow_player(&current_scene->camera_controller);

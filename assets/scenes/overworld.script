@@ -7,6 +7,8 @@ scene towards_river: entity_id;
 scene water_pump_scrapbot: entity_id;
 scene house_entrance: entity_id;
 scene generator_scrapbot: entity_id;
+scene store_location: entity_id;
+scene towards_dunes: entity_id;
 
 func settlement_loop()
     if not has_pump_gear and not has_well_part_map then
@@ -164,6 +166,12 @@ func on_exit_generator()
         ";
         npc_animate generator_scrapbot, "bot_handover", false;
         npc_wait generator_scrapbot;
+
+        cam_look_npc store_location;
+        say "Be sure to check in the store to see if there is anything useful before you head out";
+        cam_look_npc towards_dunes;
+        delay 1.0;
+
         world_unpause;
         cam_return;
         has_generator_part_map = true;

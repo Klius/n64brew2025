@@ -11,7 +11,7 @@ if ask_response() then
     fade FADE_COLOR_BLACK, 0.5;
     delay 0.5;
     is_riding_motorcycle = false;
-    load_scene "rom:/scenes/overworld.scene#health_juice";
+    load_scene "rom:/scenes/inside_lab.scene#medical_machine";
     fade FADE_COLOR_NONE, 0.5;
 end
 

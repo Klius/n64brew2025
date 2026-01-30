@@ -186,7 +186,7 @@ func room_default()
         is_riding_motorcycle = false;
         has_dismounted = true;
 
-        load_scene "rom:/scenes/overworld.scene#health_juice";
+        load_scene "rom:/scenes/inside_lab.scene#medical_machine";
     elif are_touching(health_juice_repair, ENTITY_ID_PLAYER) then
         has_motor = true;
         has_repaired_motor = true;

@@ -68,7 +68,7 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    scene_queue_next("rom:/scenes/overworld.scene#fast_travel_3");
+    // scene_queue_next("rom:/scenes/overworld.scene#fast_travel_3");
     // scene_queue_next("rom:/scenes/store.scene");
     // scene_queue_next("rom:/repair/boat_switch.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
@@ -143,6 +143,15 @@ void render(surface_t* col, surface_t* zbuffer) {
     render_menu();
 }
 
+#define VI_PER_FRAME 2
+volatile static uint8_t vi_delay;
+
+void on_vi_interrupt() {
+    if (vi_delay > 0) {
+        vi_delay -= 1;
+    }
+}
+
 bool check_scene_load() {
     if (!scene_has_next()) {
         return false;
@@ -177,7 +186,7 @@ int main(void)
 	}
 
     display_init(custom_res, DEPTH_16_BPP, 3, GAMMA_NONE, FILTERS_RESAMPLE);
-    display_set_fps_limit(30.0f);
+    // display_set_fps_limit(30.0f);
 	// *(volatile uint32_t*)0xA4400000 |= 0x300; //disables resampling on the VI
 	rdpq_init();
     t3d_init((T3DInitParams){});
@@ -197,12 +206,18 @@ int main(void)
 #endif
 
     setup();
+    
+    register_VI_handler(on_vi_interrupt);
 
     while(1) {
-        savefile_check_autosave();
-        if (current_scene && current_scene->overworld) {
-            overworld_check_unload_queue(current_scene->overworld);
+        while (vi_delay > 0) {
+            savefile_check_autosave();
+            
+            if (current_scene && current_scene->overworld) {
+                overworld_check_unload_queue(current_scene->overworld);
+            }
         }
+        vi_delay = VI_PER_FRAME;
 
         if (check_scene_load()) {
             continue;
@@ -241,7 +256,7 @@ int main(void)
 
             current_game_mode = GAME_MODE_MENU;
         } else {
-            surface_t* fb = display_get();
+            surface_t* fb = display_try_get();
 
             if (fb) {
                 rdpq_attach(fb, &zbuffer);
