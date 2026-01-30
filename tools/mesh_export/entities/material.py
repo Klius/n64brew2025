@@ -359,6 +359,9 @@ class Tex():
         result._png_metadata = self._png_metadata
         return result
     
+    def does_scroll(self):
+        return self.s.scroll != 0 or self.t.scroll != 0
+    
     def set_filename(self, filename):
         self.filename = filename
 
@@ -500,6 +503,9 @@ class Material():
         result.fog = self.fog.copy() if self.fog else None
         result.light_count = self.light_count
         return result
+    
+    def does_scroll(self) -> bool:
+        return bool((self.tex0 and self.tex0.does_scroll()) or (self.tex1 and self.tex1.does_scroll()))
 
     def combine_mode_uses(self, attr: str) -> bool:
         if not self.combine_mode:

@@ -18,9 +18,17 @@ struct overworld_tile_def {
     uint32_t actor_block_offset;
 };
 
+struct overworld_tile_layer {
+    tmesh_t terrain_mesh;
+    rspq_block_t* render_block;
+    tmesh_t* scrolling_meshes;
+    uint32_t scrolling_mesh_count;
+};
+
+typedef struct overworld_tile_layer overworld_tile_layer_t;
+
 struct overworld_tile {
-    struct tmesh* terrain_meshes;
-    rspq_block_t** render_blocks;
+    overworld_tile_layer_t* layers;
     float starting_y;
     struct tmesh** detail_meshes;
     uint16_t terrain_mesh_count;
@@ -68,7 +76,7 @@ struct overworld_actor_tile {
 };
 
 struct overworld_tile_render_block {
-    rspq_block_t** render_blocks;
+    overworld_tile_layer_t* layers;
     struct overworld_tile* tile;
     float starting_y;
     uint8_t x;

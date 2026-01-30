@@ -388,7 +388,7 @@ void overworld_render_tile(struct overworld* overworld, struct Camera* camera, s
     struct overworld_tile_render_block* block = &overworld->render_blocks[x & 0x3][z & 0x3];
     struct Vector3* camera_position = &camera->transform.position;
 
-    if (!block->render_blocks || block->x != x || block->z != z) {
+    if (!block->layers || block->x != x || block->z != z) {
         overworld->load_next.x = x;
         overworld->load_next.y = z;
         return;
@@ -429,9 +429,17 @@ void overworld_render_tile(struct overworld* overworld, struct Camera* camera, s
         tile_position = UncachedAddr(tile_position);
     
         t3d_mat4_to_fixed_3x4(tile_position, &mtx);
+
+        overworld_tile_layer_t* layer = &block->layers[y];
     
         t3d_matrix_push(tile_position);
-        rspq_block_run(block->render_blocks[y]);
+        rspq_block_run(layer->render_block);
+
+        for (int i = 0; i < layer->scrolling_mesh_count; i += 1) {
+            material_apply(layer->scrolling_meshes[i].material);
+            rspq_block_run(layer->scrolling_meshes[i].block);
+        }
+
         t3d_matrix_pop(1);
 
         mtx.m[3][1] += overworld->tile_size * WORLD_SCALE;

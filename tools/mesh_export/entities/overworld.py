@@ -131,8 +131,18 @@ def generate_overworld_tile(
 
         for mesh_data in y_cell:
             mesh_data.translate(cell_corner)
+
+        scrolling_meshes = []
+        static_meshes = []
+
+        for mesh_data in y_cell:
+            mat = material_extract.load_material_with_name(mesh_data.mat)
+            if mat.does_scroll():
+                scrolling_meshes.append(mesh_data)
+            else:
+                static_meshes.append(mesh_data)
             
-        tiny3d_mesh_writer.write_mesh(y_cell, None, [], settings, data)
+        tiny3d_mesh_writer.write_mesh(static_meshes, None, [], settings, data)
 
         cell_details = detail_cells[y] if y < len(detail_cells) else []
         data.write(struct.pack('>H', len(cell_details)))
@@ -147,6 +157,16 @@ def generate_overworld_tile(
             data.write(struct.pack('>fff', adjusted_pos.x, adjusted_pos.y, adjusted_pos.z))
             data.write(struct.pack('>ffff', rot.x, rot.y, rot.z, rot.w))
             data.write(struct.pack('>fff', scale.x, scale.y, scale.z))
+
+        data.write(len(scrolling_meshes).to_bytes(4, 'big'))
+
+        for mesh_data in scrolling_meshes:
+            settings_copy = settings.copy()
+            settings_copy.default_material_name = material_extract.material_romname(mesh_data.mat)
+            settings_copy.default_material = material_extract.load_material_with_name(mesh_data.mat)
+
+            tiny3d_mesh_writer.write_mesh([mesh_data], None, [], settings_copy, data)
+
 
     particle_list = sorted(particle_list, key = lambda x: x.material.name)
 
@@ -347,8 +367,6 @@ def generate_lod0(lod_1_objects: list[LodTile], subdivisions: int, settings: exp
             tiny3d_mesh_writer.write_mesh(mesh_data, None, [], lod_1_settings, mesh_bytes_file)
 
         mesh_bytes = mesh_bytes_file.getvalue()
-
-        print(len(mesh_bytes))
 
         file.write(len(mesh_bytes).to_bytes(4, 'big'))
         file.write(mesh_bytes)
