@@ -146,6 +146,16 @@ static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
             .max_stable_slope = 0.219131191f,
         }
     },
+    
+    [REPAIR_PART_TABLET_SCREEN] = {
+        .mesh_name = "rom:/meshes/parts/tablet_screen.tmesh",
+        .collider = {
+            BOX_COLLIDER(0.3f, 0.1f, 0.3f),
+            .center = {0.0f, 0.0f, 0.0f},
+            .friction = 0.5,
+            .max_stable_slope = 0.219131191f,
+        }
+    },
 };
 
 static struct repair_part_pickup_assets assets;
@@ -223,6 +233,10 @@ void repair_part_pickup_init(repair_part_pickup_t* part, struct repair_part_pick
     part->entity_id = entity_id;
 
     if (inventory_has_item(ITEM_DETECT_NUTS) && definition->part_type == REPAIR_PART_MONEY) {
+        part->has_tracker = true;
+    }
+    
+    if (inventory_has_item(ITEM_DETECT_SERVO) && definition->part_type == REPAIR_PART_SERVO_MOTOR) {
         part->has_tracker = true;
     }
 

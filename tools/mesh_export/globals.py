@@ -44,6 +44,8 @@ mapping = {
     "has_bike_teleport": "ITEM_BIKE_TELEPORT",
 
     "nut_count": "ITEM_NUT",
+    
+    "servo_count": "ITEM_SERVO",
 }
 
 data_type_mapping = {

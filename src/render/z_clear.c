@@ -36,17 +36,13 @@ static uint32_t index_bayer_pattern(uint32_t x, uint32_t y) {
 
 void z_clear_init() {
     z_clear_surface = surface_make(z_clear_image, FMT_RGBA16, IMG_W, IMG_H, IMG_W * 2);
-
-    sprite_t* sprite = sprite_load("rom:/images/effects/noise.sprite");
     
     for (int y = 0; y < IMG_H; y += 1) {
         for (int x = 0; x < IMG_W; x += 1) {
-            uint8_t px = ((uint8_t*)sprite->data)[x + y * IMG_W];
+            uint8_t px = index_bayer_pattern(x, y);
             z_clear_image[y * IMG_W + x] = (0x7FFF - (uint16_t)(px * (DEPTH_OFFSET / 256.0f))) << 1;
         }
     }
-
-    sprite_free(sprite);
 
     data_cache_hit_writeback_invalidate(z_clear_image, sizeof(z_clear_image));
 }

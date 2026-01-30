@@ -127,6 +127,12 @@
             "type": "sign"
         },
         {
+            "name": "parts_servo_motor",
+            "description": "",
+            "mesh": "meshes/parts/servo_motor.blend#Cylinder.001",
+            "type": "repair_part_pickup"
+        },
+        {
             "name": "parts_speed_upgrade",
             "description": "",
             "mesh": "meshes/parts/speed_upgrade.blend#speed_upgrade",
@@ -226,24 +232,6 @@
             "name": "vehicles_bike",
             "description": "",
             "mesh": "meshes/vehicles/bike.blend#Motorcycle",
-            "type": "motorcycle_spawner"
-        },
-        {
-            "name": "vehicles_bike",
-            "description": "",
-            "mesh": "meshes/vehicles/bike.blend#Motorcycle.003",
-            "type": "motorcycle_spawner"
-        },
-        {
-            "name": "vehicles_bike",
-            "description": "",
-            "mesh": "meshes/vehicles/bike.blend#Motorcycle.004",
-            "type": "motorcycle_spawner"
-        },
-        {
-            "name": "vehicles_bike",
-            "description": "",
-            "mesh": "meshes/vehicles/bike.blend#Motorcycle.005",
             "type": "motorcycle_spawner"
         },
         {

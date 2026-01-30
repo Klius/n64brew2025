@@ -99,6 +99,8 @@ enum inventory_item_type {
     ITEM_NUT,
 
     ITEM_BIKE_TELEPORT,
+    ITEM_SERVO,
+    ITEM_DETECT_SERVO,
 
     ITEM_TYPE_COUNT,
 };
@@ -203,6 +205,7 @@ enum repair_part_type {
     REPAIR_PART_TABLET,
     REPAIR_PART_MONEY,
     REPAIR_PART_BOAT_SWITCH,
+    REPAIR_PART_SERVO_MOTOR,
     REPAIR_PART_COUNT,
 };
 

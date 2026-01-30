@@ -38,6 +38,18 @@ global samson_location: i8;
 global nut_count: i16;
 global nut_count_spent: i16;
 
+global servo_count: i8;
+global has_talked_to_trader: bool;
+global has_servo_0: bool;
+global has_servo_hint_0: bool;
+global has_servo_1: bool;
+global has_servo_hint_1: bool;
+global has_servo_2: bool;
+global has_servo_hint_2: bool;
+global has_servo_3: bool;
+global has_servo_4: bool;
+global upgrade_detect_servo: bool;
+
 global is_riding_motorcycle: bool;
 
 global upgrade_faster: bool;
