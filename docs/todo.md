@@ -1,4 +1,7 @@
 
+* secondary collectable for tablet screen
+* fix the garage
+* add inside of medical building
 * make motorcycle boost feel faster (camera tricks)
 * driving up steep hills feels bad
 * check for memory leaks

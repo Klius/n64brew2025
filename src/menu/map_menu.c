@@ -416,17 +416,31 @@ static vector2_t camera_cursor_points[3] = {
     {TAN_HORZ * VIEW_DEPTH, VIEW_DEPTH},
 };
 
-void map_get_position(vector3_t* world_pos, vector2_t* map_pos) {
-    float width = current_scene->minimap_max.x - current_scene->minimap_min.x;
-    float height = current_scene->minimap_max.y - current_scene->minimap_min.y;
+vector2_t default_min = {-3072.0f, 3072.0f};
+vector2_t default_max = {3072.0f, -3072.0f};
 
-    map_pos->x = fabsf(width) < 0.001f ? 0.0f : (MAP_SIZE * (world_pos->x - current_scene->minimap_min.x) / width);
-    map_pos->y = fabsf(height) < 0.001f ? 0.0f : (MAP_SIZE * (1.0f - (world_pos->z - current_scene->minimap_min.y) / height));
+void map_get_position(vector3_t* world_pos, vector2_t* map_pos) {
+    vector3_t final_pos;
+    vector2_t rotation;
+    vector2ComplexFromAngle(current_scene->minimap_rotation, &rotation);
+
+    vector3RotateWith2(world_pos, &rotation, &final_pos);
+    final_pos.x += current_scene->minimap_location.x;
+    final_pos.z += current_scene->minimap_location.y;
+
+    vector2_t* min = current_scene->overworld ? &current_scene->minimap_min : &default_min;
+    vector2_t* max = current_scene->overworld ? &current_scene->minimap_max : &default_max;
+
+    float width = max->x - min->x;
+    float height = max->y - min->y;
+
+    map_pos->x = fabsf(width) < 0.001f ? 0.0f : (MAP_SIZE * (final_pos.x - min->x) / width);
+    map_pos->y = fabsf(height) < 0.001f ? 0.0f : (MAP_SIZE * (1.0f - (final_pos.z - min->y) / height));
 
 }
 
 void map_render_minimap(int map_x, int map_y) {
-    if (!current_scene || !current_scene->overworld) {
+    if (!current_scene) {
         return;
     }
 
@@ -1148,7 +1162,7 @@ void map_menu_hide() {
 }
 
 void map_mark_revealed(struct Vector3* pos) {
-    if (!current_scene || !current_scene->overworld) {
+    if (!current_scene) {
         return;
     }
 
@@ -1202,7 +1216,7 @@ uint8_t* map_get_revealed() {
 }
 
 bool map_menu_has_revealed(vector3_t* pos) {
-    if (!current_scene || !current_scene->overworld) {
+    if (!current_scene) {
         return false;
     }
 

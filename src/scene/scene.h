@@ -108,6 +108,8 @@ struct scene {
     struct overworld* overworld;
     vector2_t minimap_min;
     vector2_t minimap_max;
+    vector2_t minimap_location;
+    float minimap_rotation;
 
     room_entity_block_t* room_entities;
     shared_entity_block_t shared_entities;

@@ -71,6 +71,11 @@ void scene_load_minimap(scene_t* scene, FILE* file) {
     fread(&scene->minimap_max, sizeof(vector2_t), 1, file);
 }
 
+void scene_mini_location(scene_t* scene, FILE* file) {
+    fread(&scene->minimap_location, sizeof(vector2_t), 1, file);
+    fread(&scene->minimap_rotation, sizeof(float), 1, file);
+}
+
 void scene_load_camera_animations(struct camera_animation_list* list, const char* filename, FILE* file) {
     uint16_t count;
     fread(&count, sizeof(count), 1, file);
@@ -333,6 +338,7 @@ struct scene* scene_load(const char* filename) {
     }
 
     scene_load_minimap(scene, file);
+    scene_mini_location(scene, file);
 
     scene_load_camera_animations(&scene->camera_animations, filename, file);
 

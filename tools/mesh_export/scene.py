@@ -559,6 +559,19 @@ def write_minimap_range(scene_rotation: mathutils.Matrix, file):
 
     file.write(struct.pack('>ffff', minimap_min.x, minimap_min.z, minimap_max.x, minimap_max.z))
 
+    
+def write_minimap_location(base_transform: mathutils.Matrix, file):
+    center = mathutils.Vector()
+    rotation = 0
+
+    scene = bpy.data.scenes[0]
+
+    if 'overworld_center' in scene:
+        center = base_transform @ mathutils.Vector(scene['overworld_center'])
+        rotation = scene['overworld_rotation']
+
+    file.write(struct.pack('>fff', center.x, center.z, rotation))
+
 def process_scene():
     input_filename = sys.argv[1]
     output_filename = sys.argv[-2]
@@ -672,6 +685,8 @@ def process_scene():
             file.write(b'\0')
 
         write_minimap_range(base_transform, file)
+
+        write_minimap_location(base_transform, file)
 
         entities.camera_animation.export_camera_animations(output_filename.replace('.scene', '.sanim'), file)
 
