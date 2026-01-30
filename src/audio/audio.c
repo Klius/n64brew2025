@@ -12,8 +12,7 @@
 #define BUFFERS_PER_SECOND      25
 #define MAX_ECHO_DURATION       0.5
 
-// about half a second
-#define ACTUAL_BUFFER_DELAY     4
+#define ACTUAL_BUFFER_DELAY     6
 
 #define TOTAL_AUDIO_BUFFERS     (ACTUAL_BUFFER_DELAY)
 

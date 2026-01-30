@@ -520,11 +520,22 @@ void map_render_minimap(int map_x, int map_y) {
     vector2_t screen_pos;
     map_get_position(player_get_position(&current_scene->player), &screen_pos);
 
+    
+    vector2_t scene_rotation;
+    if (current_scene->minimap_rotation != 0.0f) {
+        vector2ComplexFromAngle(current_scene->minimap_rotation, &scene_rotation);
+    } else {
+        scene_rotation = (vector2_t){};
+    }
+
     vector3_t forward;
     quatMultVector(&current_scene->camera.transform.rotation, &gForward, &forward);
     vector2_t cam_rot;
     vector2LookDir(&cam_rot, &forward);
     vector2Negate(&cam_rot, &cam_rot);
+
+    vector2ComplexMul(&cam_rot, &scene_rotation, &cam_rot);
+    
     struct view_vertex cursor_points[3];
     for (int i = 0; i < 3; i += 1) {
         menu_transform_point(&camera_cursor_points[i], &cam_rot, &screen_pos, &cursor_points[i].pos);
@@ -545,8 +556,10 @@ void map_render_minimap(int map_x, int map_y) {
     material_apply(assets.map_arrow);
 
     vector2_t* rot = player_get_rotation(&current_scene->player);
+    vector2_t player_rot;
+    vector2ComplexMul(rot, &scene_rotation, &player_rot);
     for (int i = 0; i < 3; i += 1) {
-        menu_transform_point(&player_cursor_points[i], rot, &screen_pos, &cursor_points[i].pos);
+        menu_transform_point(&player_cursor_points[i], &player_rot, &screen_pos, &cursor_points[i].pos);
         cursor_points[i].pos.x += map_x;
         cursor_points[i].pos.y += map_y;
     }

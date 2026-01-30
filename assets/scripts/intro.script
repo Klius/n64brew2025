@@ -2,11 +2,5 @@
 world_pause;
 fade FADE_COLOR_BLACK, 0;
 delay 3;
-say "
-    I can't let Samson die. 
-    
-    He is all I have left.
-";
-load_scene "rom:/scenes/garage.scene#default";
-fade FADE_COLOR_NONE, 2;
-world_unpause;
+say "I can't let Samson die.";
+load_scene "rom:/scenes/inside_house.scene#intro";
