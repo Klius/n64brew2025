@@ -323,32 +323,6 @@ int render_batch_compare_element(struct render_batch* batch, uint16_t a_index, u
     return a->type - b->type;
 }
 
-void render_batch_check_texture_scroll(int tile, struct material_tex* tex) {
-    if (!tex->texture_enabled || (!tex->scroll_x && !tex->scroll_y)) {
-        return;
-    }
-
-    int w = tex->width << 2;
-    int h = tex->height << 2;
-
-    int x_offset = (int)(game_time * tex->scroll_x * w) % w;
-    int y_offset = (int)(game_time * tex->scroll_y * h) % h;
-
-    if (x_offset < 0) {
-        x_offset += w;
-    }
-
-    if (y_offset < 0) {
-        y_offset += h;
-    }
-
-    rdpq_set_tile_size_fx(
-        tile, 
-        x_offset + tex->s0, y_offset + tex->t0, 
-        x_offset + tex->s1, y_offset + tex->t1
-    );
-}
-
 static bool element_type_2d[] = {
     [RENDER_BATCH_MESH] = false,
     [RENDER_BATCH_PARTICLES] = true,
@@ -457,9 +431,6 @@ void render_batch_finish(struct render_batch* batch, mat4x4 view_proj_matrix, T3
             } else {
                 rdpq_sync_pipe();
             }
-
-            render_batch_check_texture_scroll(TILE0, &element->material->tex0);
-            render_batch_check_texture_scroll(TILE1, &element->material->tex1);
 
             bool need_z_write = (element->material->flags & MATERIAL_FLAGS_Z_WRITE) != 0;
             bool need_z_read = (element->material->flags & MATERIAL_FLAGS_Z_READ) != 0;

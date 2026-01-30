@@ -3,6 +3,7 @@
 #include <t3d/t3d.h>
 #include "../resource/sprite_cache.h"
 #include "../render/defs.h"
+#include "../time/time.h"
 
 void material_init(struct material* material) {
     material->block = 0;
@@ -389,6 +390,35 @@ void material_release(struct material* material) {
     material_destroy(material);
 }
 
+void material_check_texture_scroll(int tile, struct material_tex* tex) {
+    if (!tex->texture_enabled || (!tex->scroll_x && !tex->scroll_y)) {
+        return;
+    }
+
+    int w = tex->width << 2;
+    int h = tex->height << 2;
+
+    int x_offset = (int)(game_time * tex->scroll_x * w) % w;
+    int y_offset = (int)(game_time * tex->scroll_y * h) % h;
+
+    if (x_offset < 0) {
+        x_offset += w;
+    }
+
+    if (y_offset < 0) {
+        y_offset += h;
+    }
+
+    rdpq_set_tile_size_fx(
+        tile, 
+        x_offset + tex->s0, y_offset + tex->t0, 
+        x_offset + tex->s1, y_offset + tex->t1
+    );
+}
+
 void material_apply(struct material* material) {
     rspq_block_run(material->block);
+
+    material_check_texture_scroll(TILE0, &material->tex0);
+    material_check_texture_scroll(TILE1, &material->tex1);
 }
