@@ -6,7 +6,7 @@
 
 typedef void (*dialog_end_callback)(void* data);
 
-#define MAX_MESSAGE_CHARACTERS  256
+#define MAX_MESSAGE_CHARACTERS  512
 
 struct dialog_box {
     char* current_message;

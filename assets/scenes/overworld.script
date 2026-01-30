@@ -691,7 +691,7 @@ func trader_scrapbot_talk()
         else
             say "Bring me more servos and I will buy them from you";
         end
-    elif servo_count > 3 then
+    elif servo_count >= 3 then
         ask "It looks like you found 3 servos. Do we have a deal?";
 
         if ask_response() then

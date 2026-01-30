@@ -147,11 +147,11 @@ static repair_part_type_def_t types[REPAIR_PART_COUNT] = {
         }
     },
     
-    [REPAIR_PART_TABLET_SCREEN] = {
-        .mesh_name = "rom:/meshes/parts/tablet_screen.tmesh",
+    [REPAIR_PART_SERVO_MOTOR] = {
+        .mesh_name = "rom:/meshes/parts/servo_motor.tmesh",
         .collider = {
-            BOX_COLLIDER(0.3f, 0.1f, 0.3f),
-            .center = {0.0f, 0.0f, 0.0f},
+            BOX_COLLIDER(0.5f, 0.5f, 0.5f),
+            .center = {0.0f, 0.5f, 0.0f},
             .friction = 0.5,
             .max_stable_slope = 0.219131191f,
         }

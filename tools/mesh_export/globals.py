@@ -46,6 +46,7 @@ mapping = {
     "nut_count": "ITEM_NUT",
     
     "servo_count": "ITEM_SERVO",
+    "upgrade_detect_servo": "ITEM_DETECT_SERVO",
 }
 
 data_type_mapping = {

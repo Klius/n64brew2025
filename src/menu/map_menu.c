@@ -415,7 +415,7 @@ static const char* icon_files[MENU_ICON_TYPE_COUNT] = {
     [MENU_ICON_IMAGE] = "rom:/images/maps/image_icon.sprite",
     [MENU_ICON_NUT] = "rom:/images/maps/nut.sprite",
     [MENU_ICON_BIKE_TELEPORT] = "rom:/images/parts/bike_teleport.sprite",
-    [MENU_ICON_SERVO] = "rom:/images/parts/server_motor_icon.sprite",
+    [MENU_ICON_SERVO] = "rom:/images/parts/servo_motor_icon.sprite",
 };
 
 static vector2_t player_cursor_points[3] = {
@@ -1177,7 +1177,7 @@ void map_menu_hide() {
 }
 
 void map_mark_revealed(struct Vector3* pos) {
-    if (!current_scene || (current_scene->minimap_location.x == 0.0f && current_scene->minimap_location.y == 0.0f)) {
+    if (!current_scene || (current_scene->overworld == NULL && current_scene->minimap_location.x == 0.0f && current_scene->minimap_location.y == 0.0f)) {
         return;
     }
 

@@ -44,6 +44,9 @@ global has_servo_1: bool;
 global has_servo_2: bool;
 global has_servo_3: bool;
 global has_servo_4: bool;
+global has_servo_5: bool;
+global has_servo_6: bool;
+global has_servo_7: bool;
 global upgrade_detect_servo: bool;
 
 global is_riding_motorcycle: bool;
