@@ -293,11 +293,11 @@ bool motorcycle_check_active(motorcycle_t* motorcycle) {
     bool is_active = vector3DistSqrd(&motorcycle->transform.position, player_get_position(&current_scene->player)) < MOTORCYCLE_CULL_DISTANCE * MOTORCYCLE_CULL_DISTANCE;
 
     if (is_active && !motorcycle->is_active) {
-        render_scene_add(&motorcycle->transform.position, 2.0f, motorcycle_render, motorcycle);
         collision_scene_add(&motorcycle->collider);
         motorcycle->drop_shadow.enabled = false;
+        motorcycle->renderable.hide = false;
     } else if (!is_active && motorcycle->is_active) {
-        render_scene_remove(motorcycle);
+        motorcycle->renderable.hide = true;
         collision_scene_remove(&motorcycle->collider);
         motorcycle->drop_shadow.enabled = true;
     }
@@ -609,9 +609,9 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
 
 void motorcycle_destroy(motorcycle_t* motorcycle) {
     if (motorcycle->is_active) {
-        render_scene_remove_renderable(&motorcycle->renderable);
         collision_scene_remove(&motorcycle->collider);
     }
+    render_scene_remove(motorcycle);
     renderable_destroy_direct(&motorcycle->renderable);
     interactable_destroy(&motorcycle->interactable);
     update_remove(motorcycle);

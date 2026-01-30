@@ -174,7 +174,6 @@ void scene_update(void* data) {
             cutscene_builder_delay(&cutscene, 0.5f);
             cutscene_builder_load_scene(&cutscene, scene->loading_zones[i].scene_name);
             cutscene_builder_pause(&cutscene, false, false, UPDATE_LAYER_WORLD);
-            cutscene_builder_delay(&cutscene, 0.5f);
             cutscene_builder_fade(&cutscene, FADE_COLOR_NONE, 0.5f);
 
             cutscene_runner_run(cutscene_builder_finish(&cutscene), 0, cutscene_runner_free_on_finish(), NULL, 0);

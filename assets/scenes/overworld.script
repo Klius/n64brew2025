@@ -195,12 +195,6 @@ func main_menu()
     cam_animate "main_menu";
     delay 1;
     show_main_menu;
-    cam_wait;
-    cam_animate "main_menu";
-    cam_wait;
-    cam_animate "main_menu";
-    cam_wait;
-    world_unpause;
 end
 
 func main_menu_loop()

@@ -4,8 +4,6 @@
 * driving up steep hills feels bad
 * check for memory leaks
 * add scraps piles in the area where parts are
-* add home base icon to map
-* indoor locations should show up on map
 * add instructions how to save
 * fix fading between scenes
 * fix z fighting issues for distant objects
