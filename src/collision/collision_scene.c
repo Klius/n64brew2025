@@ -118,6 +118,7 @@ void collision_scene_remove_any(void* object) {
             if (g_scene.elements[i].type == COLLISION_ELEMENT_TYPE_DYNAMIC) {
                 struct dynamic_object* obj = g_scene.elements[i].object;
                 collision_scene_return_contacts(obj->active_contacts);
+                collision_scene_return_contacts(obj->shadow_contact);
                 obj->active_contacts = NULL;
             } else {
                 struct spatial_trigger* trigger = g_scene.elements[i].object;

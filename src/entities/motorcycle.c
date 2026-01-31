@@ -522,7 +522,7 @@ void motorcycle_update(void* data) {
         vector3_t target_vel;
         vector2ToLookDir(&motorcycle->transform.rotation, &target_vel);
         vector3ProjectPlane(&target_vel, &ground_normal, &target_vel);
-        vector3Normalize(&target_vel, &target_vel);;
+        vector3Normalize(&target_vel, &target_vel);
         vector3Normalize(&ground_velocity, &ground_velocity);
 
         float speed_in_target_direction = vector3Dot(&target_vel, &ground_velocity);
