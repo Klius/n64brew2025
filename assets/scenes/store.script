@@ -6,8 +6,8 @@ scene upgrade_boost_anywhere_item: entity_id;
 scene upgrade_detect_nuts_item: entity_id;
 scene upgrade_fast_travel_item: entity_id;
 
-scene faster_cost: i8 = 10;
-scene detect_nuts_cost: i8 = 15;
+scene faster_cost: i8 = 5;
+scene detect_nuts_cost: i8 = 10;
 scene boost_anywhere_cost: i8 = 20;
 scene fast_travel_cost: i8 = 20;
 
