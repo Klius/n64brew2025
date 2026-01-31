@@ -1,17 +1,15 @@
 
+* camera zoom bug
+* animation blending
 * entrances need holes
-* show family photo at the end of the game
 * race 2 looks like a dead end
-* cave visual glitches
-* check for memory leaks
 * add scraps piles in the area where parts are
 * add instructions how to save
-* animation blending
-* fix brother headband texture
-* b button render glitch
-* camera zoom bug
 * drift prompt
+* check for memory leaks
+* b button render glitch
 * store sign
+* add indoor collision
 
 After new map       
 * have boost highways be more direct

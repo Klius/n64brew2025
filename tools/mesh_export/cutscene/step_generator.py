@@ -51,6 +51,7 @@ CUTSCENE_STEP_AUDIO_PAUSE = 40
 CUTSCENE_STEP_SHOW_NUTS = 41
 CUTSCENE_STEP_SET_EXPRESSION = 42
 CUTSCENE_STEP_MOVE_MOUTH = 43
+CUTSCENE_STEP_SHOW_IMAGE = 44
 
 class ParameterType():
     def __init__(self, name: str, is_static: bool):
@@ -103,6 +104,7 @@ _step_args = {
     "show_nuts": [],
     "set_expression": [ParameterType("entity_id", False), ParameterType("int", True)],
     "move_mouth": [ParameterType("entity_id", False), ParameterType("float", True)],
+    "show_image": [ParameterType("str", True)],
 }
 
 _step_ids = {
@@ -140,6 +142,7 @@ _step_ids = {
     "show_nuts": CUTSCENE_STEP_SHOW_NUTS,
     "set_expression": CUTSCENE_STEP_SET_EXPRESSION,
     "move_mouth": CUTSCENE_STEP_MOVE_MOUTH,
+    "show_image": CUTSCENE_STEP_SHOW_IMAGE,
 }
 
 _steps_that_need_idle = {

@@ -52,6 +52,7 @@ enum cutscene_step_type {
     CUTSCENE_STEP_SHOW_NUTS,
     CUTSCENE_STEP_SET_EXPRESSION,
     CUTSCENE_STEP_MOVE_MOUTH,
+    CUTSCENE_STEP_SHOW_IMAGE,
 };
 
 typedef void (*cutscene_step_callback)(void* data);
@@ -181,6 +182,9 @@ union cutscene_step_data {
     struct {
         float time;
     } move_mouth;
+    struct {
+        char* filename;
+    } show_image;
 };
 
 struct cutscene_step {

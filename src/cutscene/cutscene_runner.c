@@ -22,6 +22,7 @@
 #include "cutscene_timer.h"
 #include <assert.h>
 #include "../cutscene/race.h"
+#include "../effects/image_overlay.h"
 
 #define MAX_QUEUED_CUTSCENES   4
 #define MAX_CUTSCENE_CALL_DEPTH 6
@@ -415,6 +416,14 @@ void cutscene_runner_init_step(struct cutscene_active_entry* cutscene, struct cu
                 break;
             }
             cutscene_actor_animate_mouth(subject, step->data.move_mouth.time);
+            break;
+        }
+        case CUTSCENE_STEP_SHOW_IMAGE: {
+            if (!step->data.show_image.filename || !*step->data.show_image.filename) {
+                image_overlay_set(NULL);
+            } else {
+                image_overlay_set(step->data.show_image.filename);
+            }
             break;
         }
     }

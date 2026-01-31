@@ -177,6 +177,9 @@ struct cutscene* cutscene_load(const char* filename) {
             case CUTSCENE_STEP_MOVE_MOUTH:
                 fread(&step->data.move_mouth.time, 4, 1, file);
                 break;
+            case CUTSCENE_STEP_SHOW_IMAGE:
+                step->data.show_image.filename = string_load(file);
+                break;
         }
     }
     
@@ -242,6 +245,9 @@ void cutscene_destroy(struct cutscene* cutscene) {
                 break;
             case CUTSCENE_STEP_START_RACE:
                 free(step->data.race_start.on_finish);
+                break;
+            case CUTSCENE_STEP_SHOW_IMAGE:
+                free(step->data.show_image.filename);
                 break;
             default:
                 break;
