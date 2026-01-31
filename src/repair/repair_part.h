@@ -42,6 +42,8 @@ void repair_part_load(repair_part_t* part, FILE* file);
 void repair_part_destroy(repair_part_t* part);
 
 void repair_part_render(repair_part_t* part, struct frame_memory_pool* pool);
+void repair_part_render_drop_location(repair_part_t* part, struct frame_memory_pool* pool);
+
 bool repair_part_raycast(repair_part_t* part, ray_t* ray, float* distance);
 void repair_part_update(repair_part_t* part);
 void repair_part_set_complete(repair_part_t* part);

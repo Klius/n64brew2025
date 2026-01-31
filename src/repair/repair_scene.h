@@ -10,10 +10,19 @@
 #include "../math/vector2.h"
 #include "../render/material.h"
 
+enum repair_scene_sounds {
+    REPAIR_SOUND_PICKUP,
+    REPAIR_SOUND_HOVER,
+    REPAIR_SOUND_CLICK,
+    REPAIR_SOUND_COUNT,
+};
+
 struct repair_scene_assets {
     sprite_t* background;
     material_t cursor_material;
     material_t missing_part_material;
+    material_t correct_slot_material;
+    wav64_t* sounds[REPAIR_SOUND_COUNT];
 };
 
 typedef struct repair_scene_assets repair_scene_assets_t;
@@ -38,8 +47,10 @@ struct repair_scene {
 
     rspq_block_t* background_block;
 
-    bool is_missing_parts: 1;
-    bool is_complete: 1;
+    bool is_missing_parts;
+    bool is_complete;
+    bool can_drop;
+    bool is_active;
 };
 
 typedef struct repair_scene repair_scene_t;
