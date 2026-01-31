@@ -10,6 +10,9 @@
 #define STATIC_SCALE    64
 #define WORLD_SCALE     32
 
+#define WORLD_NEAR_PLANE      1.0f
+#define WORLD_FAR_PLANE       125.0f
+
 #define MODEL_WORLD_SCALE   ((float)WORLD_SCALE / (float)MODEL_SCALE)
 #define STATIC_WORLD_SCALE   ((float)WORLD_SCALE / (float)STATIC_SCALE)
 

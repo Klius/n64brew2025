@@ -231,7 +231,7 @@ void overworld_create_2d_clipping_planes(quaternion_t* camera_rotation, float ta
     }
 }
 
-#define CULL_TOLERANCE          800000
+#define CULL_TOLERANCE          1200000
 #define SKYBOX_RENDER_OFFSET    10
 
 #define LEVEL2_MIN_DISTANCE     500
