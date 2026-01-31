@@ -3,4 +3,12 @@ world_pause;
 fade FADE_COLOR_BLACK, 0;
 delay 3;
 say "I can't let Samson die.";
-load_scene "rom:/scenes/inside_house.scene#intro";
+fade FADE_COLOR_NONE, 2.0;
+cam_animate "intro";
+delay 2.0;
+
+say "He is all I have left.";
+fade FADE_COLOR_BLACK, 2;
+delay 2.0;
+world_unpause;
+load_scene "rom:/scenes/garage.scene#default";

@@ -3,6 +3,7 @@
 #include "../audio/audio.h"
 #include "../cutscene/race.h"
 #include "../time/time.h"
+#include "../savefile/savefile.h"
 
 static vector2_t settlement_loc = {
     179.4, 113.6,
@@ -15,6 +16,8 @@ static const char* music_filenames[OVERWORLD_SONG_COUNT] = {
     [OVERWORLD_SONG_DESERT_DAYDREAMS] = "rom:/sounds/music/desert_daydreams.wav64",
     [OVERWORLD_SONG_DESERT_STRING] = "rom:/sounds/music/desert_strings.wav64",
     [OVERWORLD_SONG_RACE] = "rom:/sounds/music/race.wav64",
+    [OVERWORLD_SONG_MEMORIES_INDOOR] = "rom:/sounds/music/memories_of_the_oldtimes_indoors.wav64",
+    [OVERWORLD_SONG_MEMORIES_OUTDOOR] = "rom:/sounds/music/memories_of_the_oldtimes_outdoors.wav64",
 };
 
 void overworld_music_init(overworld_music_t* music) {
@@ -28,6 +31,10 @@ void overworld_music_init(overworld_music_t* music) {
 
 wav64_t* overworld_music_determine_song(overworld_music_t* music, vector3_t* player_pos, bool has_overworld) {
     if (!has_overworld) {
+        if (strncmp(savefile_get_last_scene(), "rom:/scenes/inside_house.scene", strlen("rom:/scenes/inside_house.scene")) == 0) {
+            return music->songs[OVERWORLD_SONG_MEMORIES_INDOOR];
+        }
+
         return NULL;
     }
 
@@ -45,7 +52,7 @@ wav64_t* overworld_music_determine_song(overworld_music_t* music, vector3_t* pla
     };
     
     if (vector2MagSqr(&offset) < SETTLEMENT_RADIUS * SETTLEMENT_RADIUS) {
-        return NULL;
+        return music->songs[OVERWORLD_SONG_MEMORIES_OUTDOOR];
     }
 
     if (offset.y < 0.0f) {

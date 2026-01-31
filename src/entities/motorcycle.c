@@ -41,7 +41,7 @@
 #define RIDE_HOVER_HEIGHT       0.5f
 #define FAST_HOVER_HEIGHT       1.0f
 #define BOB_HEIGHT              0.1f
-#define BOB_TIME                4.0f
+#define BOB_TIME                12.0f
 
 #define BASE_BOOST_TIME         3.0f
 #define UPGRADED_BOOST_TIME     3.5f
@@ -368,6 +368,8 @@ void motorcycle_update(void* data) {
     
     vector3_t ground_velocity;
     vector3ProjectPlane(&motorcycle->collider.velocity, &ground_normal, &ground_velocity);
+    vector3_t normal_velocity;
+    vector3Project(&motorcycle->collider.velocity, &ground_normal, &normal_velocity);
 
     float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
 
@@ -555,23 +557,23 @@ void motorcycle_update(void* data) {
             }
         }
 
-        // if (!input.btn.z) {
+        vector3AddScaled(&target_vel, &normal_velocity, vector3Dot(&ground_normal, &motorcycle->collider.velocity) > 0.0f ? 0.99f : 0.5f, &target_vel);
+
         if (are_brakes_on) {
             target_vel.y += spring_accel * fixed_time_step;
         } else {
             vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
         }
-        // }
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
     }
     
     motorcycle->was_stopped = target_speed == 0.0f && motorcycle->has_traction;
 
-    // if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
-    //     // this sucks
-    //     vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
-    // }
+    if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
+        // this sucks
+        vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
+    }
 }
 
 static motorcycle_t* current_instance;
