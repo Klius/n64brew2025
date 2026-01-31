@@ -1,5 +1,6 @@
 
 * add inside of medical building
+* show family photo at the end of the game
 * make motorcycle boost feel faster (camera tricks)
 * driving up steep hills feels bad
 * check for memory leaks

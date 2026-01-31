@@ -599,7 +599,6 @@ void player_unload_sound(struct player* player) {
 void player_init(struct player* player, struct player_definition* definition, struct Transform* camera_transform) {
     transformSaInitIdentity(&player->cutscene_actor.transform);
     renderable_single_axis_init(&player->renderable, &player->cutscene_actor.transform, "rom:/meshes/characters/scrapper_kid.tmesh");
-    player->renderable.hide = true;
     player->camera_transform = camera_transform;
 
     player->cutscene_actor.transform.position = definition->location;

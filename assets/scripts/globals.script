@@ -111,6 +111,16 @@ global overworld_nut_46: bool;
 global overworld_nut_47: bool;
 global overworld_nut_48: bool;
 global overworld_nut_49: bool;
+global overworld_nut_50: bool;
+global overworld_nut_51: bool;
+global overworld_nut_52: bool;
+global overworld_nut_53: bool;
+global overworld_nut_54: bool;
+global overworld_nut_55: bool;
+global overworld_nut_56: bool;
+global overworld_nut_57: bool;
+global overworld_nut_58: bool;
+global overworld_nut_59: bool;
 
 global boat_nut_0: bool;
 global boat_nut_1: bool;

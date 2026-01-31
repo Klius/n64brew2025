@@ -525,7 +525,7 @@ void map_render_minimap(int map_x, int map_y) {
     if (current_scene->minimap_rotation != 0.0f) {
         vector2ComplexFromAngle(current_scene->minimap_rotation, &scene_rotation);
     } else {
-        scene_rotation = (vector2_t){};
+        scene_rotation = (vector2_t){1.0f, 0.0f};
     }
 
     vector3_t forward;

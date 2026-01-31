@@ -10,7 +10,6 @@
 #define SHADOW_SCALE    (0.5f * MODEL_WORLD_SCALE)
 
 void drop_shadow_render(void* data, struct render_batch* batch) {
-    return;
     struct drop_shadow* drop_shadow = (struct drop_shadow*)data;
 
     if (!drop_shadow->enabled) {
