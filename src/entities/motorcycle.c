@@ -357,6 +357,8 @@ void motorcycle_update(void* data) {
         return;
     }
 
+    bool debug = joypad_get_buttons(0).c_down;
+
     armature_t* armature = renderable_get_armature(&motorcycle->renderable);
     animator_update(&motorcycle->animator, armature, scaled_time_step);
 
@@ -367,7 +369,7 @@ void motorcycle_update(void* data) {
     vector3_t ground_velocity;
     vector3ProjectPlane(&motorcycle->collider.velocity, &ground_normal, &ground_velocity);
 
-    float current_speed = sqrtf(vector3MagSqrd2D(&ground_velocity));
+    float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
 
     float target_height = motorcycle_hover_height(motorcycle, current_speed) + HOVER_SAG_AMOUNT;
 
@@ -527,8 +529,8 @@ void motorcycle_update(void* data) {
 
         float speed_in_target_direction = vector3Dot(&target_vel, &ground_velocity);
 
-        if (speed_in_target_direction > 0) {
-            float transferred_speed = 0.95f * current_speed * speed_in_target_direction;
+        if (speed_in_target_direction > 0 && !motorcycle->was_stopped && !are_brakes_on) {
+            float transferred_speed = 0.99f * current_speed * speed_in_target_direction;
 
             if (transferred_speed > target_speed) {
                 target_speed = transferred_speed;
@@ -553,19 +555,23 @@ void motorcycle_update(void* data) {
             }
         }
 
+        // if (!input.btn.z) {
         if (are_brakes_on) {
             target_vel.y += spring_accel * fixed_time_step;
         } else {
             vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
         }
+        // }
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
     }
+    
+    motorcycle->was_stopped = target_speed == 0.0f && motorcycle->has_traction;
 
-    if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
-        // this sucks
-        vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
-    }
+    // if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
+    //     // this sucks
+    //     vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
+    // }
 }
 
 static motorcycle_t* current_instance;
@@ -593,6 +599,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->boost_sound = 0;
     motorcycle->idle_sound = 0;
     motorcycle->drift_direction = 0;
+    motorcycle->was_stopped = true;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;

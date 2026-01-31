@@ -28,6 +28,7 @@ struct motorcycle {
     drop_shadow_t drop_shadow;
     bool has_traction;
     bool is_active;
+    bool was_stopped;
     int8_t drift_direction;
     
     float boost_timer;
