@@ -351,9 +351,9 @@ void render_batch_setup_light(struct render_batch* batch, enum light_source ligh
         }
         case LIGHT_SOURCE_RIM: {
             T3DVec3 dir = {{
-                .x = -batch->camera_matrix[2][0] * COS_30 + batch->camera_matrix[1][0] * SIN_30,
-                .y = -batch->camera_matrix[2][1] * COS_30 + batch->camera_matrix[1][1] * SIN_30,
-                .z = -batch->camera_matrix[2][2] * COS_30 + batch->camera_matrix[1][2] * SIN_30,
+                .x = -batch->camera_matrix[2][0] * COS_10 + batch->camera_matrix[1][0] * SIN_10,
+                .y = -batch->camera_matrix[2][1] * COS_10 + batch->camera_matrix[1][1] * SIN_10,
+                .z = -batch->camera_matrix[2][2] * COS_10 + batch->camera_matrix[1][2] * SIN_10,
             }};
             dir.y += 1.5f;
             t3d_light_set_ambient(black_color);

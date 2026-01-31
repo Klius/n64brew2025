@@ -9,6 +9,9 @@
 #define COS_30      0.86602540378443864676372317075294f
 #define SIN_30      0.5f
 
+#define COS_10      0.98480775301220805936674302458952f
+#define SIN_10      0.17364817766693034885171662676931f
+
 #define DEG_TO_RAD(angle)   ((angle) * (PI_F / 180.0f))
 
 int randomInt();
