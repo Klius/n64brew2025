@@ -81,11 +81,7 @@ void repair_part_render_drop_location(repair_part_t* part, struct frame_memory_p
     transformToWorldMatrix(&correct_transform, mtx.m);
     t3d_mat4_to_fixed(mtx_fp, &mtx);
     t3d_matrix_push(mtx_fp);
-    if (part->is_present) {
-        rspq_block_run(part->mesh.block);
-    } else {
-        rspq_block_run(part->solid_mesh.block);
-    }
+    rspq_block_run(part->solid_mesh.block);
     t3d_matrix_pop(1);
 }
 

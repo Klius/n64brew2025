@@ -18,6 +18,7 @@ static const char* music_filenames[OVERWORLD_SONG_COUNT] = {
     [OVERWORLD_SONG_RACE] = "rom:/sounds/music/race.wav64",
     [OVERWORLD_SONG_MEMORIES_INDOOR] = "rom:/sounds/music/memories_of_the_oldtimes_indoors.wav64",
     [OVERWORLD_SONG_MEMORIES_OUTDOOR] = "rom:/sounds/music/memories_of_the_oldtimes_outdoors.wav64",
+    [OVERWORLD_SONG_INDOOR_AMBIENCE] = "rom:/sounds/music/science_lab_ambience.wav64",
 };
 
 void overworld_music_init(overworld_music_t* music) {
@@ -34,6 +35,16 @@ wav64_t* overworld_music_determine_song(overworld_music_t* music, vector3_t* pla
         if (strncmp(savefile_get_last_scene(), "rom:/scenes/inside_house.scene", strlen("rom:/scenes/inside_house.scene")) == 0) {
             return music->songs[OVERWORLD_SONG_MEMORIES_INDOOR];
         }
+
+        if (strncmp(savefile_get_last_scene(), "rom:/scenes/inside_lab.scene", strlen("rom:/scenes/inside_lab.scene")) == 0) {
+            return music->songs[OVERWORLD_SONG_INDOOR_AMBIENCE];
+        }
+        
+        if (strncmp(savefile_get_last_scene(), "rom:/scenes/inside_boat.scene", strlen("rom:/scenes/inside_boat.scene")) == 0) {
+            return music->songs[OVERWORLD_SONG_INDOOR_AMBIENCE];
+        }
+
+        debugf("%s\n", savefile_get_last_scene());
 
         return NULL;
     }
