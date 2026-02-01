@@ -107,6 +107,8 @@ enum inventory_item_type {
     ITEM_MAP_DUNES,
     ITEM_MAP_CANYON,
 
+    ITEM_HAS_DRIFTED,
+
     ITEM_TYPE_COUNT,
 };
 

@@ -14,6 +14,7 @@ struct hud_assets {
     material_t* tracker_icon;
     material_t* nut_icon;
     material_t* b_button;
+    material_t* r_button;
     sprite_t* compass_border;
     sprite_t* boost_indicator;
 };

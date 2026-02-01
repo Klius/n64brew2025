@@ -355,6 +355,7 @@ struct scene* scene_load(const char* filename) {
     cutscene_ref_run_then_destroy(&starting_cutscene, 0);
 
     overworld_music_init(&scene->music);
+    scene->pickup = wav64_load("rom:/sounds/parts/pickup.wav64", NULL);
 
     return scene;
 }
@@ -440,6 +441,7 @@ void scene_release(struct scene* scene) {
     expression_set_scene_variables(NULL);
 
     overworld_music_destroy(&scene->music);
+    wav64_close(scene->pickup);
 
     free(scene);
 

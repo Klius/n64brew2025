@@ -499,6 +499,7 @@ void motorcycle_update(void* data) {
 
             if (input.btn.r) {
                 motorcycle->drift_direction = input_normalized > 0.0f ? 1 : -1;
+                inventory_set_has_item(ITEM_HAS_DRIFTED, true);
             }
         }
 

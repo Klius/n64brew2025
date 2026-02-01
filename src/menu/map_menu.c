@@ -71,6 +71,7 @@ struct map_asssets {
     material_t* map_icon;
     material_t* selection_cursor;
     material_t* check_icon;
+    material_t* c_right;
 
     wav64_t* sounds[MENU_SOUND_COUNT];
     wav64_t* unpause_sound;
@@ -865,6 +866,28 @@ struct menu_item* map_find_selected_item() {
     return NULL;
 }
 
+void map_render_save_prompt() {
+    material_apply(assets.c_right);
+
+    int x = 134;
+    int y = 183;
+
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 20, 0, 0);
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_CENTER,
+            .width = 128,
+            .height = 20,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 24, y, 
+        "Save",
+        4
+    );
+}
+
 void map_render(void* data) {
     menu_common_render_background(26, 26, 268, 188);
 
@@ -886,6 +909,8 @@ void map_render(void* data) {
 
     struct menu_item* selected_item = map_find_selected_item();
     map_render_title(selected_item);
+
+    map_render_save_prompt();
 
     switch (map_menu.state) {
         case MAP_MENU_LIST:
@@ -1130,6 +1155,7 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.map_icon = material_cache_load("rom:/materials/menu/map_icon.mat");
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
     assets.check_icon = material_cache_load("rom:/materials/menu/check.mat");
+    assets.c_right = material_cache_load("rom:/materials/menu/c_right.mat");
 
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         assets.sounds[i] = wav64_load(menu_sound_files[i], NULL);
@@ -1210,6 +1236,7 @@ void map_menu_hide() {
     material_cache_release(assets.map_icon);
     material_cache_release(assets.selection_cursor);
     material_cache_release(assets.check_icon);
+    material_cache_release(assets.c_right);
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         wav64_close(assets.sounds[i]);
     }

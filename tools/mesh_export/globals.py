@@ -32,6 +32,7 @@ mapping = {
     "has_given_tablet": 'ITEM_GIVEN_TABLET',
     
     "has_dismounted": 'ITEM_HAS_DISMOUNTED',
+    "has_drifted": 'ITEM_HAS_DRIFTED',
     
     "upgrade_faster": 'ITEM_UPGRADE_FASTER',
     "upgrade_longer_boost": 'ITEM_LONGER_BOOST',

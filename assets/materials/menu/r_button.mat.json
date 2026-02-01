@@ -1,0 +1,8 @@
+{
+    "tex0": "../../images/menu/r_button.png",
+    "combineMode": [{
+        "color": ["0", "0", "0", "TEX0"],
+        "alpha": ["0", "0", "0", "TEX0"]
+    }],
+    "blendMode": "TRANSPARENT"
+}

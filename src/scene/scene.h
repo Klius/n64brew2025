@@ -133,6 +133,7 @@ struct scene {
     bool can_pause;
 
     overworld_music_t music;
+    wav64_t* pickup;
 
     struct camera_animation_list camera_animations;
 };

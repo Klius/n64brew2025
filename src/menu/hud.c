@@ -304,13 +304,13 @@ void hud_render_nuts(struct hud* hud) {
     hud->prev_nut_count = nut_count;
 }
 
-void hud_render_dismount(struct hud* hud) {
+bool hud_render_dismount(struct hud* hud) {
     if (!current_scene || 
         !current_scene->overworld || 
         !inventory_has_item(ITEM_RIDING_MOTORCYCLE) || 
         inventory_has_item(ITEM_HAS_DISMOUNTED)
     ) {
-        return;
+        return false;
     }
 
     material_apply(hud->assets.overlay_material);
@@ -341,6 +341,60 @@ void hud_render_dismount(struct hud* hud) {
         "Exit",
         4
     );
+
+    return true;
+}
+
+float drift_prompt_at = 0.0f;
+
+bool hud_render_drift(struct hud* hud) {
+    if (!current_scene || !current_scene->overworld || inventory_has_item(ITEM_HAS_DRIFTED)) {
+        return false;
+    }
+
+    if (inventory_has_item(ITEM_RIDING_MOTORCYCLE)) {
+        if (drift_prompt_at == 0.0f) {
+            drift_prompt_at = game_time + 20.0f;
+        }
+    } else {
+        drift_prompt_at = 0.0f;
+        return false;
+    }
+
+    if (game_time < drift_prompt_at) {
+        return false;
+    }
+
+    material_apply(hud->assets.overlay_material);
+    rdpq_set_prim_color((color_t){0, 0, 0, 128});
+
+    int x = (SCREEN_WD - 54) / 2;
+    int y = 190;
+
+    rdpq_texture_rectangle(
+        TILE0, 
+        x - TEXT_PADDING, y - TEXT_PADDING, 
+        x + 62 + TEXT_PADDING, y + TEXT_PADDING + 25,
+        0, 0
+    );
+
+    material_apply(hud->assets.r_button);
+    rdpq_texture_rectangle(TILE0, x, y + 6, x + 24, y + 18, 0, 0);
+    
+    rdpq_text_printn(&(rdpq_textparms_t){
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_TOP,
+            .width = 100,
+            .height = 20,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 28, y + 4, 
+        "Drift",
+        5
+    );
+
+    return true;
 }
 
 void hud_render(void *data) {
@@ -358,7 +412,9 @@ void hud_render(void *data) {
     hud_render_compass(data);
     hud_render_autosave(data);
     hud_render_tracker_icon(data);
-    hud_render_dismount(data);
+    if (!hud_render_dismount(data)) {
+        hud_render_drift(data);
+    }
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
@@ -377,6 +433,7 @@ void hud_init(struct hud* hud, struct player* player, camera_t* camera) {
     hud->assets.saving_icon = material_cache_load("rom:/materials/menu/nut_icon.mat");
     hud->assets.tracker_icon = material_cache_load("rom:/materials/menu/tracker_icon.mat");   
     hud->assets.nut_icon = material_cache_load("rom:/materials/parts/nut_particle.mat");
+    hud->assets.r_button = material_cache_load("rom:/materials/menu/r_button.mat");
 
     if (!inventory_has_item(ITEM_HAS_DISMOUNTED)) {
         hud->assets.b_button = material_cache_load("rom:/materials/menu/b_button.mat");   
@@ -396,6 +453,7 @@ void hud_destroy(struct hud* hud) {
     material_cache_release(hud->assets.saving_icon);
     material_cache_release(hud->assets.tracker_icon);
     material_cache_release(hud->assets.nut_icon);
+    material_cache_release(hud->assets.r_button);
     if (hud->assets.b_button) {
         material_cache_release(hud->assets.b_button);
     }

@@ -165,6 +165,7 @@ void repair_part_pickup_common_init() {
 }
 
 void repair_part_pickup_common_destroy() {
+    audio_cancel(assets.beacon_beep);
     wav64_close(assets.beacon_beep);
 }
 
@@ -172,6 +173,7 @@ void repair_part_interact(struct interactable* interactable, entity_id from) {
     repair_part_pickup_t* part = (repair_part_pickup_t*)interactable->data;
     expression_set_bool(part->has_part, true);
     entity_despawn(interactable->id);
+    audio_play_2d(current_scene->pickup, 1.0f, 0.0f, 1.0f, 0);
 
     if (part->count != VARIABLE_DISCONNECTED) {
         expression_set_integer(part->count, expression_get_integer(part->count) + 1);
