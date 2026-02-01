@@ -295,6 +295,7 @@ enum sign_type {
     SIGN_TYPE_DETECTOR_UPGRADE,
     SIGN_TYPE_BOOST_ANYWHERE,
     SIGN_TYPE_FAST_TRAVEL,
+    SIGN_TYPE_SIGN_POST,
 };
 
 struct sign_definition {

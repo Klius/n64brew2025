@@ -1,0 +1,9 @@
+sign_start;
+cam_look_npc ENTITY_ID_SUBJECT;
+
+say "
+    Map maker
+    Canyons
+";
+
+sign_end;

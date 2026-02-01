@@ -15,6 +15,7 @@ static const char* meshes[] = {
     [SIGN_TYPE_DETECTOR_UPGRADE] = "rom:/meshes/parts/scanner_upgrade.tmesh",
     [SIGN_TYPE_BOOST_ANYWHERE] = "rom:/meshes/parts/boost_upgrade.tmesh",
     [SIGN_TYPE_FAST_TRAVEL] = "rom:/meshes/parts/fast_travel_upgrade.tmesh",
+    [SIGN_TYPE_SIGN_POST] = "rom:/meshes/objects/sign_post.tmesh",
 };
 
 void sign_interact(struct interactable* interactable, entity_id from) {

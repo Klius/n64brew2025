@@ -55,6 +55,12 @@
             "type": "checkpoint"
         },
         {
+            "name": "objects_sign_post",
+            "description": "",
+            "mesh": "meshes/objects/sign_post.blend#sign_post",
+            "type": "sign"
+        },
+        {
             "name": "objects_text_poster",
             "description": "",
             "mesh": "meshes/objects/text_poster.blend#text_poster",
