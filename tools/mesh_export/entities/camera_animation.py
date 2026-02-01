@@ -76,13 +76,17 @@ class camera_animation:
     def evaluate(self, frame) -> camera_animation_frame:
         result = camera_animation_frame()
 
-        for slot in self.movement_action.slots:
-            for layer in self.movement_action.layers:
-                for strip in layer.strips:
-                    bag = strip.channelbag(slot)
+        if hasattr(self.movement_action, 'slots'):
+            for slot in self.movement_action.slots:
+                for layer in self.movement_action.layers:
+                    for strip in layer.strips:
+                        bag = strip.channelbag(slot)
 
-                    for fcurve in bag.fcurves:
-                        result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
+                        for fcurve in bag.fcurves:
+                            result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
+        else:
+            for fcurve in self.movement_action.fcurves:
+                result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
 
         if self.movement_action != self.lens_action:
             for fcurve in self.lens_action.fcurves:
