@@ -1,0 +1,7 @@
+
+func next_house_hint()
+    sign_start;
+    cam_look_npc ENTITY_ID_SUBJECT;
+    say "For my next map make a daring leap to the large isolated plateau.";
+    sign_end;
+end

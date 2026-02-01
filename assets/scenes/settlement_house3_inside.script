@@ -1,0 +1,7 @@
+
+func next_house_hint()
+    sign_start;
+    cam_look_npc ENTITY_ID_SUBJECT;
+    say "For my next map look atop the massive rock that touches sand and salt.";
+    sign_end;
+end

@@ -68,7 +68,7 @@ void setup() {
 #endif
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
-    scene_queue_next("rom:/scenes/settlement_house1_inside.scene#default");
+    // scene_queue_next("rom:/scenes/settlement_house3_inside.scene#default");
     // scene_queue_next("rom:/scenes/inside_house.scene");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
@@ -97,7 +97,9 @@ void render_3d(surface_t* col, surface_t* z_buffer) {
     }
     rdpq_set_color_image(col);
     rdpq_set_z_image(z_buffer);
-	// t3d_screen_clear_color(RGBA32(180, 220, 255, 0));
+    if (current_scene && !current_scene->overworld) {
+        t3d_screen_clear_color(RGBA32(0, 0, 0, 0));
+    }
     
     t3d_frame_start();
 

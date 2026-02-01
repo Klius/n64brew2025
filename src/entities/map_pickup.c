@@ -22,6 +22,7 @@ void map_pickup_iteract(struct interactable* interactable, entity_id from) {
 
     inventory_set_has_item(map->map_type, true);
     map_menu_show_with_item(map->map_type);
+    interactable->interact_type = INTERACT_TYPE_NONE;
 }
 
 void map_pickup_init(map_pickup_t* map_pickup, struct map_pickup_definition* definition, entity_id entity_id) {

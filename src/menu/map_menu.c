@@ -21,6 +21,8 @@
 #define NEW_ITEM_ANIM_TIME      1.0f
 #define OPEN_ITEM_DELAY_TIME    1.0f
 
+#define MAP_REVEAL_TIME         1.0f
+
 enum menu_item_type {
     MENU_ITEM_PART,
     MENU_ITEM_MAP,
@@ -361,12 +363,17 @@ enum map_menu_state {
     MAP_MENU_NEW_ITEM_DETAILS,
     MAP_MENU_DETAILS_ANIMATE,
     MAP_MENU_DETAILS,
+    MAP_MENU_MAP_REVEAL,
 };
 
 union map_menu_state_data {
     struct {
         float timer;
     } new_items;
+    struct {
+        float timer;
+        sprite_t* mask;
+    } map_reveal;
 };
 
 struct map_menu {
@@ -886,6 +893,7 @@ void map_render(void* data) {
             break;
         case MAP_MENU_NEW_ITEMS:
         case MAP_MENU_NEW_ITEM_DETAILS:
+        case MAP_MENU_MAP_REVEAL:
             map_render_items(map_menu.state_data.new_items.timer * (1.0f / NEW_ITEM_ANIM_TIME));
             break;
         case MAP_MENU_DETAILS_ANIMATE:
@@ -1002,6 +1010,32 @@ void map_check_direction() {
     map_menu.selected_item = new_selection;
 }
 
+void map_menu_reveal_update() {
+    map_menu.state_data.map_reveal.timer += fixed_time_step;
+
+    int scalar = (int)(map_menu.state_data.map_reveal.timer * (256.0f / MAP_REVEAL_TIME));
+
+    if (scalar > 256) {
+        scalar = 256;
+    }
+
+    uint8_t* mask = (uint8_t*)map_menu.state_data.map_reveal.mask->data;
+    uint8_t* end = map_revealed + MAP_SIZE * MAP_SIZE;
+
+    for (uint8_t* revealed = map_revealed; revealed < end; ++revealed, ++mask) {
+        uint8_t mask_value = (int8_t)((scalar * *mask) >> 8);
+
+        if (mask_value > *revealed) {
+            *revealed = mask_value;
+        }
+    }
+
+    if (map_menu.state_data.map_reveal.timer >= MAP_REVEAL_TIME) {
+        map_menu.state = MAP_MENU_LIST;
+        sprite_free(map_menu.state_data.map_reveal.mask);
+    }
+}
+
 void map_menu_update(void* data) {
     joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
     joypad_inputs_t input = joypad_get_inputs(0);
@@ -1056,6 +1090,22 @@ void map_menu_update(void* data) {
                 map_menu_hide_details();
             }
             break;
+        case MAP_MENU_MAP_REVEAL:
+            map_menu_reveal_update();
+            break;
+    }
+}
+
+const char* map_menu_check_for_map_item(enum inventory_item_type item) {
+    switch (item) {
+        case ITEM_MAP_RIVER:
+            return "rom:/images/maps/river_map.sprite";
+        case ITEM_MAP_DUNES:
+            return "rom:/images/maps/dunes_map.sprite";
+        case ITEM_MAP_CANYON:
+            return "rom:/images/maps/canyons_map.sprite";
+        default:
+            return NULL;
     }
 }
 
@@ -1131,7 +1181,13 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     font_type_use(FONT_DIALOG);
     map_menu.can_unpause = false;
 
-    if (item != ITEM_TYPE_NONE) {
+    const char* map_mask = map_menu_check_for_map_item(item);
+
+    if (map_mask) {
+        map_menu.state = MAP_MENU_MAP_REVEAL;
+        map_menu.state_data.map_reveal.timer = 0.0f;
+        map_menu.state_data.map_reveal.mask = sprite_load(map_mask);
+    } else if (item != ITEM_TYPE_NONE) {
         map_menu.selected_item = item;
     } else if (map_menu.selected_item == ITEM_TYPE_NONE || !map_find_selected_item()) {
         map_menu.selected_item = map_get_default_selection();
