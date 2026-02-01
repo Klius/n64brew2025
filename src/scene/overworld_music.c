@@ -44,8 +44,6 @@ wav64_t* overworld_music_determine_song(overworld_music_t* music, vector3_t* pla
             return music->songs[OVERWORLD_SONG_INDOOR_AMBIENCE];
         }
 
-        debugf("%s\n", savefile_get_last_scene());
-
         return NULL;
     }
 

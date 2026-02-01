@@ -22,6 +22,7 @@ enum entity_type_id {
     ENTITY_TYPE_motorcycle_spawner,
     ENTITY_TYPE_sign,
     ENTITY_TYPE_checkpoint,
+    ENTITY_TYPE_map_pickup,
     // type enum insert point
     
     ENTITY_TYPE_count,
@@ -101,6 +102,10 @@ enum inventory_item_type {
     ITEM_BIKE_TELEPORT,
     ITEM_SERVO,
     ITEM_DETECT_SERVO,
+
+    ITEM_MAP_RIVER,
+    ITEM_MAP_DUNES,
+    ITEM_MAP_CANYON,
 
     ITEM_TYPE_COUNT,
 };
@@ -311,6 +316,12 @@ struct checkpoint_definition {
     struct Vector2 rotation;
     enum checkpoint_type checkpoint_type;
     uint16_t checkpoint_index;
+};
+
+struct map_pickup_definition {
+    struct Vector3 position;  
+    struct Vector2 rotation;
+    enum inventory_item_type map_type;
 };
 
 // definition insert point

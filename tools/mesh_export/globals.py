@@ -47,6 +47,10 @@ mapping = {
     
     "servo_count": "ITEM_SERVO",
     "upgrade_detect_servo": "ITEM_DETECT_SERVO",
+    
+    "has_map_river": "ITEM_MAP_RIVER",
+    "has_map_dunes": "ITEM_MAP_DUNES",
+    "has_map_canyon": "ITEM_MAP_CANYON",
 }
 
 data_type_mapping = {

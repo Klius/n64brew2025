@@ -1,5 +1,4 @@
 
-* particle placement bug
 * add note about bike drifting
 * animation blending
 * entrances need holes

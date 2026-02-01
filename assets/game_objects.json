@@ -103,6 +103,12 @@
             "type": "repair_part_pickup"
         },
         {
+            "name": "parts_map_pickup",
+            "description": "",
+            "mesh": "meshes/parts/map_pickup.blend#note",
+            "type": "map_pickup"
+        },
+        {
             "name": "parts_motor",
             "description": "",
             "mesh": "meshes/parts/motor.blend#hoverbike_motor",
