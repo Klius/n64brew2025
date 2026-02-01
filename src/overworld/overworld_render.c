@@ -433,9 +433,15 @@ void overworld_render_tile(struct overworld* overworld, struct Camera* camera, s
         overworld_tile_layer_t* layer = &block->layers[y];
     
         t3d_matrix_push(tile_position);
+        
+        for (int i = 0; i < layer->pre_scrolling_mesh_count; i += 1) {
+            material_apply(layer->scrolling_meshes[i].material);
+            rspq_block_run(layer->scrolling_meshes[i].block);
+        }
+
         rspq_block_run(layer->render_block);
 
-        for (int i = 0; i < layer->scrolling_mesh_count; i += 1) {
+        for (int i = layer->pre_scrolling_mesh_count; i < layer->scrolling_mesh_count; i += 1) {
             material_apply(layer->scrolling_meshes[i].material);
             rspq_block_run(layer->scrolling_meshes[i].block);
         }

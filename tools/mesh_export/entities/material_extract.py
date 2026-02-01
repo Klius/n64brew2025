@@ -485,6 +485,9 @@ def determine_material_from_f3d(mat: bpy.types.Material) -> material.Material:
     else:
         result.light_count = 0
 
+    if 'priority' in mat:
+        result.priority = mat['priority']
+
     return result
 
 def material_can_extract(bpy_mat: bpy.types.Material) -> bool:

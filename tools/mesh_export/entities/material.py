@@ -485,6 +485,7 @@ class Material():
         self.vtx_effect: str | None = None
         self.fog: Fog | None = None
         self.light_count: int | None = None
+        self.priority: int | None = None
 
     def copy(self):
         result = Material()
@@ -502,6 +503,7 @@ class Material():
         result.vtx_effect = self.vtx_effect
         result.fog = self.fog.copy() if self.fog else None
         result.light_count = self.light_count
+        result.priority =  self.priority
         return result
     
     def does_scroll(self) -> bool:
@@ -531,19 +533,22 @@ class Material():
         return 128, 128
     
     def get_render_layer(self) -> int:
+        if self.priority != None:
+            return self.priority
+
         if not self.blend_mode:
-            return 0
+            return 10
         
         if self.blend_mode.z_mode == 'OPAQUE':
-            return 0
+            return 10
         if self.blend_mode.z_mode == 'INTER':
-            return 0
+            return 10
         if self.blend_mode.z_mode == 'TRANSPARENT':
-            return 1
+            return 20
         if self.blend_mode.z_mode == 'DECAL':
-            return 2
+            return 30
         
-        return 0
+        return 10
     
     def get_palette_data(self) -> tuple[list[int] | None, int]:
         if not self.tex0 and not self.tex1:
@@ -1031,6 +1036,8 @@ def parse_material(filename: str):
     result.z_buffer = _optional_boolean(json_data, 'zBuffer', 'zBuffer', True)
 
     result.vtx_effect = _optional_string(json_data, 'uvGen', 'uvGen', 'none')
+
+    result.priority = _optional_number(json_data, 'priority', 'priority', None)
 
     result.fog = Fog()
 

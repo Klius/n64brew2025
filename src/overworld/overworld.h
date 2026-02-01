@@ -22,7 +22,8 @@ struct overworld_tile_layer {
     tmesh_t terrain_mesh;
     rspq_block_t* render_block;
     tmesh_t* scrolling_meshes;
-    uint32_t scrolling_mesh_count;
+    uint16_t scrolling_mesh_count;
+    uint16_t pre_scrolling_mesh_count;
 };
 
 typedef struct overworld_tile_layer overworld_tile_layer_t;
