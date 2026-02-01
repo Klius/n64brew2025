@@ -295,7 +295,11 @@ func race0_entry()
                 say "Good work, you set a new track record of {stopwatch_time():duration}";
             end
         else
-            say "You didn't complete the race in under {race0_record:duration}.";
+            say "
+                You didn't complete the race in under {race0_record:duration}.
+
+                Remember, you can drift using R to charge boosts.
+            ";
             
             ask "Would you like to try again?";
                 
@@ -326,7 +330,7 @@ func race1_bot_speak()
         say "
             Welcome.
 
-            I am RB1. If you complete 3 laps on my track in under {race1_record:duration} I will give you 10 nuts.
+            I am RB1. If you complete 3 laps on my track in under {race1_record:duration} I will give you 20 nuts.
         ";
     else
         say "
@@ -395,13 +399,13 @@ func race1_entry()
 
                     Your time was {stopwatch_time():duration}
 
-                    As promised here are your 10 nuts
+                    As promised here are your 20 nuts
                 ";
 
                 world_unpause;
                 cam_return;
                 has_race1_reward = true;
-                nut_count = nut_count + 10;
+                nut_count = nut_count + 20;
                 return;
             else
                 say "Good work, you set a new track record of {stopwatch_time():duration}";
@@ -548,7 +552,7 @@ func race3_bot_speak()
         say "
             Welcome.
 
-            I am RB3. If you race up the river in under {race2_record:duration} I will give you 10 nuts.
+            I am RB3. If you race up the river in under {race2_record:duration} I will give you 20 nuts.
         ";
     else
         say "
@@ -617,13 +621,13 @@ func race3_entry()
 
                     Your time was {stopwatch_time():duration}
 
-                    As promised here are your 10 nuts
+                    As promised here are your 20 nuts
                 ";
 
                 world_unpause;
                 cam_return;
                 has_race3_reward = true;
-                nut_count = nut_count + 10;
+                nut_count = nut_count + 20;
                 return;
             else
                 say "Good work, you set a new track record of {stopwatch_time():duration}";
