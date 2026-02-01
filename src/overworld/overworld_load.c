@@ -53,7 +53,8 @@ overworld_tile_layer_t overworld_tile_load_layer(tmesh_t** detail_meshes, T3DMat
 
     result.render_block = rspq_block_end();
 
-    fread(&result.scrolling_mesh_count, 4, 1, file);
+    fread(&result.scrolling_mesh_count, 2, 1, file);
+    fread(&result.pre_scrolling_mesh_count, 2, 1, file);
 
     if (result.scrolling_mesh_count) {
         result.scrolling_meshes = malloc(sizeof(tmesh_t) * result.scrolling_mesh_count);

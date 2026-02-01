@@ -4,5 +4,10 @@
         "alpha": ["0", "0", "0", "PRIM"]
     }],
     "primColor": [10, 230, 0, 54],
-    "blendMode": "TRANSPARENT"
+    "blendMode": {
+        "cyc1": ["IN", "IN_A", "MEMORY", "INV_MUX_A"],
+        "zWrite": false,
+        "zCompare": false
+    },
+    "zBuffer": false
 }

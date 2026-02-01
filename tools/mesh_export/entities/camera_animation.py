@@ -19,7 +19,7 @@ class camera_animation_frame:
         self.has_quat = False
         self.euler_angles = mathutils.Euler()
         self.has_euler = False
-        self.fov = 70
+        self.fov = 70 * math.pi / 180
 
     def __str__(self):
         return f"loc = {self.location}, rot = {self.get_rotation()} fov = {self.fov}"
@@ -75,12 +75,18 @@ class camera_animation:
     
     def evaluate(self, frame) -> camera_animation_frame:
         result = camera_animation_frame()
-        
-        for fcurve in self.movement_action.fcurves:
-            result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
 
-        for fcurve in self.lens_action.fcurves:
-            result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
+        for slot in self.movement_action.slots:
+            for layer in self.movement_action.layers:
+                for strip in layer.strips:
+                    bag = strip.channelbag(slot)
+
+                    for fcurve in bag.fcurves:
+                        result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
+
+        if self.movement_action != self.lens_action:
+            for fcurve in self.lens_action.fcurves:
+                result.set_value(fcurve.data_path, fcurve.array_index, fcurve.evaluate(frame))
 
         return result
     

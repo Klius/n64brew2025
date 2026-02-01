@@ -48,6 +48,12 @@ class mesh_data():
 
         return result
     
+    def mat_priority(self) -> int:
+        if not self.mat or not 'priority' in self.mat:
+            return 10
+        
+        return self.mat['priority']
+    
     def mat_name(self) -> str:
         if self.mat:
             return self.mat.name

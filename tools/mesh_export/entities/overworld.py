@@ -132,8 +132,8 @@ def generate_overworld_tile(
         for mesh_data in y_cell:
             mesh_data.translate(cell_corner)
 
-        scrolling_meshes = []
-        static_meshes = []
+        scrolling_meshes: list[mesh.mesh_data] = []
+        static_meshes: list[mesh.mesh_data] = []
 
         for mesh_data in y_cell:
             mat = material_extract.load_material_with_name(mesh_data.mat)
@@ -158,7 +158,17 @@ def generate_overworld_tile(
             data.write(struct.pack('>ffff', rot.x, rot.y, rot.z, rot.w))
             data.write(struct.pack('>fff', scale.x, scale.y, scale.z))
 
-        data.write(len(scrolling_meshes).to_bytes(4, 'big'))
+        scrolling_meshes = sorted(scrolling_meshes, key = lambda x: x.mat_priority())
+
+        data.write(len(scrolling_meshes).to_bytes(2, 'big'))
+
+        pre_sort_count = 0
+
+        for mesh in scrolling_meshes:
+            if mesh.mat_priority() < 10:
+                pre_sort_count += 1
+
+        data.write(pre_sort_count.to_bytes(2, 'big'))
 
         for mesh_data in scrolling_meshes:
             settings_copy = settings.copy()
