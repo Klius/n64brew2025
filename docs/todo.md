@@ -1,5 +1,4 @@
 
-* camera zoom bug
 * animation blending
 * entrances need holes
 * race 2 looks like a dead end
