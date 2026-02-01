@@ -122,7 +122,7 @@ void static_particles_render_instances(static_particles_t* particle_list, int pa
         
             transform.position = instance->center;
             vector3Sub(&instance->center, camera_pos, &transform.position);
-            vector3Scale(&instance->size, &transform.scale, MODEL_WORLD_SCALE);
+            vector3Scale(&instance->size, &transform.scale, STATIC_WORLD_SCALE);
             vector3Scale(&transform.position, &transform.position, WORLD_SCALE);
         
             T3DMat4FP* mtxfp = frame_pool_get_transformfp(pool);
