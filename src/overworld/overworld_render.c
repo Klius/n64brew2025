@@ -456,6 +456,7 @@ void overworld_render_low_priority(overworld_tile_render_info_t* curr) {
     
     for (int i = 0; i < curr->layer->pre_scrolling_mesh_count; i += 1) {
         material_apply(curr->layer->scrolling_meshes[i].material);
+        rdpq_mode_zbuf(false, false);
         rspq_block_run(curr->layer->scrolling_meshes[i].block);
     }
     
@@ -473,12 +474,6 @@ void overworld_render_tile(overworld_tile_render_info_t* curr) {
     }
 
     t3d_matrix_pop(1);
-
-    // if (block->tile->static_particle_count) {
-    //     static_particles_start();
-    //     static_particles_render_instances(block->tile->static_particles, block->tile->static_particle_count, pool, &camera->transform.position);
-    //     static_particles_end();
-    // }
 }
 
 void overworld_render_particles(overworld_tile_render_info_t* curr, vector3_t* camera_pos, struct frame_memory_pool* pool) {
@@ -527,6 +522,9 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
     for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
         overworld_render_low_priority(curr);
     }
+
+    rdpq_sync_pipe();
+    rdpq_mode_zbuf(true, true);
     
     for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
         overworld_render_tile(curr);
