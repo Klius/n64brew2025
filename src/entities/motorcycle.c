@@ -46,8 +46,9 @@
 #define BASE_BOOST_TIME         3.0f
 #define UPGRADED_BOOST_TIME     3.5f
 
-#define SELF_BOOST_COOLDOWN     10.0f
+#define SELF_BOOST_COOLDOWN     6.0f
 #define DRIFT_BOOST_COOLDOWN    2.0f
+#define JUMP_BOOST_COOLDOWN     1.2f
 
 #define CAST_CENTER             0.3f
 
@@ -374,6 +375,7 @@ void motorcycle_update(void* data) {
     float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
 
     float target_height = motorcycle_hover_height(motorcycle, current_speed) + HOVER_SAG_AMOUNT;
+    bool is_grounded = min_height_offset < target_height;
 
     vector3_t forward;
 
@@ -399,7 +401,7 @@ void motorcycle_update(void* data) {
 
     vector2_t target_rotation_offset = gRight2;
 
-    if (motorcycle->drift_direction) {
+    if (is_grounded && motorcycle->drift_direction) {
         motorcycle->self_boost_cooldown -= fixed_time_step * (SELF_BOOST_COOLDOWN / DRIFT_BOOST_COOLDOWN);
 
         if (!input.btn.r) {
@@ -412,6 +414,11 @@ void motorcycle_update(void* data) {
         } else {
             vector2ComplexFromAngle(motorcycle->drift_direction > 0 ? 0.3f : -0.3f, &target_rotation_offset);
         }
+    } else if (!is_grounded) {
+        motorcycle->self_boost_cooldown -= fixed_time_step * (SELF_BOOST_COOLDOWN / JUMP_BOOST_COOLDOWN);
+    } else if (!motorcycle->was_grounded && motorcycle->self_boost_cooldown <= 0.0f) {
+        activate_boost = true;
+        motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     }
 
     vector2_t max_rotation;
@@ -438,7 +445,7 @@ void motorcycle_update(void* data) {
         if (motorcycle->self_boost_cooldown > 0.0f) {
             motorcycle->self_boost_cooldown -= fixed_time_step;
         }
-    } else if (!motorcycle->drift_direction && motorcycle->self_boost_cooldown < SELF_BOOST_COOLDOWN) {
+    } else if (!motorcycle->drift_direction && motorcycle->self_boost_cooldown < SELF_BOOST_COOLDOWN && is_grounded) {
         motorcycle->self_boost_cooldown += fixed_time_step * (SELF_BOOST_COOLDOWN / DRIFT_BOOST_COOLDOWN);
     }
 
@@ -517,7 +524,7 @@ void motorcycle_update(void* data) {
         motorcycle_check_for_mount(motorcycle);
     }
 
-    if (min_height_offset < target_height) {
+    if (is_grounded) {
         vector3_t* vel = &motorcycle->collider.velocity;
         float prev_y = vel->y;
 
@@ -567,7 +574,8 @@ void motorcycle_update(void* data) {
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
     }
-    
+
+    motorcycle->was_grounded = is_grounded;
     motorcycle->was_stopped = target_speed == 0.0f && motorcycle->has_traction;
 
     if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {

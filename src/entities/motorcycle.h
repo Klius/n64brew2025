@@ -29,6 +29,7 @@ struct motorcycle {
     bool has_traction;
     bool is_active;
     bool was_stopped;
+    bool was_grounded;
     int8_t drift_direction;
     
     float boost_timer;
