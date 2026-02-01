@@ -261,16 +261,16 @@ bool player_handle_ground_movement(struct player* player, struct contact* ground
         return false;
     }
 
-    if (dynamic_object_should_slide(MAX_STABLE_SLOPE, ground_contact->normal.y, ground_contact->surface_type)) {
-        // TODO handle sliding logic
-        player->slide_timer += fixed_time_step;
+    // if (dynamic_object_should_slide(MAX_STABLE_SLOPE, ground_contact->normal.y, ground_contact->surface_type)) {
+    //     // TODO handle sliding logic
+    //     player->slide_timer += fixed_time_step;
 
-        if (player->slide_timer > SLIDE_DELAY) {
-            return true;
-        }
-    } else {
-        player->slide_timer = 0.0f;
-    }
+    //     if (player->slide_timer > SLIDE_DELAY) {
+    //         return true;
+    //     }
+    // } else {
+    //     player->slide_timer = 0.0f;
+    // }
 
     player_handle_look(player, target_direction);
 

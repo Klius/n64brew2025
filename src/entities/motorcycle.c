@@ -416,7 +416,7 @@ void motorcycle_update(void* data) {
         }
     } else if (!is_grounded) {
         motorcycle->self_boost_cooldown -= fixed_time_step * (SELF_BOOST_COOLDOWN / JUMP_BOOST_COOLDOWN);
-    } else if (!motorcycle->was_grounded && motorcycle->self_boost_cooldown <= 0.0f) {
+    } else if (!motorcycle->was_grounded && motorcycle->self_boost_cooldown <= 0.0f && !inventory_has_item(ITEM_BOOST_ANYWHERE)) {
         activate_boost = true;
         motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     }

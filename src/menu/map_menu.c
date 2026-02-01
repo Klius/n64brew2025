@@ -1112,6 +1112,8 @@ void map_menu_reveal_update() {
         }
     }
 
+    data_cache_hit_writeback_invalidate(map_revealed, MAP_SIZE * MAP_SIZE);
+
     if (map_menu.state_data.map_reveal.timer >= MAP_REVEAL_TIME) {
         map_menu.state = MAP_MENU_LIST;
         sprite_free(map_menu.state_data.map_reveal.mask);
