@@ -72,6 +72,9 @@ struct map_asssets {
     material_t* selection_cursor;
     material_t* check_icon;
     material_t* c_right;
+    material_t* a_button;
+    material_t* b_button;
+    material_t* joystick;
 
     wav64_t* sounds[MENU_SOUND_COUNT];
     wav64_t* unpause_sound;
@@ -867,18 +870,72 @@ struct menu_item* map_find_selected_item() {
 }
 
 void map_render_save_prompt() {
-    material_apply(assets.c_right);
+    int x = 30;
+    int y = 181;
+    
+    material_apply(assets.a_button);
 
-    int x = 134;
-    int y = 183;
-
-    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 20, 0, 0);
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 25, 0, 0);
     rdpq_text_printn(&(rdpq_textparms_t){
             // .line_spacing = -3,
             .align = ALIGN_LEFT,
             .valign = VALIGN_CENTER,
             .width = 128,
-            .height = 20,
+            .height = 24,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 26, y, 
+        "View",
+        4
+    );
+    
+    x = 95;
+    material_apply(assets.b_button);
+
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 25, 0, 0);
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_CENTER,
+            .width = 128,
+            .height = 24,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 26, y, 
+        "Back",
+        4
+    );
+    
+    x = 160;
+    material_apply(assets.joystick);
+
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 25, 0, 0);
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_CENTER,
+            .width = 128,
+            .height = 24,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        x + 26, y, 
+        "Move",
+        4
+    );
+
+    x = 227;
+    material_apply(assets.c_right);
+
+    rdpq_texture_rectangle(TILE0, x, y + 2, x + 24, y + 22, 0, 0);
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_CENTER,
+            .width = 128,
+            .height = 24,
             .wrap = WRAP_NONE,
         }, 
         FONT_DIALOG, 
@@ -1156,6 +1213,9 @@ void map_menu_show_with_item(enum inventory_item_type item) {
     assets.selection_cursor = material_cache_load("rom:/materials/menu/selection_cursor.mat");
     assets.check_icon = material_cache_load("rom:/materials/menu/check.mat");
     assets.c_right = material_cache_load("rom:/materials/menu/c_right.mat");
+    assets.a_button = material_cache_load("rom:/materials/menu/a_button.mat");
+    assets.b_button = material_cache_load("rom:/materials/menu/b_button.mat");
+    assets.joystick = material_cache_load("rom:/materials/menu/joystick.mat");
 
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         assets.sounds[i] = wav64_load(menu_sound_files[i], NULL);
@@ -1237,6 +1297,9 @@ void map_menu_hide() {
     material_cache_release(assets.selection_cursor);
     material_cache_release(assets.check_icon);
     material_cache_release(assets.c_right);
+    material_cache_release(assets.a_button);
+    material_cache_release(assets.b_button);
+    material_cache_release(assets.joystick);
     for (int i = 0; i < MENU_SOUND_COUNT; i += 1) {
         wav64_close(assets.sounds[i]);
     }

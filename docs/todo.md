@@ -6,7 +6,6 @@ After new map
 * Check races
 * Audio not pausing for overworld cutscene
 
-* animation blending
 * entrances need holes
 * check for memory leaks
 * b button render glitch
