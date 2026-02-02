@@ -143,9 +143,17 @@ func on_brother_talk()
 
             terzdesign
             kaelin
-
-            Thank you for playing
         ";
+
+        show_image "rom:/images/menu/family.sprite";
+        fade FADE_COLOR_NONE, 2.0;
+
+        delay 5.0;
+
+        fade FADE_COLOR_BLACK, 2.0;
+        delay 2;
+        show_image "";
+
         set_expression characters_brother_healed, NPC_EXPRESSION_NEUTRAL;
         
         fade FADE_COLOR_NONE, 2.0;
