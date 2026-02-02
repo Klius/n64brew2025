@@ -1,7 +1,7 @@
 V=1
 SOURCE_DIR=src
 BUILD_DIR=build
-# N64_CFLAGS += -O3 -DNDEBUG
+N64_CFLAGS += -O3 -DNDEBUG
 include $(N64_INST)/include/n64.mk
 N64_ROM_TITLE = "Junk Runner 64"
 N64_ROM_REGION = E
