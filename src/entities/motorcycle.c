@@ -416,7 +416,7 @@ void motorcycle_update(void* data) {
         }
     } else if (!is_grounded) {
         motorcycle->self_boost_cooldown -= fixed_time_step * (SELF_BOOST_COOLDOWN / JUMP_BOOST_COOLDOWN);
-    } else if (!motorcycle->was_grounded && motorcycle->self_boost_cooldown <= 0.0f) {
+    } else if (!motorcycle->was_grounded && motorcycle->self_boost_cooldown <= 0.0f && !inventory_has_item(ITEM_BOOST_ANYWHERE)) {
         activate_boost = true;
         motorcycle->self_boost_cooldown = SELF_BOOST_COOLDOWN;
     }
@@ -626,6 +626,8 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
 }
 
 void motorcycle_destroy(motorcycle_t* motorcycle) {
+    audio_stop(motorcycle->idle_sound);
+
     if (motorcycle->is_active) {
         collision_scene_remove(&motorcycle->collider);
     }

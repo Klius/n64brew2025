@@ -151,8 +151,8 @@ global has_race1_reward: bool;
 global has_race2_reward: bool;
 global has_race3_reward: bool;
 
-global race0_record: float = 250.0;
-global race1_record: float = 200.0;
+global race0_record: float = 220.0;
+global race1_record: float = 120.0;
 global race2_record: float = 220.0;
 global race3_record: float = 160.0;
 

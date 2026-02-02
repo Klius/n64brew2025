@@ -384,16 +384,25 @@ void overworld_render_lod_1(struct overworld* overworld, struct Camera* camera, 
     rdpq_mode_zbuf(true, true);
 } 
 
-void overworld_render_tile(struct overworld* overworld, struct Camera* camera, struct frame_memory_pool* pool, int x, int z) {
+struct overworld_tile_render_info {
+    T3DMat4FP* transform;
+    overworld_tile_layer_t* layer;
+    struct overworld_tile_render_block* particles_block;
+};
+
+typedef struct overworld_tile_render_info overworld_tile_render_info_t;
+
+
+overworld_tile_render_info_t* overworld_tile_enumerate_tiles(struct overworld* overworld, struct Camera* camera, struct frame_memory_pool* pool, int x, int z, overworld_tile_render_info_t* curr) {
     struct overworld_tile_render_block* block = &overworld->render_blocks[x & 0x3][z & 0x3];
     struct Vector3* camera_position = &camera->transform.position;
-
+    
     if (!block->layers || block->x != x || block->z != z) {
         overworld->load_next.x = x;
         overworld->load_next.y = z;
-        return;
+        return curr;
     }
-
+    
     int min_y = (int)floorf((camera_position->y - block->starting_y - camera->far) * overworld->inv_tile_size);
     int max_y = (int)ceilf((camera_position->y - block->starting_y + camera->far) * overworld->inv_tile_size);
 
@@ -404,7 +413,7 @@ void overworld_render_tile(struct overworld* overworld, struct Camera* camera, s
     if (max_y > block->y_height) {
         max_y = block->y_height;
     }
-
+    
     T3DMat4 mtx;
     t3d_mat4_identity(&mtx);
 
@@ -419,41 +428,60 @@ void overworld_render_tile(struct overworld* overworld, struct Camera* camera, s
     mtx.m[1][1] = STATIC_WORLD_SCALE;
     mtx.m[2][2] = STATIC_WORLD_SCALE;
 
-    for (int y = min_y; y < max_y; y += 1) {
+    for (int y = min_y; y < max_y; y += 1, ++curr) {
         T3DMat4FP* tile_position = frame_malloc(pool, sizeof(T3DMat4FP));
     
         if (!tile_position) {
-            return;
+            return curr;
         }
     
         tile_position = UncachedAddr(tile_position);
     
         t3d_mat4_to_fixed_3x4(tile_position, &mtx);
 
-        overworld_tile_layer_t* layer = &block->layers[y];
-    
-        t3d_matrix_push(tile_position);
+        *curr = (overworld_tile_render_info_t) {
+            .transform = tile_position,
+            .layer = &block->layers[y],
+            .particles_block = y == min_y ? block : NULL,
+        };
         
-        for (int i = 0; i < layer->pre_scrolling_mesh_count; i += 1) {
-            material_apply(layer->scrolling_meshes[i].material);
-            rspq_block_run(layer->scrolling_meshes[i].block);
-        }
-
-        rspq_block_run(layer->render_block);
-
-        for (int i = layer->pre_scrolling_mesh_count; i < layer->scrolling_mesh_count; i += 1) {
-            material_apply(layer->scrolling_meshes[i].material);
-            rspq_block_run(layer->scrolling_meshes[i].block);
-        }
-
-        t3d_matrix_pop(1);
-
         mtx.m[3][1] += overworld->tile_size * WORLD_SCALE;
     }
 
-    if (block->tile->static_particle_count) {
+    return curr;
+}
+
+void overworld_render_low_priority(overworld_tile_render_info_t* curr) {
+    t3d_matrix_push(curr->transform);
+    
+    for (int i = 0; i < curr->layer->pre_scrolling_mesh_count; i += 1) {
+        material_apply(curr->layer->scrolling_meshes[i].material);
+        rdpq_mode_zbuf(false, false);
+        rspq_block_run(curr->layer->scrolling_meshes[i].block);
+    }
+    
+    t3d_matrix_pop(1);
+}
+
+void overworld_render_tile(overworld_tile_render_info_t* curr) {
+    t3d_matrix_push(curr->transform);
+
+    rspq_block_run(curr->layer->render_block);
+
+    for (int i = curr->layer->pre_scrolling_mesh_count; i < curr->layer->scrolling_mesh_count; i += 1) {
+        material_apply(curr->layer->scrolling_meshes[i].material);
+        rspq_block_run(curr->layer->scrolling_meshes[i].block);
+    }
+
+    t3d_matrix_pop(1);
+}
+
+void overworld_render_particles(overworld_tile_render_info_t* curr, vector3_t* camera_pos, struct frame_memory_pool* pool) {
+    struct overworld_tile_render_block* block = curr->particles_block;
+
+    if (block && block->tile->static_particle_count) {
         static_particles_start();
-        static_particles_render_instances(block->tile->static_particles, block->tile->static_particle_count, pool, camera_position);
+        static_particles_render_instances(block->tile->static_particles, block->tile->static_particle_count, pool, camera_pos);
         static_particles_end();
     }
 }
@@ -476,15 +504,33 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
         return;
     }
 
+    overworld_tile_render_info_t tiles[8];
+    overworld_tile_render_info_t* block = tiles;
+
     for (int i = 0; i < 4; i += 1) {
         struct overworld_tile_slice next = overworld_step(overworld, &state);
 
         for (int x = next.min_x; x < next.max_x; x += 1) {
-            overworld_render_tile(overworld, camera, pool, x, next.y);
+            block = overworld_tile_enumerate_tiles(overworld, camera, pool, x, next.y, block);
         }
         
         if (!next.has_more) {
             break;
         }
+    }
+    
+    for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
+        overworld_render_low_priority(curr);
+    }
+
+    rdpq_sync_pipe();
+    rdpq_mode_zbuf(true, true);
+    
+    for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
+        overworld_render_tile(curr);
+    }
+    
+    for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
+        overworld_render_particles(curr, &camera->transform.position, pool);
     }
 }
