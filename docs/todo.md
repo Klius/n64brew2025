@@ -6,3 +6,4 @@ After new map
 * entrances need holes
 * check for memory leaks
 * b button render glitch
+* song is clipping

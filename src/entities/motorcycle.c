@@ -626,6 +626,8 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
 }
 
 void motorcycle_destroy(motorcycle_t* motorcycle) {
+    audio_stop(motorcycle->idle_sound);
+
     if (motorcycle->is_active) {
         collision_scene_remove(&motorcycle->collider);
     }
