@@ -549,6 +549,10 @@ void player_update(struct player* player) {
 #endif
 
     if ((cutscene_actor_update(&player->cutscene_actor) || !update_has_layer(UPDATE_LAYER_WORLD)) && player->state != PLAYER_IN_VEHICLE) {
+        if (!cutscene_actor_is_moving(&player->cutscene_actor) && !player_is_running(player, PLAYER_ANIMATION_IDLE)) {
+            player_run_clip(player, PLAYER_ANIMATION_IDLE);
+        }
+
         return;
     }
 
