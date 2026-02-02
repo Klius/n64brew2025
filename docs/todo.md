@@ -1,9 +1,6 @@
 
 
-After new map       
-* Update cave image
-* Move canyon map maker location
-* Check races
+After new map
 * Audio not pausing for overworld cutscene
 
 * entrances need holes
