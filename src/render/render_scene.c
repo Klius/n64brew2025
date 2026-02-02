@@ -201,13 +201,19 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
 
         bool should_draw = true;
 
-        // for (int plane = 0; el->center && plane < 2; plane += 1) {
-        //     float distnace = planePointDistance(&clipping_planes.planes[i], el->center);
-
-        //     if (distnace > el->radius) {
-        //         should_draw = false;
-        //     }
-        // }
+        if (el->center) {
+            vector3_t offset;
+            vector3Sub(el->center, &camera->transform.position, &offset);
+    
+            for (int plane = 0; el->center && plane < 2; plane += 1) {
+                float distance = planePointDistance(&clipping_planes.planes[plane], &offset);
+    
+                if (distance < -el->radius) {
+                    should_draw = false;
+                    break;
+                }
+            }
+        }
 
         if (should_draw) {
             ((render_scene_callback)current->callback)(el->data, &batch);
