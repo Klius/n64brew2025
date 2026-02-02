@@ -198,8 +198,21 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
 
     for (int i = 0; i < r_scene_3d.callbacks.count; ++i) {
         struct render_scene_element* el = callback_element_get_data(current);
-        ((render_scene_callback)current->callback)(el->data, &batch);
 
+        bool should_draw = true;
+
+        // for (int plane = 0; el->center && plane < 2; plane += 1) {
+        //     float distnace = planePointDistance(&clipping_planes.planes[i], el->center);
+
+        //     if (distnace > el->radius) {
+        //         should_draw = false;
+        //     }
+        // }
+
+        if (should_draw) {
+            ((render_scene_callback)current->callback)(el->data, &batch);
+        }
+        
         current = callback_list_next(&r_scene_3d.callbacks, current);
     }
     render_batch_finish(&batch, view_proj_matrix, viewport);

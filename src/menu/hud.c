@@ -327,7 +327,7 @@ bool hud_render_dismount(struct hud* hud) {
     );
 
     material_apply(hud->assets.b_button);
-    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 25, 0, 0);
+    rdpq_texture_rectangle(TILE0, x, y, x + 24, y + 24, 0, 0);
     
     rdpq_text_printn(&(rdpq_textparms_t){
             .align = ALIGN_LEFT,

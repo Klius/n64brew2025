@@ -69,7 +69,7 @@ void setup() {
 
     // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
     // scene_queue_next("rom:/scenes/settlement_house1_inside.scene#default");
-    // scene_queue_next("rom:/scenes/overworld.scene#race0");
+    // scene_queue_next("rom:/scenes/overworld.scene#race3");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
