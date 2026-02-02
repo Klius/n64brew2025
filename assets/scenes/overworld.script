@@ -21,8 +21,8 @@ func exit_garage()
         fade FADE_COLOR_BLACK, 0;
         world_pause;
         cam_animate "exit_garage";
-        audio_pause true;
         delay 0.1;
+        audio_pause true;
         fade FADE_COLOR_NONE, 0.5;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;
         npc_animate water_pump_scrapbot, "get_attention", true;
