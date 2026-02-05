@@ -233,6 +233,9 @@ void overworld_create_2d_clipping_planes(quaternion_t* camera_rotation, float ta
 
 #define CULL_TOLERANCE          1200000
 #define SKYBOX_RENDER_OFFSET    10
+#define MAX_PRIORITY            100
+
+#define PRIORITY_BIT_OFFSET     24
 
 #define LEVEL2_MIN_DISTANCE     500
 
@@ -271,7 +274,7 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
             should_skip_children = true;
         }
 
-        entry->priority = (distance >> 2) + ((uint32_t)(100 - curr->priority) << 24);
+        entry->priority = (distance >> 2) + ((uint32_t)(MAX_PRIORITY - curr->priority) << PRIORITY_BIT_OFFSET);
         
         entry->mesh = &curr->meshes[overworld_lod_1_direction_index(delta.x, delta.y)];
         entry += 1;
@@ -297,7 +300,7 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
             mat = mesh->material;
         }
 
-        T3DMat4FP* use_mtx = (order[i].priority >> 24) < SKYBOX_RENDER_OFFSET ? skybox_mtx : mtx;
+        T3DMat4FP* use_mtx = (order[i].priority >> PRIORITY_BIT_OFFSET) > (MAX_PRIORITY - SKYBOX_RENDER_OFFSET) ? skybox_mtx : mtx;
 
         if (use_mtx != curr_mtx) {
             if (curr_mtx) {
