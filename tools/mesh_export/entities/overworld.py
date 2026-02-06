@@ -251,13 +251,15 @@ class LodTile():
     def priority(self):
         digit_prefix_length = 0
 
-        while digit_prefix_length < len(self.obj.name) and (self.obj.name[digit_prefix_length].isdigit() or (digit_prefix_length == -1 and self.obj.name[0] == '-')):
+        while digit_prefix_length < len(self.obj.name) and (self.obj.name[digit_prefix_length].isdigit() or (digit_prefix_length == 0 and self.obj.name[0] == '-')):
             digit_prefix_length += 1
 
         result = int(self.obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
 
         if not self.is_skybox():
-            result += 100 - self.level * SKYBOX_RENDER_OFFSET
+            result += self.level * SKYBOX_RENDER_OFFSET
+        else:
+            result += 100
 
         return result
     

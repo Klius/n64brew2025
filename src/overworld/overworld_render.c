@@ -232,7 +232,7 @@ void overworld_create_2d_clipping_planes(quaternion_t* camera_rotation, float ta
 }
 
 #define CULL_TOLERANCE          1200000
-#define SKYBOX_RENDER_OFFSET    10
+#define SKYBOX_RENDER_OFFSET    100
 
 #define LEVEL2_MIN_DISTANCE     500
 
@@ -241,6 +241,9 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
 
     struct overworld_lod1_entry* end = lod1->entries + lod1->entry_count;
     struct overworld_lod1_sort_entry* entry = order;
+
+
+    
     for (struct overworld_lod1_entry* curr = lod1->entries; curr < end; curr += 1) {
         vector2s16_t delta = {
             .x = curr->x - camera_x,
@@ -249,7 +252,7 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
 
         bool should_cull = false;
 
-        for (int plane = 0; curr->priority >= SKYBOX_RENDER_OFFSET && plane < 2; plane += 1) {
+        for (int plane = 0; curr->priority < SKYBOX_RENDER_OFFSET && plane < 2; plane += 1) {
             if (vector2s16Dot(&delta, &clipping_planes[plane]) > CULL_TOLERANCE * curr->lod_scale) {
                 should_cull = true;
                 break;
@@ -271,7 +274,7 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
             should_skip_children = true;
         }
 
-        entry->priority = (distance >> 2) + ((uint32_t)(100 - curr->priority) << 24);
+        entry->priority = (distance >> 2) + ((uint32_t)curr->priority << 24);
         
         entry->mesh = &curr->meshes[overworld_lod_1_direction_index(delta.x, delta.y)];
         entry += 1;
@@ -297,7 +300,7 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
             mat = mesh->material;
         }
 
-        T3DMat4FP* use_mtx = (order[i].priority >> 24) < SKYBOX_RENDER_OFFSET ? skybox_mtx : mtx;
+        T3DMat4FP* use_mtx = (order[i].priority >> 24) >= SKYBOX_RENDER_OFFSET ? skybox_mtx : mtx;
 
         if (use_mtx != curr_mtx) {
             if (curr_mtx) {
