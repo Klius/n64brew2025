@@ -218,6 +218,10 @@ void repair_part_pickup_update(void* data) {
     } else {
         part->beep_timer += scaled_time_step;
     }
+
+    if (dynamic_object_get_ground(&part->collider)) {
+        part->collider.is_fixed = true;
+    }
 }
 
 void repair_part_pickup_init(repair_part_pickup_t* part, struct repair_part_pickup_definition* definition, entity_id entity_id) {
