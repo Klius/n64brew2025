@@ -248,13 +248,15 @@ class LodTile():
 
         self.bb: tuple[mathutils.Vector, mathutils.Vector] = (bb_min, bb_max)
 
-    def priority(self):
         digit_prefix_length = 0
 
         while digit_prefix_length < len(self.obj.name) and (self.obj.name[digit_prefix_length].isdigit() or (digit_prefix_length == 0 and self.obj.name[0] == '-')):
             digit_prefix_length += 1
 
-        result = int(self.obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
+        self.sort_prefix = int(self.obj.name[0: digit_prefix_length]) if digit_prefix_length > 0 else 0
+
+    def priority(self):
+        result = -self.sort_prefix
 
         if not self.is_skybox():
             result += self.level * SKYBOX_RENDER_OFFSET
@@ -275,6 +277,9 @@ class LodTile():
         return result
     
     def does_contain(self, child) -> bool:
+        if self.sort_prefix != child.sort_prefix:
+            return False
+
         intersection = bounding_box_intersection(self.bb, child.bb)
 
         return bounding_box_volume(intersection) > bounding_box_volume(child.bb) * 0.5
