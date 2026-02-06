@@ -86,6 +86,10 @@ void scene_render_room(struct scene* scene, int room_index, struct render_batch*
 
 void scene_render(void* data, struct render_batch* batch) {
     struct scene* scene = (struct scene*)data;
+
+    if (scene->overworld) {
+        return;
+    }
     
     for (int i = 0; i < MAX_LOADED_ROOM; i += 1) {
         if (scene->loaded_rooms[i].room_index == ROOM_INDEX_NONE) {
