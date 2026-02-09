@@ -185,6 +185,15 @@ bool check_scene_load() {
 
 #define DEBUG_CONNECT_DELAY     TICKS_FROM_MS(1500)
 
+void step_simulation() {
+    if (update_has_layer(UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE)) {
+        // uint64_t start_time = get_ticks_us();
+        collision_scene_collide();
+        // debugf("collision_time = %f\n", (get_ticks_us() - start_time) / 1000.0f);
+    }
+    update_dispatch();
+}
+
 int main(void)
 {
 	resolution_t custom_res = {SCREEN_WD, SCREEN_HT, false};
@@ -285,22 +294,16 @@ int main(void)
             audio_update_listener(&gZeroVec, &gRight);
         }
         audio_player_update();
-        if (update_has_layer(UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE)) {
-            // uint64_t start_time = get_ticks_us();
-            collision_scene_collide();
-            // debugf("collision_time = %f\n", (get_ticks_us() - start_time) / 1000.0f);
-        }
-        
 #if ENABLE_BIG_SCREEN_SHOT
-    if (joypad_get_buttons_pressed(0).l) {
-        camera_next_sub_fov();
-    }
+        if (joypad_get_buttons_pressed(0).l) {
+            camera_next_sub_fov();
+        }
 
-    if (!camera_is_showing_fov()) {
-        update_dispatch();
-    }
+        if (!camera_is_showing_fov()) {
+            step_simulation();
+        }
 #else
-    update_dispatch();
+        step_simulation();
 #endif
     }
 }
