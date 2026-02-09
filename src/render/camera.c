@@ -29,6 +29,46 @@ void camera_extract_clipping_plane(float viewPersp[4][4], struct Plane* output, 
     output->d *= mult;
 }
 
+#if ENABLE_BIG_SCREEN_SHOT
+
+static int current_frame_index = 0;
+
+struct frame {
+    float l, r, b, t;
+};
+
+typedef struct frame frame_t;
+
+static frame_t frames[] = {
+    {-1.0f, 1.0f, -1.0f, 1.0f},
+
+    {-1.0f, -0.33333333333f, -1.0f, -0.33333333333f},
+    {-0.33333333333f, 0.33333333333f, -1.0f, -0.33333333333f},
+    {0.33333333333f, 1.0f, -1.0f, -0.33333333333f},
+    
+    {-1.0f, -0.33333333333f, -0.33333333333f, 0.33333333333f},
+    {-0.33333333333f, 0.33333333333f, -0.33333333333f, 0.33333333333f},
+    {0.33333333333f, 1.0f, -0.33333333333f, 0.33333333333f},
+    
+    {-1.0f, -0.33333333333f, 0.33333333333f, 1.0f},
+    {-0.33333333333f, 0.33333333333f, 0.33333333333f, 1.0f},
+    {0.33333333333f, 1.0f, 0.33333333333f, 1.0f},
+};
+
+void camera_next_sub_fov() {
+    current_frame_index += 1;
+
+    if (current_frame_index == sizeof(frames) / sizeof(*frames)) {
+        current_frame_index = 0;
+    }
+}
+
+bool camera_is_showing_fov() {
+    return current_frame_index > 0;
+}
+
+#endif
+
 void camera_apply(struct Camera* camera, T3DViewport* viewport, struct ClippingPlanes* clipping_planes, mat4x4 view_proj_matrix) {
     float tan_fov = tanf(camera->fov * DEG_TO_RAD(0.5f));
     float aspect_ratio = (float)viewport->size[0] / (float)viewport->size[1];
@@ -36,15 +76,31 @@ void camera_apply(struct Camera* camera, T3DViewport* viewport, struct ClippingP
     float near = camera->near * WORLD_SCALE;
     float far = camera->far * WORLD_SCALE;
 
+    float side = aspect_ratio * tan_fov * near;
+    float top = tan_fov * near;
+
+#if ENABLE_BIG_SCREEN_SHOT
+    frame_t* frame = &frames[current_frame_index];
     matrixPerspective(
         viewport->matProj.m, 
-        -aspect_ratio * tan_fov * near,
-        aspect_ratio * tan_fov * near,
-        tan_fov * near,
-        -tan_fov * near,
+        side * frame->l,
+        side * frame->r,
+        top * frame->t,
+        top * frame->b,
         near,
         far
     );
+#else
+    matrixPerspective(
+        viewport->matProj.m, 
+        -side,
+        side,
+        top,
+        -top,
+        near,
+        far
+    );
+#endif
     t3d_viewport_set_w_normalize(viewport, near, far);
 
     struct Transform inverse;

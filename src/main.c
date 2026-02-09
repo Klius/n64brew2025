@@ -26,6 +26,7 @@
 #include "menu/main_menu.h"
 #include "overworld/overworld_load.h"
 #include "render/z_clear.h"
+#include "render/defs.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -122,6 +123,12 @@ void render_3d(surface_t* col, surface_t* z_buffer) {
 }
 
 void render_menu() {
+#if ENABLE_BIG_SCREEN_SHOT
+    if (camera_is_showing_fov()) {
+        return;
+    }
+#endif
+
     rdpq_sync_pipe();
     rdpq_mode_persp(false);
     rdpq_set_mode_standard();
@@ -180,7 +187,7 @@ bool check_scene_load() {
 
 int main(void)
 {
-	resolution_t custom_res = {320, 240, false};
+	resolution_t custom_res = {SCREEN_WD, SCREEN_HT, false};
 
 	if (get_tv_type() == 0) //TEMP: if PAL, adjust vertical res
 	{
@@ -283,6 +290,17 @@ int main(void)
             collision_scene_collide();
             // debugf("collision_time = %f\n", (get_ticks_us() - start_time) / 1000.0f);
         }
+        
+#if ENABLE_BIG_SCREEN_SHOT
+    if (joypad_get_buttons_pressed(0).l) {
+        camera_next_sub_fov();
+    }
+
+    if (!camera_is_showing_fov()) {
         update_dispatch();
+    }
+#else
+    update_dispatch();
+#endif
     }
 }

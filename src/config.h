@@ -5,4 +5,6 @@
 
 #define DEBUG_ENABLED   0
 
+#define ENABLE_BIG_SCREEN_SHOT  1
+
 #endif

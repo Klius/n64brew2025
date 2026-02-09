@@ -2,9 +2,19 @@
 #define __RENDER_DEFS_H__
 
 #include "../math/vector3.h"
+#include "../config.h"
+
+#if ENABLE_BIG_SCREEN_SHOT
+
+#define SCREEN_WD   640
+#define SCREEN_HT   480
+
+#else
 
 #define SCREEN_WD   320
 #define SCREEN_HT   240
+
+#endif
 
 #define MODEL_SCALE     128
 #define STATIC_SCALE    64
