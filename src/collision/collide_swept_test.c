@@ -70,6 +70,12 @@ void test_collide_object_swept_to_triangle(struct test_context* t) {
 
     did_hit = collide_object_swept_to_triangle(&collide_data, 0, COLLISION_LAYER_TANGIBLE);
     test_eqi(t, false, did_hit);
+
+    prev_pos = (vector3_t){0.5f, 0.25f, 0.04f};
+    position = (vector3_t){0.5f, 0.25f, 2.0f};
+    
+    did_hit = collide_object_swept_to_triangle(&collide_data, 0, COLLISION_LAYER_TANGIBLE);
+    test_eqi(t, false, did_hit);
 }
 
 void test_collide_object_to_mesh_swept(struct test_context* t) {

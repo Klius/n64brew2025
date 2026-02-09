@@ -85,7 +85,9 @@ bool collide_object_swept_to_triangle(void* data, int triangle_index, int collis
         if (!mesh_triangle_filter_edge_contacts(
             &triangle.triangle, 
             collide_data->mesh->index.vertices, 
-            &result.normal)) {
+            &result.normal) || 
+            vector3Dot(&result.normal, &swept.offset) < 0.0f
+        ) {
             *collide_data->object->position = final_pos;
             return false;
         }
