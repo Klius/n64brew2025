@@ -325,30 +325,17 @@ void overworld_render_lod_1(struct overworld* overworld, struct Camera* camera, 
     T3DViewport* new_viewport = frame_malloc(pool, sizeof(T3DViewport));
     *new_viewport = t3d_viewport_create();
     
-    float tan_fov = tanf(camera->fov * (0.5f * 3.14159f / 180.0f));
-    float aspect_ratio = (float)prev_viewport->size[0] / (float)prev_viewport->size[1];
-
     float lod_scale = 1.0f / overworld->tile_x;
+    float aspect_ratio = (float)new_viewport->size[0] / (float)new_viewport->size[1];
 
-    float near = (camera->far * 0.25f) * lod_scale * WORLD_SCALE;
-    float far = overworld->tile_size * (1.4f * WORLD_SCALE);
+    camera_t lod_1_camera = *camera;
+    lod_1_camera.near = (camera->far * 0.25f) * lod_scale;
+    lod_1_camera.far = overworld->tile_size * 1.4f;
     
-    matrixPerspective(
-        new_viewport->matProj.m, 
-        -aspect_ratio * tan_fov * near,
-        aspect_ratio * tan_fov * near,
-        tan_fov * near,
-        -tan_fov * near,
-        near,
-        far
-    );
-    t3d_viewport_set_w_normalize(new_viewport, camera->near * WORLD_SCALE, camera->far * WORLD_SCALE);
+    float tan_fov = tanf(camera->fov * DEG_TO_RAD(0.5f));
+    camera_apply(&lod_1_camera, new_viewport, NULL, NULL);
 
-    struct Transform inverse;
-    transformInvert(&camera->transform, &inverse);
-    inverse.position = gZeroVec;
-    transformToMatrix(&inverse, new_viewport->matCamera.m);
-    new_viewport->_isCamProjDirty = true;
+    t3d_viewport_set_w_normalize(new_viewport, camera->near * WORLD_SCALE, camera->far * WORLD_SCALE);
 
     t3d_viewport_attach(new_viewport);
 
