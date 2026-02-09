@@ -578,11 +578,6 @@ void motorcycle_update(void* data) {
 
     motorcycle->was_grounded = is_grounded;
     motorcycle->was_stopped = target_speed == 0.0f && motorcycle->has_traction;
-
-    if (motorcycle->collider.active_contacts && motorcycle->vehicle.driver) {
-        // this sucks
-        vector3AddScaled(&motorcycle->transform.position, &motorcycle->collider.active_contacts->normal, 0.5f, &motorcycle->transform.position);
-    }
 }
 
 static motorcycle_t* current_instance;
