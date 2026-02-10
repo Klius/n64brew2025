@@ -295,9 +295,7 @@ void audio_player_update() {
     }
 
     if (audio_can_write()) {
-        short *buf = audio_write_begin();
-        mixer_poll(buf, audio_get_buffer_length());
-        audio_write_end();
+        mixer_try_play();
     }
 
     if (active_sounds[0].wav && !mixer_ch_playing(0)) {

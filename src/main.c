@@ -240,6 +240,8 @@ int main(void)
         if (check_scene_load()) {
             continue;
         }
+        
+        mixer_try_play();
 
         if (current_game_mode == GAME_MODE_TRANSITION_TO_MENU) {
             surface_t* fb = display_get();
@@ -305,5 +307,6 @@ int main(void)
 #else
         step_simulation();
 #endif
+        mixer_try_play();
     }
 }
