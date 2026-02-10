@@ -39,20 +39,22 @@ struct frame {
 
 typedef struct frame frame_t;
 
+#define HORZ_OFFSET     0.017f
+
 static frame_t frames[] = {
     {-1.0f, 1.0f, -1.0f, 1.0f},
 
-    {-1.0f, -0.33333333333f, -1.0f, -0.33333333333f},
+    {-1.0f + HORZ_OFFSET, -0.33333333333f + HORZ_OFFSET, -1.0f, -0.33333333333f},
     {-0.33333333333f, 0.33333333333f, -1.0f, -0.33333333333f},
-    {0.33333333333f, 1.0f, -1.0f, -0.33333333333f},
+    {0.33333333333f - HORZ_OFFSET, 1.0f - HORZ_OFFSET, -1.0f, -0.33333333333f},
     
-    {-1.0f, -0.33333333333f, -0.33333333333f, 0.33333333333f},
+    {-1.0f + HORZ_OFFSET, -0.33333333333f + HORZ_OFFSET, -0.33333333333f, 0.33333333333f},
     {-0.33333333333f, 0.33333333333f, -0.33333333333f, 0.33333333333f},
-    {0.33333333333f, 1.0f, -0.33333333333f, 0.33333333333f},
+    {0.33333333333f - HORZ_OFFSET, 1.0f - HORZ_OFFSET, -0.33333333333f, 0.33333333333f},
     
-    {-1.0f, -0.33333333333f, 0.33333333333f, 1.0f},
+    {-1.0f + HORZ_OFFSET, -0.33333333333f + HORZ_OFFSET, 0.33333333333f, 1.0f},
     {-0.33333333333f, 0.33333333333f, 0.33333333333f, 1.0f},
-    {0.33333333333f, 1.0f, 0.33333333333f, 1.0f},
+    {0.33333333333f - HORZ_OFFSET, 1.0f - HORZ_OFFSET, 0.33333333333f, 1.0f},
 };
 
 void camera_next_sub_fov() {
@@ -73,7 +75,7 @@ void camera_apply(struct Camera* camera, T3DViewport* viewport, struct ClippingP
     float tan_fov = tanf(camera->fov * DEG_TO_RAD(0.5f));
     float aspect_ratio = (float)viewport->size[0] / (float)viewport->size[1];
 
-    float near = camera->near * WORLD_SCALE;
+    float near = camera->near * WORLD_SCALE * 0.5f;
     float far = camera->far * WORLD_SCALE;
 
     float side = aspect_ratio * tan_fov * near;
