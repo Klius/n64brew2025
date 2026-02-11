@@ -68,7 +68,9 @@ void setup() {
     scene_queue_next("rom:/scenes/overworld.scene#main_menu");
 #endif
 
-    // scene_queue_next("rom:/scenes/overworld_accuracy_test.scene");
+#if ENABLE_WORLD_SCALE
+    scene_queue_next("rom:/scenes/world_scale_test.scene");
+#endif
     // scene_queue_next("rom:/scenes/settlement_house1_inside.scene#default");
     // scene_queue_next("rom:/scenes/overworld.scene#test");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");

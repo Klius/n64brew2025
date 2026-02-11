@@ -75,7 +75,7 @@ void camera_apply(struct Camera* camera, T3DViewport* viewport, struct ClippingP
     float tan_fov = tanf(camera->fov * DEG_TO_RAD(0.5f));
     float aspect_ratio = (float)viewport->size[0] / (float)viewport->size[1];
 
-    float near = camera->near * WORLD_SCALE * 0.5f;
+    float near = camera->near * WORLD_SCALE;
     float far = camera->far * WORLD_SCALE;
 
     float side = aspect_ratio * tan_fov * near;
@@ -103,7 +103,11 @@ void camera_apply(struct Camera* camera, T3DViewport* viewport, struct ClippingP
         far
     );
 #endif
+#if ENABLE_WORLD_SCALE
+    t3d_viewport_set_w_normalize(viewport, 1.0f * WORLD_SCALE, 150.0f * WORLD_SCALE);
+#else
     t3d_viewport_set_w_normalize(viewport, near, far);
+#endif
 
     struct Transform inverse;
     transformInvert(&camera->transform, &inverse);

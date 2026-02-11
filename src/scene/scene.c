@@ -163,6 +163,10 @@ void scene_check_cutscenes(scene_t* scene) {
     }
 }
 
+#if ENABLE_WORLD_SCALE
+extern float near_scalar;
+#endif
+
 void scene_update(void* data) {
     struct scene* scene = (struct scene*)data;
 
@@ -209,6 +213,20 @@ void scene_update(void* data) {
             scene->can_pause = false;
         }
         
+#if ENABLE_WORLD_SCALE
+        if (input.btn.d_up) {
+            scene->camera.far *= 1.01f;
+        }
+        if (input.btn.d_down) {
+            scene->camera.far /= 1.01f;
+        }
+        if (input.btn.d_left) {
+            near_scalar /= 1.01f;
+        }
+        if (input.btn.d_right) {
+            near_scalar *= 1.01f;
+        }
+#endif
     }
 
     overworld_music_update(&scene->music, player_get_position(&scene->player), scene->overworld != NULL);

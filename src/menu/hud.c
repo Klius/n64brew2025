@@ -397,6 +397,28 @@ bool hud_render_drift(struct hud* hud) {
     return true;
 }
 
+#if ENABLE_WORLD_SCALE
+
+void hud_render_scale() {
+    char message[64];
+    int len = sprintf(message, "far = %dm\nnear = %f", (int)current_scene->camera.far, current_scene->camera.near);
+    
+    rdpq_text_printn(&(rdpq_textparms_t){
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_TOP,
+            .width = 100,
+            .height = 60,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        20.0f, 20.0f, 
+        message,
+        len
+    );
+}
+
+#endif
+
 void hud_render(void *data) {
 #if ENABLE_CHEATS
     hud_render_memory_usage(data);
@@ -415,6 +437,10 @@ void hud_render(void *data) {
     if (!hud_render_dismount(data)) {
         hud_render_drift(data);
     }
+
+#if ENABLE_WORLD_SCALE
+    hud_render_scale();
+#endif
 }
 
 void hud_init(struct hud* hud, struct player* player, camera_t* camera) {

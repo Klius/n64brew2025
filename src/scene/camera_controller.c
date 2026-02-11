@@ -9,6 +9,7 @@
 #include "../entity/interactable.h"
 #include "../entities/vehicle.h"
 #include "../render/defs.h"
+#include "../config.h"
 #include <math.h>
 
 static struct move_towards_parameters camera_move_parameters = {
@@ -37,6 +38,10 @@ static struct move_towards_parameters camera_move_parameters = {
 #define TURN_SPEED              13.0f
 #define TURN_ACCEL              32.0f
 
+#if ENABLE_WORLD_SCALE
+float near_scalar = 1.0f;
+#endif
+
 void camera_cached_calcuations_check(struct camera_cached_calcuations* cache, struct Camera* camera) {
     if (camera->fov == cache->fov) {
         return;
@@ -51,7 +56,15 @@ void camera_cached_calcuations_check(struct camera_cached_calcuations* cache, st
 }
 
 static inline float camera_get_distnace(struct camera_controller* controller) {
-    return controller->state == CAMERA_STATE_LOOK_AT_WITH_PLAYER ? CAMERA_CUTSCENE_DISTNACE : CAMERA_FOLLOW_DISTANCE;
+    float result = controller->state == CAMERA_STATE_LOOK_AT_WITH_PLAYER ? CAMERA_CUTSCENE_DISTNACE : CAMERA_FOLLOW_DISTANCE;
+
+#if ENABLE_WORLD_SCALE
+    if (near_scalar < 1.0f) {
+        result *= near_scalar;
+    }   
+#endif
+
+    return result;
 }
 
 void camera_look_at_from_rotation(struct camera_controller* controller) {
@@ -229,10 +242,16 @@ float camera_controller_determine_vert_movement(struct camera_controller* contro
     offset->y = sin_angle;
     offset->z *= cos_angle;
 
+    float scalar = 1.0f;
+
+#if ENABLE_WORLD_SCALE
+    scalar = near_scalar;
+#endif
+
     if (sin_angle < 0.0f) {
-        return mathfLerp(camera_get_distnace(controller), CAMERA_UPPER_FOLLOW_DISTANCE, -sin_angle);
+        return mathfLerp(camera_get_distnace(controller), CAMERA_UPPER_FOLLOW_DISTANCE * scalar, -sin_angle);
     } else {
-        return mathfLerp(camera_get_distnace(controller), CAMERA_LOWER_FOLLOW_DISTANCE, sin_angle);
+        return mathfLerp(camera_get_distnace(controller), CAMERA_LOWER_FOLLOW_DISTANCE * scalar, sin_angle);
     }
 }
 
@@ -262,6 +281,7 @@ float camera_controller_determine_player_move_target(struct camera_controller* c
     float target_distance = camera_controller_determine_vert_movement(controller, buttons, &offset);
     float follow_distance = target_distance;
 
+#if !ENABLE_WORLD_SCALE
     // determine how far the camera should be the wall checker will determine if the camera 
     // should move closer to avoid obstacles
     if (controller->wall_checker.collider.active_contacts) {
@@ -271,14 +291,23 @@ float camera_controller_determine_player_move_target(struct camera_controller* c
             follow_distance = clamped_distance;
         }
     }
+#endif
 
     vector3AddScaled(player_pos, &offset, -follow_distance, result);
 
+    float height = CAMERA_FOLLOW_HEIGHT;
+    
+#if ENABLE_WORLD_SCALE
+    if (near_scalar < 1.0f) {
+        height *= near_scalar;
+    }   
+#endif
+
     // move the player up to compensate for the player's height
-    result->y += CAMERA_FOLLOW_HEIGHT;
+    result->y += height;
     // look at the player
     struct Vector3 looking_at = *player_pos;
-    looking_at.y += CAMERA_FOLLOW_HEIGHT;
+    looking_at.y += height;
 
     // slowly move the looking_at towards the look target to prevent a jarring motion
     move_towards(&controller->looking_at, &controller->looking_at_speed, &looking_at, &camera_move_parameters);
@@ -379,7 +408,13 @@ void camera_controller_determine_near_plane(struct camera_controller* controller
 
     float target_near_plane = sqrtf(vector3MagSqrd2D(&offset)) - PLAYER_CLIP_RADIUS;
 
-    camera_set_near(controller->camera, clampf(target_near_plane, MIN_NEAR_PLANE, controller->state == CAMERA_FOLLOW_VEHICLE ? MAX_BIKE_NEAR_PLANE : MAX_NEAR_PLANE));
+    float near = clampf(target_near_plane, MIN_NEAR_PLANE, controller->state == CAMERA_FOLLOW_VEHICLE ? MAX_BIKE_NEAR_PLANE : MAX_NEAR_PLANE);
+
+#if ENABLE_WORLD_SCALE
+    near *= near_scalar;
+#endif
+
+    camera_set_near(controller->camera, near);
 }
 
 void camera_follow_vehicle_update(struct camera_controller* controller) {

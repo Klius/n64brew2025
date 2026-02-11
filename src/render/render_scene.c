@@ -56,6 +56,10 @@ void render_scene_render_renderable(void* data, struct render_batch* batch) {
     }
 }
 
+#if ENABLE_WORLD_SCALE
+extern float near_scalar;
+#endif
+
 void render_scene_render_renderable_single_axis(void* data, struct render_batch* batch) {
     struct renderable* renderable = (struct renderable*)data;
 
@@ -70,7 +74,16 @@ void render_scene_render_renderable_single_axis(void* data, struct render_batch*
     }
 
     mat4x4 mtx;
+#if ENABLE_WORLD_SCALE
+    transform_sa_t transform_final = *(transform_sa_t*)renderable->transform.transform;
+    if (near_scalar < 1.0f) {
+        transform_final.scale *= near_scalar;
+    }
+    transformSAToMatrix(&transform_final, mtx);
+#else
     transformSAToMatrix(renderable->transform.transform, mtx);
+#endif
+
     render_batch_relative_mtx(batch, mtx);
     t3d_mat4_to_fixed_3x4(mtxfp, (T3DMat4*)mtx);
 

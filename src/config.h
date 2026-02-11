@@ -6,5 +6,6 @@
 #define DEBUG_ENABLED   0
 
 #define ENABLE_BIG_SCREEN_SHOT  0
+#define ENABLE_WORLD_SCALE      1
 
 #endif
