@@ -8,6 +8,10 @@
 
 static int edge_deltas[] = {0x1, 0x2, 0x4};
 
+#if ENABLE_LOD_RENDER_DEBUG
+int lod_render_mode = LOD_RENDER_MODE_DEFAULT;
+#endif
+
 int overworld_find_next_edge(struct Vector2 transformed_points[8], int current_index, int prev_index) {
     int result = -1;
 
@@ -241,8 +245,6 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
 
     struct overworld_lod1_entry* end = lod1->entries + lod1->entry_count;
     struct overworld_lod1_sort_entry* entry = order;
-
-
     
     for (struct overworld_lod1_entry* curr = lod1->entries; curr < end; curr += 1) {
         vector2s16_t delta = {
@@ -291,6 +293,14 @@ void overworld_render_lod_1_entries(struct overworld_lod1* lod1, int camera_x, i
     struct material* mat = NULL;
 
     T3DMat4FP* curr_mtx = NULL;
+    
+#if ENABLE_LOD_RENDER_DEBUG
+    if (lod_render_mode == LOD_RENDER_MODE_DETAILED) {
+        return;
+    } else if (lod_render_mode >= 0 && lod_render_mode < final_count) {
+        final_count = lod_render_mode;
+    }
+#endif
 
     for (int i = 0; i < final_count; i += 1) {
         struct tmesh* mesh = order[i].mesh;
@@ -489,6 +499,12 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
     overworld_render_lod_1(overworld, camera, viewport, pool);
 
     t3d_viewport_attach(viewport);
+
+#if ENABLE_LOD_RENDER_DEBUG
+    if (lod_render_mode == LOD_RENDER_MODE_LOD3 || lod_render_mode >= 0) {
+        return;
+    }
+#endif
 
     if (!state.loop_count) {
         return;

@@ -9,6 +9,7 @@
 #include "../cutscene/cutscene_runner.h"
 #include "../menu/map_menu.h"
 #include "../time/time.h"
+#include "../config.h"
 
 struct scene* current_scene;
 
@@ -225,6 +226,21 @@ void scene_update(void* data) {
         }
         if (input.btn.d_right) {
             near_scalar *= 1.01f;
+        }
+#endif
+
+#if ENABLE_LOD_RENDER_DEBUG
+        if (input.btn.d_right) {
+            lod_render_mode = LOD_RENDER_MODE_DEFAULT;
+        }
+        if (input.btn.d_left) {
+            lod_render_mode = LOD_RENDER_MODE_DETAILED;
+        }
+        if (input.btn.d_down) {
+            lod_render_mode = LOD_RENDER_MODE_LOD3;
+        }
+        if (pressed.d_up) {
+            ++lod_render_mode;
         }
 #endif
     }

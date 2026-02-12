@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <stdbool.h>
 #include "defs.h"
+#include "../config.h"
 
 #define MIN_RENDER_SCENE_SIZE   64
 
@@ -204,6 +205,12 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
 
         current_step = callback_list_next(&r_scene_3d.step_callbacks, current_step);
     }
+
+#if ENABLE_LOD_RENDER_DEBUG
+    if (lod_render_mode == LOD_RENDER_MODE_LOD3 || lod_render_mode >= 0) {
+        return;
+    }
+#endif
 
     render_batch_init(&batch, &camera->transform, pool);
 

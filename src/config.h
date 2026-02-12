@@ -6,6 +6,17 @@
 #define DEBUG_ENABLED   0
 
 #define ENABLE_BIG_SCREEN_SHOT  0
-#define ENABLE_WORLD_SCALE      1
+#define ENABLE_WORLD_SCALE      0
+#define ENABLE_LOD_RENDER_DEBUG 1
+
+#if ENABLE_LOD_RENDER_DEBUG
+
+#define LOD_RENDER_MODE_DEFAULT     -1
+#define LOD_RENDER_MODE_DETAILED    -2
+#define LOD_RENDER_MODE_LOD3        -3
+
+extern int lod_render_mode;
+
+#endif
 
 #endif
