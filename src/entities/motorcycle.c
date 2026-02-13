@@ -357,6 +357,8 @@ void motorcycle_update(void* data) {
     if (!motorcycle_check_active(motorcycle)) {
         return;
     }
+    
+    motorcycle->collider.is_jumping = 2;
 
     bool debug = joypad_get_buttons(0).c_down;
 
@@ -606,6 +608,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->idle_sound = 0;
     motorcycle->drift_direction = 0;
     motorcycle->was_stopped = true;
+    motorcycle->collider.is_jumping = 2;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;
