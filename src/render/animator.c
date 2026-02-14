@@ -280,60 +280,54 @@ void animator_step(struct animator* animator, float delta_time) {
         }
     }
 
-    float currentFrameFractional = animator->current_time * current_clip->frames_per_second;
-    int prevFrame = (int)floorf(currentFrameFractional);
-    int next_frame = (int)ceilf(currentFrameFractional);
-    float lerpValue = currentFrameFractional - prevFrame;
+    float current_frame_fractional = animator->current_time * current_clip->frames_per_second;
+    int prev_frame = (int)floorf(current_frame_fractional);
+    int next_frame = (int)ceilf(current_frame_fractional);
+    float lerpValue = current_frame_fractional - prev_frame;
 
-    prevFrame = animator_clamp_frame(animator, prevFrame);
+    prev_frame = animator_clamp_frame(animator, prev_frame);
     next_frame = animator_clamp_frame(animator, next_frame);
 
-    if (next_frame == prevFrame) {
+    if (next_frame == prev_frame) {
         lerpValue = 1.0f;
     }
 
-    int existingPrevFrame = animator_bone_state_index_of_frame(animator, prevFrame);
-    int existingNextFrame = animator_bone_state_index_of_frame(animator, next_frame);
+    int existing_prev_frame = animator_bone_state_index_of_frame(animator, prev_frame);
+    int existing_next_frame = animator_bone_state_index_of_frame(animator, next_frame);
+    
+    animator->blend_lerp = lerpValue;
 
-    if (existingPrevFrame == -1 && existingNextFrame == -1) {
+    if (existing_prev_frame == -1 && existing_next_frame == -1) {
         // both frames need to be requested
-        animator->blend_lerp = lerpValue;
-        if (prevFrame != next_frame) {
+        if (prev_frame != next_frame) {
             animator->next_frame_state_index = 0;
-            animator_request_frame(animator, prevFrame);
+            animator_request_frame(animator, prev_frame);
         }
         animator->next_frame_state_index = 1;
         animator_request_frame(animator, next_frame);
         return;
     }
 
-    if (existingNextFrame == -1) {
+    if (existing_next_frame == -1) {
         // only the next frame needs to be requested
-        animator->blend_lerp = lerpValue;
-        animator->next_frame_state_index = existingPrevFrame ^ 1;
+        animator->next_frame_state_index = existing_prev_frame ^ 1;
         animator_request_frame(animator, next_frame);
         return;
     }
 
-    if (existingPrevFrame == -1) {
+    if (existing_prev_frame == -1) {
         // only the previous frame needs to be requested
-        animator->blend_lerp = 1.0f - lerpValue;
-        animator->next_frame_state_index = existingNextFrame ^ 1;
-        animator_request_frame(animator, prevFrame);
+        animator->next_frame_state_index = existing_next_frame ^ 1;
+        animator_request_frame(animator, prev_frame);
+        animator->next_frame_state_index = existing_next_frame;
         return;
     }
 
-    if (existingNextFrame == existingPrevFrame) {
+    if (existing_next_frame == existing_prev_frame) {
         // only one frame is needed and is already present
         animator->blend_lerp = 1.0f;
-        animator->next_frame_state_index = existingNextFrame;
+        animator->next_frame_state_index = existing_next_frame;
         return;
-    }
-
-    if (existingNextFrame == 1) {
-        animator->blend_lerp = lerpValue;
-    } else {
-        animator->blend_lerp = 1.0f - lerpValue;
     }
 }
 
@@ -385,7 +379,7 @@ void animator_run_clip(struct animator* animator, struct animation_clip* clip, f
     animator->done = 0;
     animator->events.all = 0;
 
-    animator->blend_frames = should_blend ? 10 : 0;
+    animator->blend_frames = should_blend ? 7 : 0;
 
     animator_step(animator, 0.0f);
 }
