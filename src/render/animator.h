@@ -27,9 +27,9 @@ struct animator {
     uint16_t bone_state_frames[2];
     uint16_t next_frame_state_index;
     uint16_t bone_count;
-    // flags
-    uint16_t loop: 1;
-    uint16_t done: 1;
+    uint8_t loop;
+    uint8_t done;
+    uint8_t blend_frames;
     animator_events_t events;
     uint8_t image_frame_0;
     uint8_t image_frame_1;

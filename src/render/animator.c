@@ -34,6 +34,8 @@ void animator_init(struct animator* animator, int bone_count) {
     animator->events.all = 0;
     animator->image_frame_0 = NO_IMAGE_FRAME;
     animator->image_frame_1 = NO_IMAGE_FRAME;
+    animator->blend_frames = 0;
+    animator->done = 0;
 }
 
 void animator_destroy(struct animator* animator) {
@@ -123,6 +125,28 @@ void animator_init_zero_transform(struct animator* animator, struct animation_us
     animator->events.all = 0;
 }
 
+void animator_scale_for_blending(struct animator* animator, struct animation_used_attributes* used_attributes, struct Transform* transforms, float weight) {
+    if (animator->next_frame_state_index == -1) {
+        return;
+    }
+
+    for (int i = 0; i < animator->bone_count; ++i) {
+        if (used_attributes->has_pos) {
+            vector3Scale(&transforms[i].position, &transforms[i].position, weight);
+        }
+        if (used_attributes->has_rot) {
+            quatScale(&transforms[i].rotation, weight, &transforms[i].rotation);
+        }
+        if (used_attributes->has_scale) {
+            vector3Scale(&transforms[i].scale, &transforms[i].scale, weight);
+        }
+
+        used_attributes += 1;
+    }
+
+    animator->events.all = 0;
+}
+
 void animator_normalize(struct animator* animator, struct Transform* transforms) {
     for (int i = 0; i < animator->bone_count; ++i) {
         quatNormalize(&transforms[i].rotation, &transforms[i].rotation);
@@ -197,8 +221,18 @@ void animator_read_transform(struct animator* animator, struct Transform* transf
         return;
     }
 
-    animator_init_zero_transform(animator, animator->current_clip->used_bone_attributes, transforms);
-    animator_read_transform_with_weight(animator, transforms, 1.0f);
+    if (animator->blend_frames) {
+        float blend_weight = 1.0f / (animator->blend_frames + 1);
+
+        animator_scale_for_blending(animator, animator->current_clip->used_bone_attributes, transforms, 1.0f - blend_weight);
+        animator_read_transform_with_weight(animator, transforms, blend_weight);
+
+        --animator->blend_frames;
+    } else {
+        animator_init_zero_transform(animator, animator->current_clip->used_bone_attributes, transforms);
+        animator_read_transform_with_weight(animator, transforms, 1.0f);
+    }
+
     animator_normalize(animator, transforms);
 }
 
@@ -329,6 +363,8 @@ void animator_update(struct animator* animator, struct armature* armature, float
 }
 
 void animator_run_clip(struct animator* animator, struct animation_clip* clip, float start_time, bool loop) {
+    bool should_blend = animator->current_clip != 0 || animator->done;
+
     animator->current_clip = clip;
 
     if (!clip) {
@@ -348,6 +384,8 @@ void animator_run_clip(struct animator* animator, struct animation_clip* clip, f
     animator->loop = loop;
     animator->done = 0;
     animator->events.all = 0;
+
+    animator->blend_frames = should_blend ? 10 : 0;
 
     animator_step(animator, 0.0f);
 }
