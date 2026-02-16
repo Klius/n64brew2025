@@ -34,6 +34,7 @@ struct motorcycle {
     
     float boost_timer;
     float self_boost_cooldown;
+    float coyote_timer;
 
     cast_point_t cast_points[CAST_POINT_COUNT];
 

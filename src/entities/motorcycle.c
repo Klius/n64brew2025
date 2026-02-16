@@ -52,6 +52,9 @@
 
 #define CAST_CENTER             0.3f
 
+#define COYOTE_TIME             1.5f
+#define COYOTE_FADE_TIME        0.5f
+
 struct motorcyle_assets {
     tmesh_t* mesh;
     wav64_t* boost;
@@ -371,13 +374,29 @@ void motorcycle_update(void* data) {
     
     vector3_t ground_velocity;
     vector3ProjectPlane(&motorcycle->collider.velocity, &ground_normal, &ground_velocity);
-    vector3_t normal_velocity;
-    vector3Project(&motorcycle->collider.velocity, &ground_normal, &normal_velocity);
 
     float current_speed = sqrtf(vector3MagSqrd(&ground_velocity));
 
     float target_height = motorcycle_hover_height(motorcycle, current_speed) + HOVER_SAG_AMOUNT;
     bool is_grounded = min_height_offset < target_height;
+    bool has_control = is_grounded;
+    float accel_modifier = 1.0f;
+
+    if (is_grounded) {
+        motorcycle->coyote_timer = 0.0f;
+    } else if (motorcycle->coyote_timer < COYOTE_TIME) {
+        motorcycle->coyote_timer += fixed_time_step;
+        has_control = true;
+        ground_normal = gUp;
+        accel_modifier = (motorcycle->coyote_timer < COYOTE_TIME - COYOTE_FADE_TIME) ? 
+            1.0f : 
+            (COYOTE_TIME - motorcycle->coyote_timer) * (1.0f / COYOTE_FADE_TIME);
+        ground_velocity = motorcycle->collider.velocity;
+        ground_velocity.y = 0.0f;
+    }
+
+    vector3_t normal_velocity;
+    vector3Project(&motorcycle->collider.velocity, &ground_normal, &normal_velocity);
 
     vector3_t forward;
 
@@ -527,7 +546,7 @@ void motorcycle_update(void* data) {
         motorcycle_check_for_mount(motorcycle);
     }
 
-    if (is_grounded) {
+    if (has_control) {
         vector3_t* vel = &motorcycle->collider.velocity;
         float prev_y = vel->y;
 
@@ -559,6 +578,7 @@ void motorcycle_update(void* data) {
         float max_accel = motorcycle->has_traction && motorcycle->drift_direction == 0 ? MAX_TURN_ACCEL : DRIFT_ACCEL;
 
         float target_offset = target_height - min_height_offset;
+        
         float spring_accel = target_offset * HOVER_SPRING_STRENGTH;
 
         if (prev_y > 0.0f) {
@@ -569,15 +589,19 @@ void motorcycle_update(void* data) {
             }
         }
 
-        vector3AddScaled(&target_vel, &normal_velocity, vector3Dot(&ground_normal, &motorcycle->collider.velocity) > 0.0f ? 0.99f : 0.5f, &target_vel);
-
-        if (are_brakes_on) {
-            target_vel.y += spring_accel * fixed_time_step;
+        
+        if (is_grounded) {
+            vector3AddScaled(&target_vel, &normal_velocity, vector3Dot(&ground_normal, &motorcycle->collider.velocity) > 0.0f ? 0.99f : 0.5f, &target_vel);
+            if (are_brakes_on) {
+                target_vel.y += spring_accel * fixed_time_step;
+            } else {
+                vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
+            }
         } else {
-            vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
+            vector3Add(&target_vel, &normal_velocity, &target_vel);
         }
 
-        motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * max_accel * scaled_time_step, vel);
+        motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * accel_modifier * max_accel * scaled_time_step, vel);
     }
 
     motorcycle->was_grounded = is_grounded;
@@ -611,6 +635,7 @@ void motorcycle_init(motorcycle_t* motorcycle, struct motorcycle_definition* def
     motorcycle->drift_direction = 0;
     motorcycle->was_stopped = true;
     motorcycle->collider.is_jumping = 2;
+    motorcycle->coyote_timer = 0.0f;
 
     for (int i = 0; i < CAST_POINT_COUNT; i += 1) {
         vector3_t cast_point;
