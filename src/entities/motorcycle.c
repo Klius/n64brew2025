@@ -531,7 +531,9 @@ void motorcycle_update(void* data) {
         vector3_t* vel = &motorcycle->collider.velocity;
         float prev_y = vel->y;
 
-        float is_going_up = vector3Dot(vel, &ground_normal) > 0.0f;
+        if (!are_brakes_on) {
+            prev_y = vector3Dot(&ground_normal, vel);
+        }
 
         vector3_t target_vel;
         vector2ToLookDir(&motorcycle->transform.rotation, &target_vel);
