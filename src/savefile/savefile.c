@@ -5,6 +5,7 @@
 #include <malloc.h>
 #include <stdint.h>
 #include "../menu/map_menu.h"
+#include "../config.h"
 
 #define AUTOSAVE_INTERVAL       180.0f
 #define DIRTY_AUTOSAVE_INTERVAL 3.0f
@@ -86,6 +87,10 @@ void savefile_check_for_data() {
 }
 
 bool savefile_save() {
+#if ENABLE_REWIND
+    return false;
+#endif
+
     if (!savefile_has_save()) {
         return false;
     }

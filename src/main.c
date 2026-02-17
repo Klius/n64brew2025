@@ -27,6 +27,7 @@
 #include "overworld/overworld_load.h"
 #include "render/z_clear.h"
 #include "render/defs.h"
+#include "debug/rewind.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -72,7 +73,7 @@ void setup() {
     scene_queue_next("rom:/scenes/world_scale_test.scene");
 #endif
     // scene_queue_next("rom:/scenes/settlement_house1_inside.scene#default");
-    // scene_queue_next("rom:/scenes/overworld.scene#test");
+    scene_queue_next("rom:/scenes/overworld.scene#fast_travel_2");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
@@ -188,6 +189,8 @@ bool check_scene_load() {
 #define DEBUG_CONNECT_DELAY     TICKS_FROM_MS(1500)
 
 void step_simulation() {
+    rewind_update();
+
     if (update_has_layer(UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE)) {
         // uint64_t start_time = get_ticks_us();
         collision_scene_collide();
