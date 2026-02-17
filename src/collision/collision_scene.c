@@ -337,6 +337,17 @@ bool collision_scene_should_sweep(dynamic_object_t* object, struct Vector3* prev
         fabs(offset.z) > bbSize.z;
 }
 
+void collision_scene_recalc_bb(struct dynamic_object* object, vector3_t* prev_pos) {
+    dynamic_object_recalc_bb(object);
+    object->should_sweep_collide = collision_scene_should_sweep(object, prev_pos);
+
+    if (object->should_sweep_collide) {
+        struct Vector3 move_amount;
+        vector3Sub(prev_pos, object->position, &move_amount);
+        box3DExtendDirection(&object->bounding_box, &move_amount, &object->bounding_box);
+    }
+}
+
 #define MAX_SWEPT_ITERATIONS    5
 
 void collision_scene_collide_single(struct dynamic_object* object, struct Vector3* prev_pos) {
@@ -345,11 +356,12 @@ void collision_scene_collide_single(struct dynamic_object* object, struct Vector
     }
 
     for (int i = 0; i < MAX_SWEPT_ITERATIONS; i += 1) {
-        if (collision_scene_should_sweep(object, prev_pos)) {
+        if (object->should_sweep_collide) {
             bool did_hit = collide_object_to_multiple_mesh_swept(object, g_scene.mesh_colliders, g_scene.mesh_collider_count, prev_pos);
             if (!did_hit) {
                 return;
             }
+            collision_scene_recalc_bb(object, prev_pos);
         } else {
             for (int collider_index = 0; collider_index < g_scene.mesh_collider_count; collider_index += 1) {
                 struct mesh_collider* mesh = g_scene.mesh_colliders[collider_index];
@@ -440,15 +452,8 @@ void collision_scene_collide() {
         }
 
         dynamic_object_update(object);
-        object->should_sweep_collide = collision_scene_should_sweep(object, &prev_pos[i]);
 
-        dynamic_object_recalc_bb(object);
-
-        if (object->should_sweep_collide) {
-            struct Vector3 move_amount;
-            vector3Sub(&prev_pos[i], object->position, &move_amount);
-            box3DExtendDirection(&object->bounding_box, &move_amount, &object->bounding_box);
-        }
+        collision_scene_recalc_bb(object, &prev_pos[i]);
     }
 
     collision_scene_collide_dynamic(prev_pos);

@@ -116,7 +116,6 @@ void rewind_update() {
 
         int read_head = rewind_get_read_head();
         rewind_entry_t* entry = &data.entries[read_head];
-        motorcycle->transform.position = entry->pos;
         motorcycle->transform.rotation = entry->rot;
         motorcycle->collider.velocity = entry->vel;
         return;
