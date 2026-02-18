@@ -585,23 +585,27 @@ void motorcycle_update(void* data) {
             float vel_threshold = -target_offset * 2.0f * GRAVITY_CONSTANT;
 
             if (prev_y * prev_y > vel_threshold) {
-                spring_accel = 0.0f;
+                spring_accel *= 0.5f;
             }
         }
 
         
         if (is_grounded) {
-            vector3AddScaled(&target_vel, &normal_velocity, vector3Dot(&ground_normal, &motorcycle->collider.velocity) > 0.0f ? 0.99f : 0.5f, &target_vel);
-            if (are_brakes_on) {
-                target_vel.y += spring_accel * fixed_time_step;
-            } else {
-                vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
-            }
+            target_vel.y += spring_accel * fixed_time_step;
+            // vector3AddScaled(&target_vel, &normal_velocity, vector3Dot(&ground_normal, &motorcycle->collider.velocity) > 0.0f ? 0.99f : 0.5f, &target_vel);
+            // if (are_brakes_on) {
+            // } else {
+            //     vector3AddScaled(&target_vel, &ground_normal, spring_accel * fixed_time_step, &target_vel);
+            // }
         } else {
+            vector3Scale(&target_vel, &target_vel, 0.99f);
             vector3Add(&target_vel, &normal_velocity, &target_vel);
         }
 
         motorcycle->has_traction = vector3MoveTowards(vel, &target_vel, 2.0f * accel_modifier * max_accel * scaled_time_step, vel);
+    } else {
+        vector3_t* vel = &motorcycle->collider.velocity;
+        vector3Scale(vel, vel, 0.99f);
     }
 
     motorcycle->was_grounded = is_grounded;
