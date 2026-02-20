@@ -8,7 +8,7 @@ struct animation_set* animation_cache_load(const char* filename) {
     struct resource_cache_entry* entry = resource_cache_use(&animation_resource_cache, filename);
 
     if (!entry->resource) {
-        entry->resource = animation_set_load(filename);
+        resource_cache_set_resource(&animation_resource_cache, entry, animation_set_load(filename));
     }
 
     return entry->resource;

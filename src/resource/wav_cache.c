@@ -8,7 +8,7 @@ wav64_t* wav_cache_load(const char* filename) {
     struct resource_cache_entry* entry = resource_cache_use(&wav_resource_cache, filename);
 
     if (entry->resource == NULL) {
-        entry->resource = wav64_load(filename, NULL);
+        resource_cache_set_resource(&wav_resource_cache, entry, wav64_load(filename, NULL));
     }
 
     return entry->resource;

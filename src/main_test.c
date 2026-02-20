@@ -20,6 +20,7 @@ void test_cone_minkowski_sum(struct test_context* t);
 void test_cone_bounding_box(struct test_context* t);
 void test_kd_tree_lookup(struct test_context* t);
 void test_hash_map(struct test_context* t);
+void test_memory_leaks(struct test_context* t);
 
 #define DEBUG_CONNECT_DELAY     TICKS_FROM_MS(5000)
 
@@ -65,6 +66,8 @@ int main() {
     test_run(test_cone_bounding_box);
     
     test_run(test_hash_map);
+
+    test_run(test_memory_leaks);
 
     test_report_failures();
 

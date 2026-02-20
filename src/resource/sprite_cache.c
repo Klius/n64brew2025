@@ -8,7 +8,7 @@ sprite_t* sprite_cache_load(const char* filename) {
     struct resource_cache_entry* entry = resource_cache_use(&sprite_resource_cache, filename);
 
     if (entry->resource == NULL) {
-        entry->resource = sprite_load(filename);
+        resource_cache_set_resource(&sprite_resource_cache, entry, sprite_load(filename));
     }
 
     return entry->resource;

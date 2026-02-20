@@ -253,6 +253,24 @@ void hud_render_memory_usage(struct hud* hud) {
         MEM_PADDING + MEM_WIDTH * heap_stats.used / heap_stats.total, MEM_PADDING + MEM_HEIGHT,
         0, 0
     );
+
+    
+    char text[16];
+    int len = sprintf(text, "%d", heap_stats.used);
+
+    rdpq_text_printn(&(rdpq_textparms_t){
+            // .line_spacing = -3,
+            .align = ALIGN_LEFT,
+            .valign = VALIGN_TOP,
+            .width = 100,
+            .height = 20,
+            .wrap = WRAP_NONE,
+        }, 
+        FONT_DIALOG, 
+        MEM_PADDING, MEM_PADDING + MEM_HEIGHT, 
+        text,
+        len
+    );
 }
 
 void hud_render_nuts(struct hud* hud) {
