@@ -4,13 +4,14 @@
 #include <malloc.h>
 #include <string.h>
 #include <assert.h>
+#include "../config.h"
 
 // a 32 bit prime number
 #define MAGIC_PRIME 2748002342
 #define NO_ENTRY    -1
 #define MIN_TABLE_SIZE  32
 
-#define HASH_RESOURCE(resource, mask)   (((uint32_t)(resource) * MAGIC_PRIME) & (mask))
+#define HASH_RESOURCE(resource, mask)   ((((uint32_t)(resource) >> 4) * MAGIC_PRIME) & (mask))
 
 uint32_t resource_string_hash(const void* key) {
     uint32_t hash = 0;
@@ -22,6 +23,12 @@ uint32_t resource_string_hash(const void* key) {
 
 
 void resource_cache_destroy(struct resource_cache* cache) {
+#if DEBUG_ENABLED
+    for (int i = 0; i < cache->entry_count; i += 1) {
+        debugf("resource still loaded %s\n", cache->entries[i].filename);
+    }
+#endif
+
     assert(!cache->entry_count);
     free(cache->entries);
     free(cache->filename_index);
@@ -91,7 +98,7 @@ void resource_cache_resize(struct resource_cache* cache) {
     for (int i = 0; i < cache->entry_count; ++i) {
         struct resource_cache_entry* target_entry = &new_entries[i];
 
-        int filename_index = resource_find_insert_index(new_resource_index, target_entry->filename_hash & new_mask, new_mask);
+        int filename_index = resource_find_insert_index(new_filename_index, target_entry->filename_hash & new_mask, new_mask);
         new_filename_index[filename_index] = i;
         target_entry->filename_index = filename_index;
         new_resource_index[resource_find_insert_index(new_resource_index, HASH_RESOURCE(target_entry->resource, new_mask), new_mask)] = i;
@@ -205,8 +212,6 @@ void resource_cache_adjust_filename_index(struct resource_cache* cache, int file
 void resource_cache_remove(struct resource_cache* cache, struct resource_cache_entry* entry, int entry_index, int resource_index) {
     int filename_index = entry->filename_index;
 
-    cache->filename_index[filename_index] = NO_ENTRY;
-    cache->resource_index[resource_index] = NO_ENTRY;
     free(entry->filename);
 
     cache->entry_count -= 1;
@@ -220,9 +225,12 @@ void resource_cache_remove(struct resource_cache* cache, struct resource_cache_e
 
         cache->filename_index[entry->filename_index] = entry_index;
         int resource_index = resource_find_entry(cache->resource_index, HASH_RESOURCE(entry->resource, mask), mask, last_entry_index);
+        assert(resource_index != NO_ENTRY);
         cache->resource_index[resource_index] = entry_index;
     }
 
+    cache->filename_index[filename_index] = NO_ENTRY;
+    cache->resource_index[resource_index] = NO_ENTRY;
     resource_cache_adjust_resource_index(cache, resource_index, mask);
     resource_cache_adjust_filename_index(cache, filename_index, mask);
 }
@@ -236,12 +244,8 @@ bool resource_cache_free(struct resource_cache* cache, void* resource) {
 
     for (;;) {
         int index = cache->resource_index[index_check];
-
-        if (index == NO_ENTRY) {
-            // resource not found
-            assert(false);
-        }
-
+        assert(index != NO_ENTRY);
+        
         struct resource_cache_entry* entry = &cache->entries[index];
 
         if (entry->resource == resource) {

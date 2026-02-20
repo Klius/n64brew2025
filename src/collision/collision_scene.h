@@ -77,4 +77,6 @@ void collision_scene_return_contacts(struct contact* active_contacts);
 void collision_scene_add_cast_point(struct cast_point* cast_point, vector3_t* pos);
 void collision_scene_remove_cast_point(struct cast_point* cast_point);
 
+void collision_scene_recalc_bb(struct dynamic_object* object, vector3_t* prev_pos);
+
 #endif
