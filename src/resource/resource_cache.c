@@ -11,6 +11,8 @@
 #define NO_ENTRY    -1
 #define MIN_TABLE_SIZE  32
 
+#define DEBUG_LOADING_ORDER     0
+
 #define HASH_RESOURCE(resource, mask)   ((((uint32_t)(resource) >> 4) * MAGIC_PRIME) & (mask))
 
 uint32_t resource_string_hash(const void* key) {
@@ -145,6 +147,9 @@ struct resource_cache_entry* resource_cache_insert(struct resource_cache* cache,
 }
 
 struct resource_cache_entry* resource_cache_use(struct resource_cache* cache, const char* filename) {
+#if DEBUG_LOADING_ORDER
+    debugf("resource_cache_use filename = %s\n", filename);
+#endif
     // initialize on demand
     if (!cache->entries) {
         resource_cache_init(cache);
@@ -179,7 +184,7 @@ void resource_cache_adjust_resource_index(struct resource_cache* cache, int reso
     while (cache->resource_index[resource_index] != NO_ENTRY) {
         int entry_index = cache->resource_index[resource_index];
         struct resource_cache_entry* entry = &cache->entries[entry_index];
-        int expected_index = HASH_RESOURCE(entry->resource, mask);
+        int expected_index = resource_find_insert_index(cache->resource_index, HASH_RESOURCE(entry->resource, mask), mask);
 
         if (expected_index != resource_index) {
             cache->resource_index[expected_index] = entry_index;
@@ -197,7 +202,7 @@ void resource_cache_adjust_filename_index(struct resource_cache* cache, int file
         int entry_index = cache->filename_index[filename_index];
         struct resource_cache_entry* entry = &cache->entries[entry_index];
 
-        int expected_index = entry->filename_hash & mask;
+        int expected_index = resource_find_insert_index(cache->filename_index, entry->filename_hash & mask, mask);
 
         if (expected_index != filename_index) {
             cache->filename_index[expected_index] = entry_index;
@@ -224,16 +229,16 @@ void resource_cache_remove(struct resource_cache* cache, struct resource_cache_e
         *entry = *last_entry;
 
         cache->filename_index[entry->filename_index] = entry_index;
-        int resource_index = resource_find_entry(cache->resource_index, HASH_RESOURCE(entry->resource, mask), mask, last_entry_index);
+        int existing_resource_index = resource_find_entry(cache->resource_index, HASH_RESOURCE(entry->resource, mask), mask, last_entry_index);
 
 #if DEBUG_ENABLED
-        if (resource_index == NO_ENTRY) {
-            debugf("something was wrong! %d %d %d\n", last_entry_index, entry_index, resource_index);
+        if (existing_resource_index == NO_ENTRY) {
+            debugf("something was wrong! %d %d %d\n", last_entry_index, entry_index, existing_resource_index);
         }
 #endif
 
-        assert(resource_index != NO_ENTRY);
-        cache->resource_index[resource_index] = entry_index;
+        assert(existing_resource_index != NO_ENTRY);
+        cache->resource_index[existing_resource_index] = entry_index;
     }
 
     cache->filename_index[filename_index] = NO_ENTRY;
@@ -243,6 +248,9 @@ void resource_cache_remove(struct resource_cache* cache, struct resource_cache_e
 }
 
 bool resource_cache_free(struct resource_cache* cache, void* resource) {
+#if DEBUG_LOADING_ORDER
+    debugf("resource_cache_free resource = %08x\n", resource);
+#endif
     assert(resource);
     assert(cache->entries);
 
@@ -298,6 +306,9 @@ bool resource_cache_free(struct resource_cache* cache, void* resource) {
 }
 
 void resource_cache_set_resource(struct resource_cache* cache, struct resource_cache_entry* entry, void* resource) {
+#if DEBUG_LOADING_ORDER
+    debugf("resource_cache_set_resource filename = %s resource = %08x\n", entry->filename, (int)resource);
+#endif
     assert(!entry->resource);
 
     entry->resource = resource;
