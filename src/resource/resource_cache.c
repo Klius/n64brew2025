@@ -225,6 +225,13 @@ void resource_cache_remove(struct resource_cache* cache, struct resource_cache_e
 
         cache->filename_index[entry->filename_index] = entry_index;
         int resource_index = resource_find_entry(cache->resource_index, HASH_RESOURCE(entry->resource, mask), mask, last_entry_index);
+
+#if DEBUG_ENABLED
+        if (resource_index == NO_ENTRY) {
+            debugf("something was wrong! %d %d %d\n", last_entry_index, entry_index, resource_index);
+        }
+#endif
+
         assert(resource_index != NO_ENTRY);
         cache->resource_index[resource_index] = entry_index;
     }
@@ -244,6 +251,31 @@ bool resource_cache_free(struct resource_cache* cache, void* resource) {
 
     for (;;) {
         int index = cache->resource_index[index_check];
+
+#if DEBUG_ENABLED
+        if (index == NO_ENTRY) {
+            int entry_index = 0;
+            
+            for (; entry_index < cache->entry_count; entry_index += 1) {
+                struct resource_cache_entry* entry = &cache->entries[index];
+                
+                if (entry->resource == resource) {
+                    break;
+                }
+            }
+
+            int resource_index = 0;
+
+            for (; resource_index < cache->entry_capacity; resource_index += 1) {
+                if (cache->resource_index[resource_index] == entry_index) {
+                    break;
+                }
+            }
+
+            debugf("something was wrong! %d %d %d %d\n", index_check, cache->entry_capacity, entry_index, resource_index);
+        }
+#endif
+
         assert(index != NO_ENTRY);
         
         struct resource_cache_entry* entry = &cache->entries[index];
