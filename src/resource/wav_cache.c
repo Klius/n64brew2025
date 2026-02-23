@@ -19,3 +19,7 @@ void wav_cache_release(wav64_t* wav) {
         wav64_close(wav);
     }
 }
+
+void wav_cache_destroy() {
+    resource_cache_destroy(&wav_resource_cache);
+}

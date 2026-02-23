@@ -10,6 +10,7 @@ bool savefile_save();
 bool savefile_is_autosaving();
 void savefile_set_last_scene(const char* name, const char* entry);
 const char* savefile_get_last_scene();
+void savefile_unload();
 
 void savefile_check_autosave();
 

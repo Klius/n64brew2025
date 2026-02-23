@@ -15,6 +15,7 @@ struct view_vertex {
 };
 
 void menu_common_init();
+void menu_common_destroy();
 
 void menu_common_render_background(int x, int y, int w, int h);
 

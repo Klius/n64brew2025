@@ -45,3 +45,7 @@ struct material* material_cache_load_from_file(FILE* file) {
 
     return material_cache_load(material_name);
 }
+
+void material_cache_destroy() {
+    resource_cache_destroy(&material_resource_cache);
+}

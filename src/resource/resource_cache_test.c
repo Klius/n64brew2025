@@ -43,22 +43,23 @@ void test_resource_cache(struct test_context* t) {
     
     resource_cache_destroy(&cache);
 
-    // for (int i = 0; i < LARGE_NUMBER_COUNT; i += 1) {
-    //     char name[10];
-    //     entry = resource_cache_use(&cache, name);
+    for (int i = 0; i < LARGE_NUMBER_COUNT; i += 1) {
+        char name[10];
+        sprintf(name, "%i", i);
+        entry = resource_cache_use(&cache, name);
 
-    //     int random_index = ((((uint32_t)i + 1) * PRIME_NUMBER) % LARGE_NUMBER_COUNT) + 1;
+        int random_index = ((((uint32_t)i + 1) * PRIME_NUMBER) % LARGE_NUMBER_COUNT) + 1;
 
-    //     test_eqi(t, 1, entry->reference_count);
-    //     resource_cache_set_resource(&cache, entry, (void*)(random_index * 16));
-    // }
+        test_eqi(t, 1, entry->reference_count);
+        resource_cache_set_resource(&cache, entry, (void*)(random_index * 16));
+    }
     
-    // for (int i = 0; i < 200; i += 1) {
-    //     should_free = resource_cache_free(&cache, (void*)((i + 1) * 16));
-    //     test_eqi(t, true, should_free);
-    // }
+    for (int i = 0; i < 200; i += 1) {
+        should_free = resource_cache_free(&cache, (void*)((i + 1) * 16));
+        test_eqi(t, true, should_free);
+    }
     
-    // resource_cache_destroy(&cache);
+    resource_cache_destroy(&cache);
 
     entry = resource_cache_use(&cache, "rom:/meshes/characters/scrapper_kid.anim");
     resource_cache_set_resource(&cache, entry, (void*)0x80179d10);

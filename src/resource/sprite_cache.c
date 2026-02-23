@@ -19,3 +19,7 @@ void sprite_cache_release(sprite_t* sprite) {
         sprite_free(sprite);
     }
 }
+
+void sprite_cache_destroy() {
+    resource_cache_destroy(&sprite_resource_cache);
+}

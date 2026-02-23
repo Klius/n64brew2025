@@ -10,9 +10,13 @@ void material_init(struct material* material) {
 
     material->tex0.sprite = NULL;
     material->tex0.texture_enabled = false;
+    material->tex0.num_frames = 0;
+    material->tex0.frames = NULL;
 
     material->tex1.sprite = NULL;
     material->tex1.texture_enabled = false;
+    material->tex1.num_frames = 0;
+    material->tex1.frames = NULL;
 
     material->sort_priority = SORT_PRIORITY_OPAQUE;
 
@@ -25,22 +29,24 @@ void material_init(struct material* material) {
 void material_destroy(struct material* material) {
     if (material->tex0.sprite) {
         sprite_cache_release(material->tex0.sprite);
-
-        for (int i = 0; i < material->tex0.num_frames; i += 1) {
-            sprite_cache_release(material->tex0.frames[i]);
-        }
-
-        free(material->tex0.frames);
     }
+
+    for (int i = 0; i < material->tex0.num_frames; i += 1) {
+        sprite_cache_release(material->tex0.frames[i]);
+    }
+
+    free(material->tex0.frames);
+
     if (material->tex1.sprite) {
         sprite_cache_release(material->tex1.sprite);
-
-        for (int i = 0; i < material->tex1.num_frames; i += 1) {
-            sprite_cache_release(material->tex1.frames[i]);
-        }
-
-        free(material->tex1.frames);
     }
+
+    for (int i = 0; i < material->tex1.num_frames; i += 1) {
+        sprite_cache_release(material->tex1.frames[i]);
+    }
+
+    free(material->tex1.frames);
+    
     rspq_block_free(material->block);
     free(material->palette.tlut);
     material->palette.tlut = 0;
@@ -76,6 +82,8 @@ void material_load_tex(struct material_tex* tex, FILE* file) {
 
     if (!texture_enabled) {
         tex->texture_enabled = false;
+        tex->num_frames = 0;
+        tex->frames = NULL;
         return;
     }
     tex->texture_enabled = true;

@@ -18,3 +18,7 @@ void animation_cache_release(struct animation_set* animations) {
         annotation_clip_set_free(animations);
     }
 }
+
+void animation_cache_destroy() {
+    resource_cache_destroy(&animation_resource_cache);
+}

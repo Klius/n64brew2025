@@ -3,6 +3,7 @@
 #include "../resource/tmesh_cache.h"
 #include "../resource/material_cache.h"
 #include "../render/defs.h"
+#include "../util/cleanup.h"
 #include <stddef.h>
 
 void _renderable_init(struct renderable* renderable) {
@@ -63,7 +64,7 @@ void renderable_destroy_direct(struct renderable* renderable) {
 }
 
 void renderable_destroy(struct renderable* renderable) {
-    rspq_call_deferred((void (*)(void*))tmesh_cache_release, renderable->mesh_render.mesh);
+    cleanup_safe((void (*)(void*))tmesh_cache_release, renderable->mesh_render.mesh);
     renderable_destroy_direct(renderable);
 }
 

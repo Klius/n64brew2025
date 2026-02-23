@@ -11,16 +11,28 @@ struct material* solid_primitive_material;
 struct material* sprite_blit;
 
 void menu_common_init() {
-    // material_cache_release() never called
     menu_background_material = material_cache_load("rom:/materials/menu/menu_corner.mat");
-    // material_cache_release() never called
     menu_border_material = material_cache_load("rom:/materials/menu/menu_border.mat");
-    // material_cache_release() never called
     menu_icons_material = material_cache_load("rom:/materials/menu/menu_icons.mat");
-    // material_cache_release() never called
     solid_primitive_material = material_cache_load("rom:/materials/menu/solid_primitive.mat");
-    // material_cache_release() never called
     sprite_blit = material_cache_load("rom:/materials/menu/sprite_blit.mat");
+}
+
+void menu_common_destroy() {
+    if (!menu_background_material) {
+        return;
+    }
+
+    material_cache_release(menu_background_material);
+    menu_background_material = NULL;
+    material_cache_release(menu_border_material);
+    menu_border_material = NULL;
+    material_cache_release(menu_icons_material);
+    menu_icons_material = NULL;
+    material_cache_release(solid_primitive_material);
+    solid_primitive_material = NULL;
+    material_cache_release(sprite_blit);
+    sprite_blit = NULL;
 }
 
 #define BORDER_MARGIN       5
