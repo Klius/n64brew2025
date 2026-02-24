@@ -62,7 +62,7 @@ struct cutscene_step;
 struct cutscene_function {
     struct cutscene_step* steps;
     uint16_t step_count;
-    const char* name;
+    char* name;
 };
 
 typedef struct cutscene_function cutscene_function_t;

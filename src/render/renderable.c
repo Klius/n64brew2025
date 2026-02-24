@@ -60,6 +60,7 @@ void renderable_init_point(struct renderable* renderable, vector3_t* position, f
 
 void renderable_destroy_direct(struct renderable* renderable) {
     free(renderable->mesh_render.attachments);
+    armature_destroy(&renderable->mesh_render.armature);
     renderable->mesh_render.mesh = NULL;
 }
 

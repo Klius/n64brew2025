@@ -204,6 +204,16 @@ void scene_load_cutscene(struct scene* scene, FILE* file) {
     expression_set_scene_variables(scene->scene_vars);
 }
 
+void scene_destroy_cutscene(scene_t* scene) {
+    if (scene->cutscene) {
+        cutscene_runner_cancel(scene->cutscene);
+        cutscene_free(scene->cutscene);
+    }
+    free(scene->scene_vars);
+    free(scene->room_cutscene_functions);
+    expression_set_scene_variables(NULL);
+}
+
 struct scene* scene_load(const char* filename) {
     FILE* file = asset_fopen(filename, NULL);
 
@@ -433,12 +443,7 @@ void scene_release(struct scene* scene) {
 
     camera_animation_list_destroy(&scene->camera_animations);
 
-    if (scene->cutscene) {
-        cutscene_runner_cancel(scene->cutscene);
-        cutscene_free(scene->cutscene);
-    }
-    free(scene->scene_vars);
-    expression_set_scene_variables(NULL);
+    scene_destroy_cutscene(scene);
 
     overworld_music_destroy(&scene->music);
     wav64_close(scene->pickup);

@@ -234,6 +234,9 @@ void cutscene_destroy(struct cutscene* cutscene) {
             case CUTSCENE_STEP_SHOW_TITLE:
                 free(step->data.show_title.message);
                 break;
+            case CUTSCENE_STEP_NPC_ANIMATE:
+                free(step->data.npc_animate.animation_name);
+                break;
             case CUTSCENE_STEP_PRINT:
                 cutscene_destroy_template_string(&step->data.print.message);
                 break;
@@ -252,6 +255,10 @@ void cutscene_destroy(struct cutscene* cutscene) {
             default:
                 break;
         }
+    }
+
+    for (int i = 0; i < cutscene->function_count; i += 1) {
+        free(cutscene->functions[i].name);
     }
 
     free(cutscene->steps);
