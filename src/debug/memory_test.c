@@ -12,6 +12,7 @@
 #include "../entity/interactable.h"
 #include "../util/cleanup.h"
 #include "../menu/menu_common.h"
+#include "../overworld/overworld_load.h"
 
 heap_stats_t test_memory_leak_start(const char* name) {
     debugf("    memory leak test %s\n", name);
@@ -54,15 +55,42 @@ void test_memory_leaks(struct test_context* t) {
 
     test_resource_reset();
     
-    heap_stats = test_memory_leak_start("tmesh_cache_load");
+    heap_stats = test_memory_leak_start("load_scene");
     cleanup_set_immediate(true);
     savefile_new();
     scene_t* scene = scene_load("rom:/scenes/inside_house.scene");
     scene_release(scene);
-    scene = scene_load("rom:/scenes/inside_house.scene");
+    savefile_unload();
+    test_resource_reset();
+    test_memory_leak_end(t, &heap_stats);
+
+
+    heap_stats = test_memory_leak_start("load_overworld");
+    cleanup_set_immediate(true);
+    savefile_new();
+    scene = scene_load("rom:/scenes/overworld.scene");
+
+    for (int y = 0; y < 6; y += 1) {
+        for (int x = 0; x < 6; x += 1) {
+            scene->overworld->load_next.x = x;
+            scene->overworld->load_next.y = y;
+            overworld_check_loaded_tiles(scene->overworld);
+            overworld_check_unload_queue(scene->overworld);
+        }
+    }
+
+    vector3_t* player_pos = player_get_position(&scene->player);
+
+    overworld_check_collider_tiles(scene->overworld, player_pos);
+    player_pos->x += 500.0f;
+    overworld_check_collider_tiles(scene->overworld, player_pos);
+
     scene_release(scene);
     savefile_unload();
     test_resource_reset();
     test_memory_leak_end(t, &heap_stats);
+
     cleanup_set_immediate(false);
+
+
 }
