@@ -156,10 +156,10 @@ void render(surface_t* col, surface_t* zbuffer) {
 }
 
 #define VI_PER_FRAME 2
-volatile static uint8_t vi_delay;
+volatile static int8_t vi_delay;
 
 void on_vi_interrupt() {
-    if (vi_delay > 0) {
+    if (vi_delay > -10) {
         vi_delay -= 1;
     }
 }
@@ -239,8 +239,6 @@ int main(void)
         }
 
         while (vi_delay > 0) {}
-        
-        vi_delay = VI_PER_FRAME;
 
         if (check_scene_load()) {
             continue;
@@ -292,26 +290,30 @@ int main(void)
             } 
         }
 
-        joypad_poll();
-        struct Vector3 right;
-        if (current_scene) {
-            quatMultVector(&current_scene->camera.transform.rotation, &gRight, &right);
-            audio_update_listener(&current_scene->camera.transform.position, &right);
-        } else {
-            audio_update_listener(&gZeroVec, &gRight);
-        }
-        audio_player_update();
-#if ENABLE_BIG_SCREEN_SHOT
-        if (joypad_get_buttons_pressed(0).l) {
-            camera_next_sub_fov();
-        }
-
-        if (!camera_is_showing_fov()) {
+        for (int it = 0; it < 5 && vi_delay <= 0; it += 1) {
+            joypad_poll();
+            struct Vector3 right;
+            if (current_scene) {
+                quatMultVector(&current_scene->camera.transform.rotation, &gRight, &right);
+                audio_update_listener(&current_scene->camera.transform.position, &right);
+            } else {
+                audio_update_listener(&gZeroVec, &gRight);
+            }
+            audio_player_update();
+    #if ENABLE_BIG_SCREEN_SHOT
+            if (joypad_get_buttons_pressed(0).l) {
+                camera_next_sub_fov();
+            }
+    
+            if (!camera_is_showing_fov()) {
+                step_simulation();
+            }
+    #else
             step_simulation();
+    #endif
+            mixer_try_play();
+            
+            vi_delay += VI_PER_FRAME;
         }
-#else
-        step_simulation();
-#endif
-        mixer_try_play();
     }
 }
