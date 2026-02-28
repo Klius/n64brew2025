@@ -11,6 +11,7 @@
 #include "../scene/scene_loader.h"
 #include "../scene/scene.h"
 #include "../entity/entity_spawner.h"
+#include "../profile/profile.h"
 #include "overworld_render.h"
 #include <assert.h>
 #include <malloc.h>
@@ -416,9 +417,9 @@ void overworld_check_loaded_tiles(struct overworld* overworld) {
     overworld->load_next.y = NO_TILE_COORD;
 }
 
-#define COLLIDER_SPAWN_RADIUS   200.0f
-#define DESPAWN_RADIUS          180.0f
-#define SPAWN_IN_RADIUS         160.0f
+#define COLLIDER_SPAWN_RADIUS   120.0f
+#define DESPAWN_RADIUS          100.0f
+#define SPAWN_IN_RADIUS         90.0f
 
 struct overworld_actor* overworld_malloc_actor(struct overworld* overworld) {
     struct overworld_actor* result = overworld->next_free_actor;
@@ -582,6 +583,9 @@ void overworld_check_actor_despawn(struct overworld* overworld, struct Vector3* 
 }
 
 void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3* player_pos) {
+    SC_PROFILE_START(overworld_update);
+    SC_LOOP_PROFILE_INIT(overworld_update, 3);
+
     float tile_x = (player_pos->x - overworld->min.x) * overworld->inv_tile_size;
     float tile_y = (player_pos->z - overworld->min.y) * overworld->inv_tile_size;
     float radius = SPAWN_IN_RADIUS * overworld->inv_tile_size;
@@ -600,12 +604,16 @@ void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3*
             if (*slot) {
                 if ((*slot)->x == x && (*slot)->y == y) {
                     // already loaded
+                    SC_LOOP_PROFILE_START(overworld_update, 0);
                     overworld_check_tile_spawns(overworld, *slot, tile_x, tile_y, radius);
+                    SC_LOOP_PROFILE_END(overworld_update, 0);
                     continue;;
                 }
         
+                SC_LOOP_PROFILE_START(overworld_update, 1);
                 collision_scene_remove_static_mesh(&(*slot)->collider);
                 overworld_actor_tile_free(*slot);
+                SC_LOOP_PROFILE_END(overworld_update, 1);
             }
         
             if (x < 0 || y < 0 || x >= overworld->tile_x || y >= overworld->tile_y) {
@@ -613,16 +621,26 @@ void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3*
                 continue;
             }
             
+            SC_LOOP_PROFILE_START(overworld_update, 2);
             fseek(overworld->file, overworld->tile_definitions[x + y * overworld->tile_x].actor_block_offset, SEEK_SET);
             *slot = overworld_actor_tile_load(overworld->file);
             overworld_actor_tile_mark_spawned(overworld, *slot);
             (*slot)->x = x;
             (*slot)->y = y;
             collision_scene_add_static_mesh(&(*slot)->collider);
+            SC_LOOP_PROFILE_END(overworld_update, 2);
         }
     }
 
+    SC_LOOP_FINISH(overworld_update, 0, overworld_check_tile_spawns);
+    SC_LOOP_FINISH(overworld_update, 1, overworld_actor_tile_free);
+    SC_LOOP_FINISH(overworld_update, 2, overworld_actor_tile_load);
+
+    SC_PROFILE_START(overworld_update);
     overworld_check_actor_despawn(overworld, player_pos);
+    SC_PROFILE_END(overworld_update, "overworld_check_actor_despawn");
+
+    SC_PROFILE_END(overworld_update, "overworld_check_collider_tiles");
 }
 
 void overworld_check_unload_queue(struct overworld* overworld) {
