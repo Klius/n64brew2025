@@ -28,6 +28,7 @@
 #include "render/z_clear.h"
 #include "render/defs.h"
 #include "debug/rewind.h"
+#include "profile/profile.h"
 
 #include <libdragon.h>
 #include <n64sys.h>
@@ -192,11 +193,13 @@ void step_simulation() {
     rewind_update();
 
     if (update_has_layer(UPDATE_LAYER_WORLD | UPDATE_LAYER_CUTSCENE)) {
-        // uint64_t start_time = get_ticks_us();
+        SC_PROFILE_START(main);
         collision_scene_collide();
-        // debugf("collision_time = %f\n", (get_ticks_us() - start_time) / 1000.0f);
+        SC_PROFILE_END(main, collision_scene_collide);
     }
+    SC_PROFILE_START(main);
     update_dispatch();
+    SC_PROFILE_END(main, update_dispatch);
 }
 
 int main(void)
@@ -291,6 +294,7 @@ int main(void)
         }
 
         for (int it = 0; it < 5 && vi_delay <= 0; it += 1) {
+            SC_PROFILE_START(main);
             joypad_poll();
             struct Vector3 right;
             if (current_scene) {
@@ -314,6 +318,8 @@ int main(void)
             mixer_try_play();
             
             vi_delay += VI_PER_FRAME;
+
+            SC_PROFILE_END(main, update);
         }
     }
 }

@@ -10,6 +10,7 @@
 #include "../menu/map_menu.h"
 #include "../time/time.h"
 #include "../config.h"
+#include "../profile/profile.h"
 
 struct scene* current_scene;
 
@@ -169,11 +170,13 @@ extern float near_scalar;
 #endif
 
 void scene_update(void* data) {
+    SC_PROFILE_START(scene);
     struct scene* scene = (struct scene*)data;
 
     struct Vector3 player_center = scene->player.cutscene_actor.transform.position;
     player_center.y += scene->player.cutscene_actor.collider.type->center.y;
 
+    SC_PROFILE_START(scene);
     for (int i = 0; i < scene->loading_zone_count; i += 1) {
         if (box3DContainsPoint(&scene->loading_zones[i].bounding_box, &player_center)) {
             cutscene_builder_t cutscene;
@@ -191,15 +194,26 @@ void scene_update(void* data) {
             scene->loading_zone_count = 0;
         }
     }
+    SC_PROFILE_END(scene, loading_zones);
 
+    SC_PROFILE_START(scene);
     if (scene->overworld) {
         data_cache_writeback_invalidate_all();
+        SC_PROFILE_START(scene);
         overworld_check_loaded_tiles(scene->overworld);
+        SC_PROFILE_END(scene, overworld_check_loaded_tiles);
+        SC_PROFILE_START(scene);
         overworld_check_collider_tiles(scene->overworld, player_get_position(&scene->player));
+        SC_PROFILE_END(scene, overworld_check_collider_tiles);
     }
+    SC_PROFILE_END(scene, overworld);
 
+    SC_PROFILE_START(scene);
     scene_check_despawns(scene);
+    SC_PROFILE_END(scene, scene_check_despawns);
+    SC_PROFILE_START(scene);
     scene_check_cutscenes(scene);
+    SC_PROFILE_END(scene, scene_check_cutscenes);
 
     if (update_has_layer(UPDATE_LAYER_WORLD)) {
         joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
@@ -246,6 +260,7 @@ void scene_update(void* data) {
     }
 
     overworld_music_update(&scene->music, player_get_position(&scene->player), scene->overworld != NULL);
+    SC_PROFILE_END(scene, scene_update);
 }
 
 void scene_queue_next(const char* scene_name) {

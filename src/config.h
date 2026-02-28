@@ -3,7 +3,7 @@
 
 #define ENABLE_CHEATS   0
 
-#define DEBUG_ENABLED   0
+#define DEBUG_ENABLED   1
 
 #define ENABLE_BIG_SCREEN_SHOT  0
 #define ENABLE_WORLD_SCALE      0
@@ -13,7 +13,7 @@
 
 #if ENABLE_LOD_RENDER_DEBUG
 
-#define LOD_RENDER_MODE_DEFAULT     -1
+#define LOD_RENDER_MODE_DEFAULT     -1  
 #define LOD_RENDER_MODE_DETAILED    -2
 #define LOD_RENDER_MODE_LOD3        -3
 
