@@ -327,7 +327,7 @@ struct overworld* overworld_load(const char* filename) {
 }
 
 struct overworld_actor_tile** overworld_get_actor_tile_slot(struct overworld* overworld, int tile_x, int tile_y) {
-    return &overworld->loaded_actor_tiles[tile_x & 0x1][tile_y & 0x1];
+    return &overworld->loaded_actor_tiles[tile_x & (LOADED_TILE_ARRAY_SIZE - 1)][tile_y & (LOADED_TILE_ARRAY_SIZE - 1)];
 }
 
 void overworld_free(struct overworld* overworld) {
@@ -417,9 +417,9 @@ void overworld_check_loaded_tiles(struct overworld* overworld) {
     overworld->load_next.y = NO_TILE_COORD;
 }
 
-#define COLLIDER_SPAWN_RADIUS   120.0f
-#define DESPAWN_RADIUS          100.0f
-#define SPAWN_IN_RADIUS         90.0f
+#define COLLIDER_SPAWN_RADIUS   180.0f
+#define DESPAWN_RADIUS          160.0f
+#define SPAWN_IN_RADIUS         140.0f
 
 struct overworld_actor* overworld_malloc_actor(struct overworld* overworld) {
     struct overworld_actor* result = overworld->next_free_actor;
@@ -596,6 +596,9 @@ void overworld_check_collider_tiles(struct overworld* overworld, struct Vector3*
 
     int max_x = (int)ceilf(tile_x + collider_radius);
     int max_y = (int)ceilf(tile_y + collider_radius);
+
+    assert(max_x - min_x <= LOADED_TILE_ARRAY_SIZE);
+    assert(max_y - min_y <= LOADED_TILE_ARRAY_SIZE);
 
     for (int x = min_x; x < max_x; x += 1) {
         for (int y = min_y; y < max_y; y += 1) {
