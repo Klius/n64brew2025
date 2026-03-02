@@ -293,7 +293,7 @@ int main(void)
             } 
         }
 
-        for (int it = 0; it < 5 && vi_delay <= 0; it += 1) {
+        for (int it = 0; it < 2 && vi_delay <= 0; it += 1) {
             SC_PROFILE_START(main);
             joypad_poll();
             struct Vector3 right;
