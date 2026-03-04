@@ -442,6 +442,10 @@ void hud_render(void *data) {
     hud_render_memory_usage(data);
 #endif
 
+#if ENABLE_LOD_RENDER_DEBUG
+    return;
+#endif
+
     hud_render_nuts(data);
 
     if (!update_has_layer(UPDATE_LAYER_WORLD)) {
