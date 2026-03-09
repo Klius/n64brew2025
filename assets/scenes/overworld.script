@@ -46,7 +46,7 @@ func well_scrapbot()
         say "
             Hello Jax. I have a task for you.
 
-            Aquire clean water to tend to Samson's wounds.
+            Acquire clean water to tend to Samson's wounds.
         ";
         npc_animate water_pump_scrapbot, "idle", true;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, repairs_water_pump_broken;
@@ -58,7 +58,7 @@ func well_scrapbot()
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, towards_river;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, towards_river;
         say "
-            You can scavange for parts near the river.
+            You can scavenge for parts near the river.
 
             Your bike is equipped with a scanner. When you are near the parts it will beep to let you know.    
         ";
@@ -75,7 +75,7 @@ func well_scrapbot()
         return;
     elif not has_pump_gear then
         npc_animate water_pump_scrapbot, "bot_talk", true;
-        say "Consult the map I already gave you to aquire the parts.";
+        say "Consult the map I already gave you to acquire the parts.";
     elif not has_repaired_pump then 
         npc_animate water_pump_scrapbot, "bot_talk", true;
         say "You have procured the parts";
@@ -158,7 +158,7 @@ func on_exit_generator()
         cam_animate "sand_dune_focus";
 
         say "
-            You should be able to aquire parts in the sand dunes to the north west.
+            You should be able to acquire parts in the sand dunes to the north west.
             
             I will stay here and do what I can with the fresh water you helped procure.
 
@@ -665,7 +665,7 @@ func trader_scrapbot_talk()
         say "
             I trade in spare parts. What do you need?
 
-            So you are looking for a replacment tablet screen. I have that. They are hard to come by so it will cost you.
+            So you are looking for a replacement tablet screen. I have that. They are hard to come by so it will cost you.
 
             If you bring me 3 industrial servo motors I will trade for it.
 

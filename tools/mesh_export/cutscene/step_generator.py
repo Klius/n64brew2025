@@ -241,10 +241,10 @@ def _generate_function_step(cutscene: Cutscene, step: parser.CutsceneStep, args:
             if not isinstance(parameter, parser.String):
                 raise Exception('Parameter should be a string')
 
-            for replacment in parameter.replacements:
-                expression = expresion_generator.generate_script(replacment.expr, context)
+            for replacement in parameter.replacements:
+                expression = expresion_generator.generate_script(replacement.expr, context)
                 if not expression:
-                    raise Exception(f"Could not generate expression {replacment}")   
+                    raise Exception(f"Could not generate expression {replacement}")   
 
                 if pre_expression:
                     pre_expression = pre_expression.concat(expression)

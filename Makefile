@@ -248,5 +248,8 @@ check-pairings:
 tools/mesh_export.zip: tools/mesh_export/__init__.py
 	cd tools; zip -r mesh_export.zip mesh_export/
 
+build/strings.txt: tools/mesh_export/export_text.py $(SCRIPTS)
+	$(BLENDER_4) --background --factory-startup --python-exit-code 1 --python tools/mesh_export/export_text.py -- $@ $(SCRIPTS)
+
 DEPENDENCY_FILES := $(wildcard $(BUILD_DIR)/**/*.d) $(wildcard $(BUILD_DIR)/*.d)
 -include $(DEPENDENCY_FILES)

@@ -207,9 +207,9 @@ func on_robot_talk()
     elif not has_repaired_generator then
         npc_animate scrapbot, "bot_talk", true;
         if has_generator_part_0 and has_generator_part_1 and has_generator_part_2 then
-            say "You have aquired the generator parts. Now go outside to repair the generator.";
+            say "You have acquired the generator parts. Now go outside to repair the generator.";
         else
-            say "After you aquire the parts return here to fix the generator";
+            say "After you acquire the parts return here to fix the generator";
         end
         npc_animate scrapbot, "idle", true;
     elif not has_repaired_health_machine then
@@ -323,7 +323,7 @@ func on_samson_heal()
     say "
         I finished searching potential locations where you may find parts to repair your old tablet
 
-        Perhaps it will have something from life before the impact to cheer samson up
+        Perhaps it will have something from life before the impact to cheer Samson up
     ";
     npc_animate scrapbot, "idle", true;
 
