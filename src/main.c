@@ -156,11 +156,12 @@ void render(surface_t* col, surface_t* zbuffer) {
     render_menu();
 }
 
+#define MAX_FRAME_CATCHUP   2
 #define VI_PER_FRAME 2
 volatile static int8_t vi_delay;
 
 void on_vi_interrupt() {
-    if (vi_delay > -10) {
+    if (vi_delay > -MAX_FRAME_CATCHUP * VI_PER_FRAME) {
         vi_delay -= 1;
     }
 }
