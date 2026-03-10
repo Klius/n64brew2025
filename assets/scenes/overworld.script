@@ -18,10 +18,9 @@ end
 
 func exit_garage()
     if not has_well_part_map then
-        fade FADE_COLOR_BLACK, 0;
+        delay 0.1;
         world_pause;
         cam_animate "exit_garage";
-        delay 0.1;
         audio_pause true;
         fade FADE_COLOR_NONE, 0.5;
         interact_with_npc INTERACTION_LOOK, water_pump_scrapbot, ENTITY_ID_PLAYER;

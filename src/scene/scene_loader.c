@@ -214,6 +214,10 @@ void scene_destroy_cutscene(scene_t* scene) {
     expression_set_scene_variables(NULL);
 }
 
+void scene_fade_in(struct cutscene* cutscene, void* data) {
+    fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
+}
+
 struct scene* scene_load(const char* filename) {
     FILE* file = asset_fopen(filename, NULL);
 
@@ -361,8 +365,11 @@ struct scene* scene_load(const char* filename) {
 
     scene_show_room(scene, current_room);
 
-    fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
-    cutscene_ref_run_then_destroy(&starting_cutscene, 0);
+    if (starting_cutscene.type == CUTSCENE_REF_NONE) {
+        fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
+    } else {
+        cutscene_ref_run_then_destroy(&starting_cutscene, 0, scene_fade_in, NULL);
+    }
 
     overworld_music_init(&scene->music);
     scene->pickup = wav64_load("rom:/sounds/parts/pickup.wav64", NULL);

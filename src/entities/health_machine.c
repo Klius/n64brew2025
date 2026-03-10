@@ -15,7 +15,7 @@ void health_machine_interact(interactable_t* interactable, entity_id from) {
 
     cutscene_ref_t cutscene;
     cutscene_ref_init(&cutscene, "rom:/scripts/health_machine_get.script");
-    cutscene_ref_run_then_destroy(&cutscene, health_machine->entity_id);
+    cutscene_ref_run_then_destroy(&cutscene, health_machine->entity_id, NULL, NULL);
 }
 
 void health_machine_init(health_machine_t* health_machine, struct health_machine_definition* definition, entity_id entity_id) {

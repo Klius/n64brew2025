@@ -52,7 +52,7 @@ void cutscene_timer_update(void* data) {
         if (timer.on_end[0]) {
             cutscene_ref_t cutscene;
             cutscene_ref_init(&cutscene, timer.on_end);
-            cutscene_ref_run_then_destroy(&cutscene, 0);
+            cutscene_ref_run_then_destroy(&cutscene, 0, NULL, NULL);
         }
 
         cutscene_timer_cancel();

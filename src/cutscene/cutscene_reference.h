@@ -32,6 +32,6 @@ void cutscene_ref_destroy(cutscene_ref_t* ref);
 
 void cutscene_ref_run(cutscene_ref_t* ref, entity_id subject);
 void cutscene_ref_run_then_callback(cutscene_ref_t* ref, cutscene_finish_callback finish_callback, void* data, entity_id subject);
-void cutscene_ref_run_then_destroy(cutscene_ref_t* ref, entity_id subject);
+void cutscene_ref_run_then_destroy(cutscene_ref_t* ref, entity_id subject, cutscene_finish_callback on_finish, void* data);
 
 #endif
