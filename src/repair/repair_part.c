@@ -72,6 +72,7 @@ void repair_part_render(repair_part_t* part, struct frame_memory_pool* pool) {
 
 void repair_part_render_drop_location(repair_part_t* part, struct frame_memory_pool* pool) {
     material_apply(&current_repair_scene->assets.correct_slot_material);
+    rdpq_mode_zbuf(false, false);
 
     T3DMat4FP* mtx_fp = frame_pool_get_transformfp(pool);
     T3DMat4 mtx;
