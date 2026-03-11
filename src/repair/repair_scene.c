@@ -14,6 +14,7 @@
 #include "../cutscene/cutscene_timer.h"
 #include "../util/input.h"
 #include "../audio/audio.h"
+#include "../effects/fade_effect.h"
 
 // WRLD
 #define EXPECTED_HEADER 0x57524C44
@@ -405,6 +406,8 @@ repair_scene_t* repair_scene_load(const char* filename) {
     rdpq_sprite_blit(result->assets.background, 0.0f, 0.0f, NULL);
 
     result->background_block = rspq_block_end();
+    
+    fade_effect_set((color_t){0, 0, 0, 0}, 0.5f);
 
     return result;
 }

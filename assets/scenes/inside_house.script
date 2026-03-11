@@ -31,6 +31,7 @@ func on_enter()
     if has_repaired_generator and not has_health_juice_map then
         cam_animate "power_back";
         world_pause;
+        fade FADE_COLOR_NONE, 0.5;
         interact_with_npc INTERACTION_LOOK, scrapbot, medical_machine;
         cam_wait;
         interact_with_npc INTERACTION_LOOK_MOVE, ENTITY_ID_PLAYER, near_med_machine;
@@ -70,6 +71,7 @@ end
 func on_tablet_exit()
     npc_animate characters_brother_healed, "depressed", true;
     set_expression characters_brother_healed, NPC_EXPRESSION_SAD;
+    fade FADE_COLOR_NONE, 0.5;
 
     if has_tablet_repaired_tablet then
         show_item ITEM_TABLET_REPAIRED;
@@ -258,6 +260,7 @@ func on_exit_medical_machine()
         cam_look_npc scrapbot;
         interact_with_npc INTERACTION_LOOK, scrapbot, medical_machine;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, scrapbot;
+        fade FADE_COLOR_NONE, 0.5;
         npc_animate scrapbot, "bot_talk", true;
         say "
             The surgeon bot is functional again.

@@ -173,6 +173,13 @@ filesystem/scenes/%.scene: assets/scenes/%.blend $$(wildcard assets/scenes/%.scr
 
 filesystem/scenes/%.overworld build/assets/scenes/%.json: filesystem/scenes/%.scene;
 
+build/assets/scenes/%_exits.txt: assets/scenes/%.blend tools/mesh_export/find_exits.py
+	@mkdir -p $(dir $@)
+	$(BLENDER_4) $< --background --factory-startup --python-exit-code 1 --python tools/mesh_export/find_exits.py -- $@
+
+all_exits: $(SCENE_SOURCES:assets/scenes/%.blend=build/assets/scenes/%_exits.txt)
+.PHONY: all_exits
+
 ###
 # repair
 ###

@@ -1,3 +1,4 @@
 
-* Reverse race 2
-* rdp crash
+* stray large polygons
+* fast travel while on bike
+* check the city race

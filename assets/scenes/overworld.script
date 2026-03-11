@@ -96,6 +96,7 @@ end
 
 func exit_repair_well()
     if not has_well_part_map and not has_pump_gear then
+        fade FADE_COLOR_NONE, 0.5;
         delay 0.5;
         world_pause;
         
@@ -143,6 +144,7 @@ end
 
 func on_exit_generator()
     if scrapbot_location == SCRAPBOT_LOCATION_GENERATOR and not has_generator_part_map then
+        fade FADE_COLOR_NONE, 0.5;
         delay 0.5;
         world_pause;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, generator_scrapbot;
@@ -247,6 +249,7 @@ func race0_entry()
         delay 3;
         stopwatch_run true;
     elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        fade FADE_COLOR_NONE, 0.5;
         world_pause;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race0_scrapbot;
         interact_with_npc INTERACTION_LOOK, race0_scrapbot, ENTITY_ID_PLAYER;
@@ -270,6 +273,7 @@ func race0_entry()
 
         cam_return;
     elif race_get_state() == RACE_STATE_FINISH then
+        fade FADE_COLOR_NONE, 0.5;
         stopwatch_show false;
 
         npc_animate race0_scrapbot, "bot_talk", true;
@@ -363,6 +367,7 @@ func race1_entry()
         delay 3;
         stopwatch_run true;
     elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        fade FADE_COLOR_NONE, 0.5;
         world_pause;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race1_scrapbot;
         interact_with_npc INTERACTION_LOOK, race1_scrapbot, ENTITY_ID_PLAYER;
@@ -386,6 +391,7 @@ func race1_entry()
 
         cam_return;
     elif race_get_state() == RACE_STATE_FINISH then
+        fade FADE_COLOR_NONE, 0.5;
         stopwatch_show false;
 
         npc_animate race1_scrapbot, "bot_talk", true;
@@ -474,6 +480,7 @@ func race2_entry()
         delay 3;
         stopwatch_run true;
     elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        fade FADE_COLOR_NONE, 0.5;
         world_pause;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race2_scrapbot;
         interact_with_npc INTERACTION_LOOK, race2_scrapbot, ENTITY_ID_PLAYER;
@@ -497,6 +504,7 @@ func race2_entry()
 
         cam_return;
     elif race_get_state() == RACE_STATE_FINISH then
+        fade FADE_COLOR_NONE, 0.5;
         stopwatch_show false;
 
         npc_animate race2_scrapbot, "bot_talk", true;
@@ -585,6 +593,7 @@ func race3_entry()
         delay 3;
         stopwatch_run true;
     elif race_get_state() == RACE_STATE_MISS_CHECKPOINT or race_get_state() == RACE_STATE_ABANDON then
+        fade FADE_COLOR_NONE, 0.5;
         world_pause;
         interact_with_npc INTERACTION_LOOK, ENTITY_ID_PLAYER, race3_scrapbot;
         interact_with_npc INTERACTION_LOOK, race3_scrapbot, ENTITY_ID_PLAYER;
@@ -608,6 +617,7 @@ func race3_entry()
 
         cam_return;
     elif race_get_state() == RACE_STATE_FINISH then
+        fade FADE_COLOR_NONE, 0.5;
         stopwatch_show false;
 
         npc_animate race3_scrapbot, "bot_talk", true;
