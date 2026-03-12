@@ -236,6 +236,10 @@ int main(void)
     
     register_VI_handler(on_vi_interrupt);
 
+#if DEBUG_ENABLED
+    debugf("game started\n");
+#endif
+
     while(1) {
         savefile_check_autosave();
         if (current_scene && current_scene->overworld) {
