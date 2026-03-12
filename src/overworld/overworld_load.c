@@ -104,10 +104,14 @@ struct overworld_tile* overworld_tile_load(FILE* file) {
         result->detail_meshes[i] = tmesh_cache_load(filename);
     }
 
-    T3DMat4FP* curr_matrix = UncachedAddr(result->detail_matrices);
+    T3DMat4FP* curr_matrix = result->detail_matrices;
 
     for (int i = 0; i < mesh_count; i += 1) {
         result->layers[i] = overworld_tile_load_layer(result->detail_meshes, curr_matrix, file);
+    }
+
+    if (detail_count) {
+        data_cache_hit_writeback_invalidate(result->detail_matrices, sizeof(T3DMat4FP) * detail_count);
     }
 
     result->static_particles = static_particles_load(&result->static_particle_count, file);
