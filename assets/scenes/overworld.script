@@ -398,7 +398,7 @@ func race1_entry()
         if stopwatch_time() <= race1_record then
             race1_record = stopwatch_time();
 
-            if not has_tablet_battery then
+            if not has_race1_reward then
                 say "
                     You did it!
 
@@ -511,7 +511,7 @@ func race2_entry()
         if stopwatch_time() <= race2_record then
             race2_record = stopwatch_time();
 
-            if not has_tablet_battery then
+            if not has_race2_reward then
                 say "
                     You did it!
 
@@ -624,7 +624,7 @@ func race3_entry()
         if stopwatch_time() <= race3_record then
             race3_record = stopwatch_time();
 
-            if not has_tablet_battery then
+            if not has_race3_reward then
                 say "
                     You did it!
 

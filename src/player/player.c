@@ -411,7 +411,7 @@ vector3_t fast_travel_locations[] = {
 };
 
 void player_check_for_fast_travel() {
-    if (!inventory_has_item(ITEM_FAST_TRAVEL)) {
+    if (!inventory_has_item(ITEM_FAST_TRAVEL) || race_get_state() == RACE_STATE_STARTED) {
         return;
     }
     
