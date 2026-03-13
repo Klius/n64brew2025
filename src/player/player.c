@@ -410,10 +410,12 @@ vector3_t fast_travel_locations[] = {
     {1424.01f, 16.2132f, 1838.28f},
 };
 
-void player_check_for_fast_travel(joypad_buttons_t pressed) {
+void player_check_for_fast_travel() {
     if (!inventory_has_item(ITEM_FAST_TRAVEL)) {
         return;
     }
+    
+    joypad_buttons_t pressed = joypad_get_buttons_pressed(0);
 
     int fast_travel_index = -1;
 
@@ -466,8 +468,6 @@ void player_update_grounded(struct player* player, struct contact* ground_contac
         
         cutscene_runner_run(cutscene_builder_finish(&cutscene), 0, cutscene_runner_free_on_finish(), NULL, 0);
     }
-
-    player_check_for_fast_travel(pressed);
 
     if (interactable) {
         player->hover_interaction = interactable->id;
@@ -557,6 +557,8 @@ void player_update(struct player* player) {
     }
 
     map_mark_revealed(player_get_position(player));
+    
+    player_check_for_fast_travel();
 
     struct contact* ground = dynamic_object_get_ground(&player->cutscene_actor.collider);
     
