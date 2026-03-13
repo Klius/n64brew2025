@@ -271,7 +271,13 @@ mat4x4* render_batch_get_transform(struct render_batch* batch) {
 }
 
 T3DMat4FP* render_batch_get_transformfp(struct render_batch* batch) {
-    return UncachedAddr(frame_malloc(batch->pool, sizeof(T3DMat4FP)));
+    T3DMat4FP* result = frame_malloc(batch->pool, sizeof(T3DMat4FP));
+
+    if (!result) {
+        return NULL;
+    }
+
+    return UncachedAddr(result); ;
 }
 
 T3DMat4FP* render_batch_transformfp_from_sa(struct render_batch* batch, struct TransformSingleAxis* transform) {
