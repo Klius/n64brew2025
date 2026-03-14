@@ -70,7 +70,7 @@ static dynamic_object_type_t collider_type = {
     .max_stable_slope = 0.0f,
     .surface_type = SURFACE_TYPE_DEFAULT,
     .friction = 0.0f,
-    .bounce = 0.1f,
+    .bounce = 0.0f,
     .center = {0.0f, 0.6f, 0.0f},
 };
 
@@ -164,10 +164,10 @@ static vehicle_definiton_t vehicle_def = {
 
 static vector3_t local_cast_points[CAST_POINT_COUNT] = {
     {0.0f, CAST_CENTER, 0.0f},
-    {0.31f, CAST_CENTER, 1.5f},
-    {0.31f, CAST_CENTER, -1.5f},
-    {-0.31f, CAST_CENTER, 1.5f},
-    {-0.31f, CAST_CENTER, -1.5f},
+    {0.31f, CAST_CENTER, 0.7f},
+    {0.31f, CAST_CENTER, -0.7f},
+    {-0.31f, CAST_CENTER, 0.7f},
+    {-0.31f, CAST_CENTER, -0.7f},
 };
 
 void motorcycle_common_init() {
@@ -238,10 +238,7 @@ float motorycle_get_ground_height(motorcycle_t* motorcycle, float target_height,
 
             if (actual_height < min_height_offset) {
                 min_height_offset = actual_height;
-            }
-
-            if (actual_height < target_height) {
-                vector3Add(ground_normal, &cast_point->normal, ground_normal);
+                *ground_normal = cast_point->normal;
             }
         }
 
