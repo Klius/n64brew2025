@@ -572,6 +572,12 @@ def write_minimap_location(base_transform: mathutils.Matrix, file):
 
     file.write(struct.pack('>fff', center.x, center.z, rotation))
 
+def include_all(collection):
+    collection.exclude = False
+
+    for child in collection.children:
+        include_all(child)
+
 def process_scene():
     input_filename = sys.argv[1]
     output_filename = sys.argv[-2]
@@ -584,6 +590,9 @@ def process_scene():
     definitions = {}
     enums = {}
     room_collection = entities.room.room_collection()
+
+    include_all(bpy.context.view_layer.layer_collection)
+    bpy.context.view_layer.update()
 
     room_collection.get_room_index('room_default')
 
