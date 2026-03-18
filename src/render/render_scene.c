@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "defs.h"
 #include "../config.h"
+#include "../profile/profile.h"
 
 #define MIN_RENDER_SCENE_SIZE   64
 
@@ -197,6 +198,8 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
     // just in case I need this fix
     t3d_state_set_vertex_fx_scale(FX_SCALE);
 
+    SC_PROFILE_START(render);
+
     struct callback_element* current_step = callback_list_get(&r_scene_3d.step_callbacks, 0);
 
     for (int i = 0; i < r_scene_3d.step_callbacks.count; ++i) {
@@ -212,7 +215,11 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
     }
 #endif
 
+    SC_PROFILE_END(render, step_callbacks);
+
     render_batch_init(&batch, &camera->transform, pool);
+
+    SC_PROFILE_START(render);
 
     struct callback_element* current = callback_list_get(&r_scene_3d.callbacks, 0);
 
@@ -241,5 +248,8 @@ void render_scene_render(struct Camera* camera, T3DViewport* viewport, struct fr
         
         current = callback_list_next(&r_scene_3d.callbacks, current);
     }
+    SC_PROFILE_END(render, callbacks);
+    SC_PROFILE_START(render);
     render_batch_finish(&batch, view_proj_matrix, viewport);
+    SC_PROFILE_END(render, render_batch_finish);
 }

@@ -77,7 +77,7 @@ void setup() {
     scene_queue_next("rom:/scenes/overworld.scene#test");
 #endif
     // scene_queue_next("rom:/scenes/settlement_house1_inside.scene#default");
-    // scene_queue_next("rom:/scenes/overworld.scene#fast_travel_2");
+    // scene_queue_next("rom:/scenes/overworld.scene#default");
     // scene_queue_next("rom:/repair/motorycle_engine.repair");
     // scene_queue_next("rom:/scenes/inside_boat.scene");
     // scene_queue_next("rom:/scenes/inside_house.scene#defualt");
@@ -246,7 +246,9 @@ int main(void)
     while(1) {
         savefile_check_autosave();
         if (current_scene && current_scene->overworld) {
+            SC_PROFILE_START(main);
             overworld_check_unload_queue(current_scene->overworld);
+            SC_PROFILE_END(main, overworld_check_unload_queue);
         }
 
         while (vi_delay > 0) {}
@@ -258,6 +260,8 @@ int main(void)
         }
         
         mixer_try_play();
+
+        SC_PROFILE_START(main);
 
         if (current_game_mode == GAME_MODE_TRANSITION_TO_MENU) {
             surface_t* fb = display_get();
@@ -302,6 +306,8 @@ int main(void)
                 rdpq_detach_show();
             } 
         }
+        
+        SC_PROFILE_END(main, render);
 
         for (int it = 0; it < update_count; it += 1) {
             SC_PROFILE_START(main);

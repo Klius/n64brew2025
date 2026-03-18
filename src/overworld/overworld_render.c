@@ -5,6 +5,7 @@
 #include "overworld_private.h"
 #include "../render/defs.h"
 #include "../math/vector2s16.h"
+#include "../profile/profile.h"
 
 static int edge_deltas[] = {0x1, 0x2, 0x4};
 
@@ -496,7 +497,9 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
     state.min_x = state.loop[0].x;
     state.max_x = state.loop[0].x;
 
+    SC_PROFILE_START(render);
     overworld_render_lod_1(overworld, camera, viewport, pool);
+    SC_PROFILE_END(render, overworld_render_lod_1);
 
     t3d_viewport_attach(viewport);
 
@@ -512,6 +515,8 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
 
     overworld_tile_render_info_t tiles[8];
     overworld_tile_render_info_t* block = tiles;
+    
+    SC_PROFILE_START(render);
 
     for (int i = 0; i < 4; i += 1) {
         struct overworld_tile_slice next = overworld_step(overworld, &state);
@@ -525,18 +530,26 @@ void overworld_render(struct overworld* overworld, mat4x4 view_proj_matrix, stru
         }
     }
     
+    SC_PROFILE_END(render, overworld_tile_enumerate_tiles);
+    
+    SC_PROFILE_START(render);
     for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
         overworld_render_low_priority(curr);
     }
+    SC_PROFILE_END(render, overworld_render_low_priority);
 
     rdpq_sync_pipe();
     rdpq_mode_zbuf(true, true);
     
+    SC_PROFILE_START(render);
     for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
         overworld_render_tile(curr);
     }
+    SC_PROFILE_END(render, overworld_render_tile);
     
+    SC_PROFILE_START(render);
     for (overworld_tile_render_info_t* curr = tiles; curr < block; ++curr) {
         overworld_render_particles(curr, &camera->transform.position, pool);
     }
+    SC_PROFILE_END(render, overworld_render_particles);
 }
