@@ -167,8 +167,8 @@ def apply_tex_delta(delta: material.Tex, into: material.Tex | None) -> material.
     result.width = delta.width
     result.height = delta.height
     
-    if delta.byte_size() + delta.tmem_addr > 2048:
-        result.palette_data = None
+    # if delta.byte_size() + delta.tmem_addr > 2048:
+    #     result.palette_data = None
     
     return result
 
