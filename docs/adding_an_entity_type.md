@@ -1,5 +1,15 @@
 # Adding an entity
 
+## The easy way
+
+run 
+
+```
+node tools/generate_entity.js entity_name
+```
+
+## The hard way
+
 The mesh export plugin in this repo allows you to quickly add and edit entities. To add an entity to the system you to do the following steps.
 
 1) Add the entity type to `src/scene/scene_definition.h`. You will need to add it to `enum entity_type_id` and create a struct definition that starts with the entity name and ends with `_definition`. For example, if you entity is called `foo` you would add `struct foo_definition`

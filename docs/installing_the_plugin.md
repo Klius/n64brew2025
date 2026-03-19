@@ -2,7 +2,7 @@
 
 This project has a blender plugin to help edit the blend files. To create it as a zip file run this command.
 
-> I am using blender 4.2.9
+> I am using blender 4.5.6
 
 ```bash
 make tools/mesh_export.zip

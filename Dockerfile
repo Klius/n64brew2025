@@ -2,6 +2,7 @@ FROM ubuntu:latest
 
 ARG TOOLCHAIN_URL="https://github.com/DragonMinded/libdragon/releases/download/toolchain-continuous-prerelease/gcc-toolchain-mips64-x86_64.deb"
 ARG TINY3D_REPO_URL="https://github.com/HailToDodongo/tiny3d.git"
+ARG LIBDRAGON_REPO_URL="https://github.com/DragonMinded/libdragon"
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -19,16 +20,10 @@ RUN wget $TOOLCHAIN_URL -O toolchain.deb &&\
 
 # Install libdragon
 ENV N64_INST=/opt/libdragon
-COPY libdragon /libdragon
-RUN cd /libdragon &&\
-    make install \
-    clobber \
-    tools \
-    tools-install \
-    tools-clean \
-    clobber &&\
-    cd / &&\
-    rm -r /libdragon
+RUN git clone -b preview --single-branch $LIBDRAGON_REPO_URL &&\
+    cd libdragon &&\
+    make install tools tools-install tools-clean clobber &&\
+    cd /
 
 # Install tiny3d
 ENV T3D_INST=/opt/tiny3d
@@ -40,11 +35,11 @@ RUN cd /opt &&\
 
 # Install Blender
 ENV BLENDER_4=/opt/blender/blender
-RUN wget https://ftp.nluug.nl/pub/graphics/blender/release/Blender4.3/blender-4.3.2-linux-x64.tar.xz
+RUN wget https://download.blender.org/release/Blender4.5/blender-4.5.8-linux-x64.tar.xz
 RUN apt-get install xz-utils -y &&\
-    tar -xvf blender-4.3.2-linux-x64.tar.xz &&\
-    mv blender-4.3.2-linux-x64 /opt/blender &&\
-    rm blender-4.3.2-linux-x64.tar.xz
+    tar -xvf blender-4.5.8-linux-x64.tar.xz &&\
+    mv blender-4.5.8-linux-x64 /opt/blender &&\
+    rm blender-4.5.8-linux-x64.tar.xz
 
 # Install Blender Dependencies
 RUN apt-get install -y \
@@ -66,4 +61,4 @@ RUN apt-get install -y \
     python3 \
     && apt-get clean
 
-WORKDIR /spellcraft
+WORKDIR /n64brew2025
