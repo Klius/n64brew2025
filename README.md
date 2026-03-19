@@ -1,5 +1,13 @@
 # Jam entry
 
+# Building
+
+# Using docker
+
+```
+docker build . -t n64brew2025
+docker run -v ./:/n64brew2025 -it --rm n64brew2025 make
+```
 
 ## wav/mp3 files
 
