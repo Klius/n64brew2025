@@ -2,12 +2,29 @@
 
 # Building
 
-# Using docker
+## Using docker
 
 ```
 docker build . -t n64brew2025
 docker run -v ./:/n64brew2025 -it --rm n64brew2025 make
 ```
+
+## Not using docker
+
+Install the preview branch of libdragon [https://github.com/DragonMinded/libdragon/wiki/Installing-libdragon](https://github.com/DragonMinded/libdragon/wiki/Installing-libdragon)
+
+Install tiny3d [https://github.com/HailToDodongo/tiny3d](https://github.com/HailToDodongo/tiny3d)
+
+Download blender 4.5.8 somewhere on your system [https://download.blender.org/release/Blender4.5/](https://download.blender.org/release/Blender4.5/)
+Then set the environment variable BLENDER_4 to be where the blender executable is located
+
+run
+
+`make`
+
+# Making changes to the game
+
+The build system exports files and levels from blend files. 
 
 ## wav/mp3 files
 
